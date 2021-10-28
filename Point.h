@@ -1,19 +1,19 @@
 #pragma once
 
 class Point {
-	size_t xy[2];
+	unsigned short coord[2]; // [0] == X cord , [1] == Y cord
 public:
 	void setCoord(int x, int y);
-	const size_t* getCoord();
+	const unsigned short* getCoord();
 };
 
 void Point::setCoord(int x, int y)
 {
-	this->xy[0] = x;
-	this->xy[1] = y;
+	coord[0] = x;
+	coord[1] = y;
 }
 
-const size_t* Point::getCoord()
+const unsigned short* Point::getCoord()
 {
-	return xy;
+	return coord;
 }

@@ -3,20 +3,20 @@
 
 cellcontent Cell::getMyContent()
 {
-	return this->myContent;
+	return myContent;
 }
 
 void Cell::setMyContent(cellcontent cont)
 {
-	this->myContent = cont;
+	myContent = cont;
 }
 
-void Cell::setMyCoord(size_t x, size_t y)
+void Cell::setMyCoord(unsigned short x, unsigned short y)
 {
-	this->myCoord.setCoord(x, y);
+	myCoord.setCoord(x, y);
 }
 
-const size_t* Cell::getMyCoord()
+const unsigned short* Cell::getMyCoord()
 {
-	return this->myCoord.getCoord();
+	return myCoord.getCoord();
 }
