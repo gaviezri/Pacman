@@ -7,7 +7,7 @@ class Pacman
 	char avatar = 'C';
 	Point pos;
 public:
-	char asd;
+	int whattime();
 
 };
 
