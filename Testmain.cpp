@@ -4,10 +4,10 @@ using namespace std;
 
 void main()
 {
+
 	Board br;
 
-	br.setField();
-	br.initBoard();
+	//br.setField();
 	br.printBoard();
 
 	

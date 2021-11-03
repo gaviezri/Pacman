@@ -27,7 +27,7 @@
     <ClInclude Include="Board.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Avatar.h">
+    <ClInclude Include="Pacman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,7 +44,7 @@
     <ClCompile Include="Point.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Avatar.cpp">
+    <ClCompile Include="Pacman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
