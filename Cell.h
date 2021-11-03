@@ -16,8 +16,8 @@ class Cell
 	Point myCoord;
 public:
 	cellcontent getMyContent();
-	const size_t* getMyCoord();
+	const unsigned short* getMyCoord();
 	void setMyContent(cellcontent cont);
-	void setMyCoord(size_t x, size_t y);
+	void setMyCoord(unsigned short x, unsigned short y);
 };
 
