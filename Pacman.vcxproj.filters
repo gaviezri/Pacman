@@ -30,6 +30,9 @@
     <ClInclude Include="Pacman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Pack Man\Game.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Cell.cpp">
@@ -45,6 +48,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Pacman.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Pack Man\Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Pack Man\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
