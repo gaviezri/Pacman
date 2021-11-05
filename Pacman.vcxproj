@@ -142,7 +142,7 @@
     <ClInclude Include="Board.h" />
     <ClInclude Include="Cell.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="Pacman.h" />
+    <ClInclude Include="Character.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -151,7 +151,7 @@
     <ClCompile Include="Cell.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Pacman.cpp" />
+    <ClCompile Include="Character.cpp" />
     <ClCompile Include="Point.cpp" />
   </ItemGroup>
   <ItemGroup>

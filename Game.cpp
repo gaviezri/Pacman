@@ -77,44 +77,26 @@ Direction Game::charToDic(char ch)  // converts given char to enum represntation
 
 void Game::play()  //  this is where the magic happens (!)
 {
-	//Board br;
+	Board br;
 	char move;
 	Direction dic = UP; // initialzing for the switch 
+	Character pac('C',Point(25,9)) , ghost1('?',Point(22,6)), ghost2('?', Point(28,6));
 	
 	do
 	{
-		//br.printBoard();  --> need to extract from Gal
 		if (_kbhit())
 		{
 			move = _getch();  // record move only if user enterd one
 			dic = charToDic(move);  // converts given char to enum represntation
+
+			if ( !(br.isWall(dic, pac.getPos().getCoord() )))   // checks if next move is a wall 
+			{
+				pac.updateMove(dic); 
+			}
 		}	
 		
-		switch (dic)
-		{
-		case UP:
-
-			break;
-		case DOWN:
-
-			break;
-		case LEFT:
-
-			break;
-		case RIGHT:
-
-			break;
-		case PAUSE:
-
-			break;
-		case ESC:
-
-			break;
-		default:
-			
-			break;
-		}
-		cout << "gal is gay" << endl;
+		cout << "chill its working just fine" << endl;
+		exit(0);
 		
 	} while (1);
 }
