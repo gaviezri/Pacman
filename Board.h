@@ -2,9 +2,10 @@
 #include "Cell.h"
 #include <conio.h>
 
-const short ROWS = 11;
-const short COLS = 42;
-
+const short ROWS = 13;
+const short COLS = 25;
+const bool bPATH = false;
+const bool bWALL = true;
 
 class Board
 {
@@ -13,7 +14,6 @@ class Board
 	
 public:
 	Board();
-	void initCells();
 	void printBoard();
 	bool isWall(Direction dic, const unsigned short* _pos);
 
