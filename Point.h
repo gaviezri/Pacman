@@ -1,9 +1,28 @@
 #pragma once
+#include <iostream>
+using namespace std;
+
+enum Direction { UP, DOWN, LEFT, RIGHT, PAUSE, ESC };
 
 class Point {
-	unsigned short coord[2]; // [0] == X cord , [1] == Y cord
+	unsigned short coord[2];
+
 public:
-	void setCoord(int x, int y);
-	const unsigned short* getCoord();
+	Point(unsigned short _x = 1, unsigned short _y = 1)
+	{
+		coord[0] = _x;
+		coord[1] = _y;
+	}
+
+	const unsigned short* getCoord()
+	{
+		return coord;
+	}
+
+
+	void setCoord(int _x, int _y);
+
+	void updateCoord(Direction dic);
+
 };
 

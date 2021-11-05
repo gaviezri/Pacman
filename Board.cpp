@@ -23,21 +23,33 @@
 
  Board::Board()
  {
-	 /*for (int i = 0;i<ROWS;++i)
-		 for (int j = 0;j < COLS; ++j)
-		 {
-			 if (IsOnBorder(i,j)&&(!isSecretdoor(i, j))) //top row / col & last row / col are walls by default
-				 field[i][j] = 1;												 //beside secret passages
-
-			 else if(Obstacle(i,j))
-				 field[i][j] = 1;
-			else
-			field[i][j] = 0;
-		 } 	*/
+	
 	 
  }
 	
+ bool Board::isWall(Direction dic, const unsigned short* _pos)   // checks if next move is a wall
+ {
+	 unsigned short x = _pos[0], y = _pos[1];
 
+	 switch (dic)
+	 {
+	 case UP:
+		 return (field[x][--y] == 1);
+		 break;
+	 case DOWN:
+		 return (field[x][++y] == 1);
+		 break;
+	 case LEFT:
+		 return (field[--x][y] == 1);
+		 break;
+	 case RIGHT:
+		 return (field[++x][y] == 1);
+		 break;
+
+	 default:
+		 break;
+	 }
+ }
 	 
  
 void Board::printBoard() //

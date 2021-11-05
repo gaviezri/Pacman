@@ -1,11 +1,7 @@
 #pragma once
+#include "Board.h"
+#include "Character.h"
 
-#include <iostream>
-#include <conio.h>
-
-using namespace std;
-
-enum Direction { UP, DOWN, LEFT, RIGHT, PAUSE, ESC };
 
 
 class Game
