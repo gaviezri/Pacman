@@ -153,7 +153,6 @@
     <ClCompile Include="Cell.cpp" />
     <ClCompile Include="Pacman.cpp" />
     <ClCompile Include="Point.cpp" />
-    <ClCompile Include="Testmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Pacman.rc" />
