@@ -18,7 +18,7 @@ public://score funcs!
 	void setChoice();
 	void printInstructions();
 	void play();
-	Direction charToDic(char ch);
+	//Direction charToDic(char ch);
 	void movement(Direction dic);
 	bool Over(short int bc)//indicator to end game loop
 	{

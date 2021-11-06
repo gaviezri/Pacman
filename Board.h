@@ -14,7 +14,7 @@ class Board
 public:
 	Board();
 	void printBoard();
-	cellcontent nextCellCont(Direction dic, const unsigned short* _pos);
+	short nextCellCont(Direction dic, const unsigned short* _pos);
 
 	void changeFood2Path(Cell cur)
 	{
