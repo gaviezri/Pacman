@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-enum Direction { UP, DOWN, LEFT, RIGHT, PAUSE, ESC };
+enum Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,ESC=12};
 
 class Point {
 	unsigned short coord[2];

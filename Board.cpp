@@ -111,23 +111,23 @@
 	 
  }
 	
- bool Board::isWall(Direction dic, const unsigned short* _pos)   // checks if next move is a wall
+ cellcontent Board::NextCellCont(Direction dic, const unsigned short* _pos)   // checks if next move is a wall
  {
 	 unsigned short x = _pos[0], y = _pos[1];
 
 	 switch (dic)
 	 {
 	 case UP:
-		 return (field[x][--y] == 1);
+		return cells[x][--y].getMyContent();
 		 break;
 	 case DOWN:
-		 return (field[x][++y] == 1);
+		 return (cells[x][++y].getMyContent());
 		 break;
 	 case LEFT:
-		 return (field[--x][y] == 1);
+		 return (cells[--x][y].getMyContent());
 		 break;
 	 case RIGHT:
-		 return (field[++x][y] == 1);
+		 return (cells[++x][y].getMyContent());
 		 break;
 
 	 default:

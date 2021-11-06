@@ -11,12 +11,17 @@ class Board
 {
 	Cell cells[ROWS][COLS];	// the cell of the board
 	bool field[ROWS][COLS]; // 0 == path/food , 1 == wall
+	short int breadcrumbs = 10;//count breadcrumbs!
 	
 public:
 	Board();
 	void printBoard();
-	bool isWall(Direction dic, const unsigned short* _pos);
-
+	cellcontent NextCellCont(Direction dic, const unsigned short* _pos);
+	/*void EatCrumbs(const unsigned short* _pos) //breadcrumbs method
+	{
+		if (cells[_pos[0]][_pos[1]]);
+	}
+	*/
 	//void updateCell(unsigned short x, unsigned short y, cellcontent cont);
 };
 

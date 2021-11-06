@@ -67,36 +67,52 @@ void  Game::printInstructions()
 
 Direction Game::charToDic(char ch)  // converts given char to enum represntation
 {
-	if (ch == 'w' || ch == 'W' || ch == 38) return UP;
-	if (ch == 's' || ch == 'S' || ch == 40) return DOWN;
-	if (ch == 'a' || ch == 'A' || ch == 37) return LEFT;
-	if (ch == 'd' || ch == 'D' || ch == 39) return RIGHT;
+	if (ch == 'w' || ch == 'W' || ch == -32) return UP;
+	if (ch == 's' || ch == 'S' || ch == 80) return DOWN;
+	if (ch == 'a' || ch == 'A' || ch == 75) return LEFT;
+	if (ch == 'd' || ch == 'D' || ch == 77) return RIGHT;
 	if (ch == 'p' || ch == 'P') return PAUSE;
 	if (ch == 27) return ESC;
 }
 
 void Game::play()  //  this is where the magic happens (!)
 {
-	Board br;
-	char move;
-	Direction dic = UP; // initialzing for the switch 
-	Character pac('C',Point(25,9)) , ghost1('?',Point(22,6)), ghost2('?', Point(28,6));
-	
+	//Point def1 = Point(22, 6), def2 = Point(28, 6);// when pac is hit, reset ghosts to default positions * MEMBER!
+	char move=75; //default val?
+	Direction cur_dic =UP, next_dic = UP; // initialzing for the switch 
+	Pacman pac(Point(25, 9));
+	Ghost ghost1(Point(22, 6)), ghost2(Point(28, 6));
+	br.printBoard();
 	do
 	{
 		if (_kbhit())
 		{
 			move = _getch();  // record move only if user enterd one
-			dic = charToDic(move);  // converts given char to enum represntation
+			cur_dic = next_dic;
+			next_dic = charToDic(move);  // converts given char to enum represntation
 
-			if ( !(br.isWall(dic, pac.getPos().getCoord() )))   // checks if next move is a wall 
-			{
-				pac.updateMove(dic); 
-			}
-		}	
+		}
+
+		if (WALL!=br.NextCellCont(dic, pac.getPos().getCoord()))   // checks if next move is a wall 
+		{
+			//Movement(next_dic)
+		}
+		else
+		{
+			
+			//Movement(cur_dic)
+		}
+
+		if (pac.Collision(ghost1, ghost2))
+		{
+			//reset the position of all characters; (no new breadcrumbs!)
+			pac.HitByGhost();
+		}
 		
-		cout << "chill its working just fine" << endl;
-		exit(0);
 		
-	} while (1);
+		
+		//cout << "chill its working just fine" << endl;
+		//exit(0);
+		
+	} while (tbs)*/);rue/*!Over(pac, breadcrum*/
 }
