@@ -111,7 +111,7 @@
 	 
  }
 	
- cellcontent Board::NextCellCont(Direction dic, const unsigned short* _pos)   // checks if next move is a wall
+ cellcontent Board::nextCellCont(Direction dic, const unsigned short* _pos)   // checks if next move is a wall
  {
 	 unsigned short x = _pos[0], y = _pos[1];
 
@@ -138,9 +138,9 @@
  
 void Board::printBoard() 
 {			
-//            1         2         3         4         5 
-		//  012345678901234567890123456789012345678901234567890
-	cout << "###################################################" << endl//0
+//                              1                   2         
+		//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 
+	cout<< "###################################################" << endl//0
 		<< "# . . ### . . . . . . . . . . . . . . . . ### . . #" << endl//1 // play occurs on even indexes cells only (because of spaces between chars
 		<< "# . ##### . ### . ############### . ### . ##### . #" << endl//2
 		<< "# . . . . . ### . . . . . . . . . . ### . . . . . #" << endl//3

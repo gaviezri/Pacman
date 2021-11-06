@@ -1,8 +1,10 @@
 #pragma once
 #include <iostream>
+#include <Windows.h>
 using namespace std;
 
 enum Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,ESC=12};
+
 
 class Point {
 	unsigned short coord[2];
@@ -26,3 +28,4 @@ public:
 
 };
 
+void gotoxy(int x, int y);

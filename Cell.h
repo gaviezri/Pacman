@@ -12,11 +12,27 @@ class Cell
 {
 	cellcontent myContent;
 	Point myCoord;
+
 public:
-	cellcontent getMyContent();
-	const unsigned short* getMyCoord();
-	void setMyContent(cellcontent cont);
-	void setMyCoord(unsigned short x, unsigned short y);
+	cellcontent getMyContent()
+	{
+		return myContent;
+	}
+
+	const unsigned short* getMyCoord()
+	{
+		return myCoord.getCoord();
+	}
+
+	void setMyContent(cellcontent cont)
+	{
+		myContent = cont;
+	}
+
+	void setMyCoord(unsigned short x, unsigned short y)
+	{
+		myCoord.setCoord(x, y);
+	}
 
 };
 
