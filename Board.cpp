@@ -7,108 +7,97 @@
 	 for (int i = 0; i < ROWS; i++)//HARDCODED
 	 {
 		 for (int j = 0; j < COLS; j++) // true == bWALL , false == bPATH
-		 {
+		 {	
+			 cells[i][j].setMyCoord(i, j);
+
 			 if (i == 0 || i == ROWS - 1 || (i != 7 && (j == 0 || j == COLS - 1)))
-				 field[i][j] = bWALL;
+				 cells[i][j].setMyContent(WALL);
 			 else if (i == 1)
 			 {
 				 if (j == 3 || j == 4 || j == 21 || j == 22)
-					 field[i][j] = bWALL;
+					 cells[i][j].setMyContent(WALL);
 				 else
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 			 }
 			 else if (i == 2)
 			 {
 				 if (j == 1 || j == 5 || j == 8 || j == 17 || j == 20 || j == 24)
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 				 else
-					 field[i][j] = bWALL;
+					 cells[i][j].setMyContent(WALL);
 			 }
 			 else if (i == 3)
 			 {
 				 if (j == 6 || j == 7 || j == 18 || j == 19)
-					 field[i][j] = bWALL;
+					 cells[i][j].setMyContent(WALL);
 				 else
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 			 }
 			 else if (i == 4)
 			 {
 				 if (j == 1 || j == 8 || j == 17 || j == 24)
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 				 else
-					 field[i][j] = bWALL;
+					 cells[i][j].setMyContent(WALL);;
 			 }
 			 else if (i == 5)
 			 {
 				 if (j == 3 || j == 22)
-					 field[i][j] = bWALL;
+					 cells[i][j].setMyContent(WALL);
 				 else
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 			 }
 			 else if (i == 6)
 			 {
 				 if (j == 4 || j == 6 || j == 19 || j == 21)
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 				 else
-					 field[i][j] = bWALL;
+					 cells[i][j].setMyContent(WALL);
 			 }
 			 else if (i == 7)
 			 {
-				 if (j > 8 && j < 17)
-					 field[i][j] = bWALL;
+				 if((j>=0 && j<=3)||(j>=22 && j<=25))
+					 cells[i][j].setMyContent(PATH);
+				 else if (j > 8 && j < 17)
+					 cells[i][j].setMyContent(WALL);
 				 else
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 			 }
 			 else if (i == 8)
 			 {
 				 if (j == 4 || j == 6 || j == 19 || j == 21)
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 				 else
-					 field[i][j] = bWALL;
+					 cells[i][j].setMyContent(WALL);
 			 }
 			 else if (i == 9)
 			 {
-				 if (j == 7 || j == 18)
-					 field[i][j] = bWALL;
+				 if(j==12 || j==13)
+					 cells[i][j].setMyContent(PATH);
+
+				 else if (j == 7 || j == 18)
+					 cells[i][j].setMyContent(WALL);
 				 else
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 			 }
 			 else if (i == 10)
 			 {
 				 if (j == 1 || j == 3 || j == 6 || j == 8 || j == 17 || j == 19 || j == 22 || j == 24)
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 				 else
-					 field[i][j] = bWALL;
+					 cells[i][j].setMyContent(WALL);
 			 }
 			 else if (i == 11)
 			 {
 				 if (j == 2 || (j > 10 && j < 15) || j == 23)
-					 field[i][j] = bWALL;
+					 cells[i][j].setMyContent(WALL);
 				 else
-					 field[i][j] = bPATH;
+					 cells[i][j].setMyContent(FOOD);
 			 }
 		 }
 
 
 	 }
-	 for (int i = 0; i < ROWS; ++i)
-		 for (int j = 0; j < COLS; j++)
-		 {
-
-			 cells[i][j].setMyCoord(i, j); //  give cell his coord / id
-
-			 if (!isSecretdoor(i, j)) //  if field == 1 -> its a wall
-			 {
-
-				 cells[i][j].setMyContent(WALL);
-			 }
-			 else if (isSecretdoor(i, j))     //  its a path with food 
-				 cells[i][j].setMyContent(PATH);
-			 else
-				 cells[i][j].setMyContent(FOOD);
-
-		 }
-	 
  }
 	
  cellcontent Board::nextCellCont(Direction dic, const unsigned short* _pos)   // checks if next move is a wall
@@ -138,9 +127,10 @@
  
 void Board::printBoard() 
 {			
-//                              1                   2         
-		//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 
-	cout<< "###################################################" << endl//0
+
+		//                      1                   2       
+		//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+  cout<<"###################################################" << endl//0
 		<< "# . . ### . . . . . . . . . . . . . . . . ### . . #" << endl//1 // play occurs on even indexes cells only (because of spaces between chars
 		<< "# . ##### . ### . ############### . ### . ##### . #" << endl//2
 		<< "# . . . . . ### . . . . . . . . . . ### . . . . . #" << endl//3

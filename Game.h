@@ -13,6 +13,7 @@ class Game
 	Pacman pac;
 
 public://score funcs!
+	void updateDics(Direction& cur, Direction& nxt);
 	void printMenu();
 	void setChoice();
 	void printInstructions();
