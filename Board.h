@@ -4,14 +4,12 @@
 
 const short ROWS = 13;
 const short COLS = 25;
-const bool bPATH = false;
-const bool bWALL = true;
+
 
 class Board
 {
 	Cell cells[ROWS][COLS];	// the cell of the board
-	bool field[ROWS][COLS]; // 0 == path/food , 1 == wall
-	short int breadcrumbs = 10;//count breadcrumbs!
+ 	short int breadcrumbs = 10;//count breadcrumbs!
 	
 public:
 	Board();
@@ -27,7 +25,7 @@ public:
 
 inline bool isSecretdoor(int i, int j)//secret passage check by coord
 {
-	return (i == 5 && (j == 0 || j == 40));
+	return (i == 7 && (j == 0 || j == 25));
 }
 
 

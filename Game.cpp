@@ -77,27 +77,20 @@ Direction Game::charToDic(char ch)  // converts given char to enum represntation
 
 void Game::play()  //  this is where the magic happens (!)
 {
-	//Point def1 = Point(22, 6), def2 = Point(28, 6);// when pac is hit, reset ghosts to default positions * MEMBER!
-	char move=75; //default val?
 	Direction cur_dic =UP, next_dic = UP; // initialzing for the switch 
-	Pacman pac(Point(25, 9));
-	Ghost ghost1(Point(22, 6)), ghost2(Point(28, 6));
+	Ghost ghost1(Point(11, 6)), ghost2(Point(14, 6));
 	br.printBoard();
 	do
 	{
 		if (_kbhit())
 		{
-			move = _getch();  // record move only if user enterd one
-			cur_dic = next_dic;
-			next_dic = charToDic(move);  // converts given char to enum represntation
-
+			updateDics(cur_dic, next_dic);// assign users input to nextdic and save the previous as cur
 		}
-
-		if (WALL!=br.NextCellCont(dic, pac.getPos().getCoord()))   // checks if next move is a wall 
+		if (WALL!=br.NextCellCont(next_dic, pac.getPos().getCoord()))   // checks if next move is a wall 
 		{
 			//Movement(next_dic)
 		}
-		else
+		else if(WALL != br.NextCellCont(cur_dic, pac.getPos().getCoord()))
 		{
 			
 			//Movement(cur_dic)
@@ -105,14 +98,18 @@ void Game::play()  //  this is where the magic happens (!)
 
 		if (pac.Collision(ghost1, ghost2))
 		{
-			//reset the position of all characters; (no new breadcrumbs!)
+			//resetCharacterAndPrintingBREADCRUMBSifNecessary
 			pac.HitByGhost();
 		}
+		 
 		
-		
-		
-		//cout << "chill its working just fine" << endl;
-		//exit(0);
-		
-	} while (tbs)*/);rue/*!Over(pac, breadcrum*/
+	} while (1);/*!Over(pac, breadcrum*/
+}
+
+
+void Game::updateDics(Direction& cur, Direction& nxt)
+{
+	char move = _getch();
+	cur = nxt;
+	nxt = charToDic(move);
 }
