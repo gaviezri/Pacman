@@ -3,7 +3,7 @@
 #include <conio.h>
 
 const short ROWS = 13;
-const short COLS = 25;
+const short COLS = 26;
 
 
 class Board
