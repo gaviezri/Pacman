@@ -4,95 +4,95 @@
 
  Board::Board()
  {
-	 for (int i = 0; i < ROWS; i++)//HARDCODED
+	 for (int y = 0; y < ROWS; y++)//HARDCODED
 	 {
-		 for (int j = 0; j < COLS; j++) 
+		 for (int x = 0; x < COLS; x++) 
 		 {	
-			 cells[i][j].setMyCoord(i, j);
+			 cells[y][x].setMyCoord(y, x);
 
-			 if (i == 0 || i == ROWS - 1 || (i != 7 && (j == 0 || j == COLS - 1)))
-				 cells[i][j].setMyContent(WALL);
-			 else if (i == 1)
+			 if (y == 0 || y == ROWS - 1 || (y != 7 && (x == 0 || x == COLS - 1)))
+				 cells[y][x].setMyContent(WALL);
+			 else if (y == 1)
 			 {
-				 if (j == 3 || j == 4 || j == 21 || j == 22)
-					 cells[i][j].setMyContent(WALL);
+				 if (x == 3 || x == 4 || x == 21 || x == 22)
+					 cells[y][x].setMyContent(WALL);
 				 else
-					 cells[i][j].setMyContent(FOOD);
+					 cells[y][x].setMyContent(FOOD);
 			 }
-			 else if (i == 2)
+			 else if (y == 2)
 			 {
-				 if (j == 1 || j == 5 || j == 8 || j == 17 || j == 20 || j == 24)
-					 cells[i][j].setMyContent(FOOD);
+				 if (x == 1 || x == 5 || x == 8 || x == 17 || x == 20 || x == 24)
+					 cells[y][x].setMyContent(FOOD);
 				 else
-					 cells[i][j].setMyContent(WALL);
+					 cells[y][x].setMyContent(WALL);
 			 }
-			 else if (i == 3)
+			 else if (y == 3)
 			 {
-				 if (j == 6 || j == 7 || j == 18 || j == 19)
-					 cells[i][j].setMyContent(WALL);
+				 if (x == 6 || x == 7 || x == 18 || x == 19)
+					 cells[y][x].setMyContent(WALL);
 				 else
-					 cells[i][j].setMyContent(FOOD);
+					 cells[y][x].setMyContent(FOOD);
 			 }
-			 else if (i == 4)
+			 else if (y == 4)
 			 {
-				 if (j == 1 || j == 8 || j == 17 || j == 24)
-					 cells[i][j].setMyContent(FOOD);
+				 if (x == 1 || x == 8 || x == 17 || x == 24)
+					 cells[y][x].setMyContent(FOOD);
 				 else
-					 cells[i][j].setMyContent(WALL);;
+					 cells[y][x].setMyContent(WALL);;
 			 }
-			 else if (i == 5)
+			 else if (y == 5)
 			 {
-				 if (j == 3 || j == 22)
-					 cells[i][j].setMyContent(WALL);
+				 if (x == 3 || x == 22)
+					 cells[y][x].setMyContent(WALL);
 				 else
-					 cells[i][j].setMyContent(FOOD);
+					 cells[y][x].setMyContent(FOOD);
 			 }
-			 else if (i == 6)
+			 else if (y == 6)
 			 {
-				 if (j == 4 || j == 6 || j == 19 || j == 21)
-					 cells[i][j].setMyContent(FOOD);
+				 if (x == 4 || x == 6 || x == 19 || x == 21)
+					 cells[y][x].setMyContent(FOOD);
 				 else
-					 cells[i][j].setMyContent(WALL);
+					 cells[y][x].setMyContent(WALL);
 			 }
-			 else if (i == 7)
+			 else if (y == 7)
 			 {
-				 if((j>=0 && j<=3)||(j>=22 && j<=25))
-					 cells[i][j].setMyContent(PATH);
-				 else if (j > 8 && j < 17)
-					 cells[i][j].setMyContent(WALL);
+				 if((x>=0 && x<=3)||(x>=22 && x<=25))
+					 cells[y][x].setMyContent(PATH);
+				 else if (x > 8 && x < 17)
+					 cells[y][x].setMyContent(WALL);
 				 else
-					 cells[i][j].setMyContent(FOOD);
+					 cells[y][x].setMyContent(FOOD);
 			 }
-			 else if (i == 8)
+			 else if (y == 8)
 			 {
-				 if (j == 4 || j == 6 || j == 19 || j == 21)
-					 cells[i][j].setMyContent(FOOD);
+				 if (x == 4 || x == 6 || x == 19 || x == 21)
+					 cells[y][x].setMyContent(FOOD);
 				 else
-					 cells[i][j].setMyContent(WALL);
+					 cells[y][x].setMyContent(WALL);
 			 }
-			 else if (i == 9)
+			 else if (y == 9)
 			 {
-				 if(j==12 || j==13)
-					 cells[i][j].setMyContent(PATH);
+				 if(x==12 || x==13)
+					 cells[y][x].setMyContent(PATH);
 
-				 else if (j == 7 || j == 18)
-					 cells[i][j].setMyContent(WALL);
+				 else if (x == 7 || x == 18)
+					 cells[y][x].setMyContent(WALL);
 				 else
-					 cells[i][j].setMyContent(FOOD);
+					 cells[y][x].setMyContent(FOOD);
 			 }
-			 else if (i == 10)
+			 else if (y == 10)
 			 {
-				 if (j == 1 || j == 3 || j == 6 || j == 8 || j == 17 || j == 19 || j == 22 || j == 24)
-					 cells[i][j].setMyContent(FOOD);
+				 if (x == 1 || x == 3 || x == 6 || x == 8 || x == 17 || x == 19 || x == 22 || x == 24)
+					 cells[y][x].setMyContent(FOOD);
 				 else
-					 cells[i][j].setMyContent(WALL);
+					 cells[y][x].setMyContent(WALL);
 			 }
-			 else if (i == 11)
+			 else if (y == 11)
 			 {
-				 if (j == 2 || (j > 10 && j < 15) || j == 23)
-					 cells[i][j].setMyContent(WALL);
+				 if (x == 2 || (x > 10 && x < 15) || x == 23)
+					 cells[y][x].setMyContent(WALL);
 				 else
-					 cells[i][j].setMyContent(FOOD);
+					 cells[y][x].setMyContent(FOOD);
 			 }
 		 }
 
@@ -103,20 +103,22 @@
  short Board::nextCellCont(Direction dic, const unsigned short* _pos)   // checks if next move is a wall
  {
 	 unsigned short x = _pos[0], y = _pos[1];
+	
 
 	 switch (dic)
 	 {
 	 case UP:
-		return cells[x][--y].getMyContent();
+		 return (cells[--y][x].getMyContent());
+
 		 break;
 	 case DOWN:
-		 return (cells[x][++y].getMyContent());
+		 return (cells[++y][x].getMyContent());
 		 break;
 	 case LEFT:
-		 return (cells[--x][y].getMyContent());
+		 return (cells[y][--x].getMyContent());
 		 break;
 	 case RIGHT:
-		 return (cells[++x][y].getMyContent());
+		 return (cells[y][++x].getMyContent());
 		 break;
 
 	 default:

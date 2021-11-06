@@ -87,7 +87,7 @@ void Game::play()  //  this is where the magic happens (!)
 	{
 		if (_kbhit())
 		{
-			updateDics(cur_dic, next_dic);// assign users input to nextdic and save the previous as cur
+			updateDics(cur_dic, next_dic);// assign users input to nextdic and save the previous as cur -- NOT WORKING WELL E_RELEVENT ASSCI KEYS VALUES.
 		}
 
 
@@ -139,7 +139,7 @@ void Game::movement(Direction dic)
 void Game::updateDics(Direction& cur, Direction& nxt)
 {
 	char move;
-	if (_getch() == '\033') { // if the first value is esc
+	
 		_getch(); // skip the [
 		cur = nxt;
 		switch (move = _getch()) { // the real value
@@ -156,7 +156,5 @@ void Game::updateDics(Direction& cur, Direction& nxt)
 			nxt = LEFT;
 			break;
 		}// PAUSE, ESC , DEF
-	}
-
-
+	
 }
