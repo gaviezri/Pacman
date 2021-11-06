@@ -10,7 +10,7 @@ class Pacman
 	Point def_pos = Point(13, 9);  // for printing
 
 public:
-	Pacman() : pos(def_pos) {}
+	Pacman() { pos = def_pos; };
 	
 	short getHP()
 	{

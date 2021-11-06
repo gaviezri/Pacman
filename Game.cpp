@@ -65,19 +65,20 @@ void  Game::printInstructions()
 	
 }
 
-Direction Game::charToDic(char ch)  // converts given char to enum represntation
+/*Direction Game::charToDic(char ch)  // converts given char to enum represntation
 {
 	if (ch == 'w' || ch == 'W' || ch == -32) return UP;
 	if (ch == 's' || ch == 'S' || ch == 80) return DOWN;
 	if (ch == 'a' || ch == 'A' || ch == 75) return LEFT;
 	if (ch == 'd' || ch == 'D' || ch == 77) return RIGHT;
 	if (ch == 'p' || ch == 'P') return PAUSE;
-	if (ch == 27) return ESC;
-}
+	if (ch == 27) return ESC; 
+	return DEF;
+}*/
 
 void Game::play()  //  this is where the magic happens (!)
 {
-	Direction cur_dic =UP, next_dic = UP; // initialzing for the switch 
+	Direction cur_dic = UP, next_dic = UP; // initialzing for the switch 
 
 	Ghost ghost1(Point(11, 6)), ghost2(Point(14, 6));
 
@@ -90,15 +91,15 @@ void Game::play()  //  this is where the magic happens (!)
 		}
 
 
-		if (WALL!=br.nextCellCont(next_dic, pac.getPos().getCoord()))   // checks if next move is a wall 
+		if (WALL != br.nextCellCont(next_dic, pac.getPos().getCoord()))   // checks if next move is a wall RECOGNIZE NEXT AS PATH?!
 
 		{
-			//Movement(next_dic)
+			movement(next_dic);
 		}
-		else if(WALL != br.NextCellCont(cur_dic, pac.getPos().getCoord()))
+		else if (WALL != br.nextCellCont(cur_dic, pac.getPos().getCoord()))
 		{
-			
-			//Movement(cur_dic)
+
+			movement(cur_dic);
 		}
 
 		if (pac.Collision(ghost1, ghost2))
@@ -106,16 +107,16 @@ void Game::play()  //  this is where the magic happens (!)
 			//resetCharacterAndPrintingBREADCRUMBSifNecessary
 			pac.HitByGhost();
 		}
-		 
-		
+
+
 
 	} while (1);/*!Over(pac, breadcrum*/
-
+}
 void Game::movement(Direction dic)
 {
 	const unsigned int& _x = pac.getPos().getCoord()[0], &_y = pac.getPos().getCoord()[1];   //extraction of pacman current position.
 
-	cellcontent cell_c = br.nextCellCont(dic, pac.getPos().getCoord());
+	short cell_c = br.nextCellCont(dic, pac.getPos().getCoord());
 
 	gotoxy(_x * 2, _y); 
 	cout << " ";  //deleting previous pacman symbol from board.
@@ -137,7 +138,25 @@ void Game::movement(Direction dic)
 
 void Game::updateDics(Direction& cur, Direction& nxt)
 {
-	char move = _getch();
-	cur = nxt;
-	nxt = charToDic(move);
+	char move;
+	if (_getch() == '\033') { // if the first value is esc
+		_getch(); // skip the [
+		cur = nxt;
+		switch (move = _getch()) { // the real value
+		case 'A':
+			nxt = UP;
+			break;
+		case 'B':
+			nxt = DOWN;
+			break;
+		case 'C':
+			nxt = RIGHT;
+			break;
+		case 'D':
+			nxt = LEFT;
+			break;
+		}// PAUSE, ESC , DEF
+	}
+
+
 }

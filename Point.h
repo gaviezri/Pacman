@@ -3,7 +3,7 @@
 #include <Windows.h>
 using namespace std;
 
-enum Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,ESC=12};
+enum Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,ESC=12,DEF};
 
 
 class Point {
