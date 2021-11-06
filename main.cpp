@@ -1,7 +1,8 @@
 #include "Game.h"
 
-void main() {
+int main() {
 
 	Game().printMenu();
+	return 0;
 }
 

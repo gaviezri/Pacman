@@ -1,18 +1,35 @@
 #pragma once
 #include "Board.h"
-#include "Character.h"
+#include "Pacman.h"
 
 
 
 class Game
 {
 	short int choice;
-
-public:
+	bool win;
+	short score = 0;
+	Board br;
+public://score funcs!
 	void printMenu();
 	void setChoice();
 	void printInstructions();
 	void play();
 	Direction charToDic(char ch);
+	bool Over(Pacman pac, short int bc)//indicator to end game loop
+	{
+		if (pac.getHP() == 0)
+		{
+			win = false;
+			return true;
+		}
+		else if (bc == 0)
+		{
+			win = true;
+			return true;
+		}
+		else
+			return false;
+	}
 };
 
