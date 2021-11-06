@@ -10,6 +10,8 @@ class Game
 	bool win;
 	short score = 0;
 	Board br;
+	Pacman pac;
+
 public://score funcs!
 	void updateDics(Direction& cur, Direction& nxt);
 	void printMenu();
@@ -17,7 +19,8 @@ public://score funcs!
 	void printInstructions();
 	void play();
 	Direction charToDic(char ch);
-	bool Over(Pacman pac, short int bc)//indicator to end game loop
+	void movement(Direction dic);
+	bool Over(short int bc)//indicator to end game loop
 	{
 		if (pac.getHP() == 0)
 		{

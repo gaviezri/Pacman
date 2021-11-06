@@ -23,8 +23,8 @@ void  Game::setChoice()
 	{
 		cout << "Invalid choice!" << endl;
 
-		std::cin.clear();
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		/*std::cin.clear();
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');*/  // need to ask about this
 
 		cout << "Please select one of the following options." << endl;
 		cout << " 1) Stat a new game" << endl << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl;
@@ -78,7 +78,9 @@ Direction Game::charToDic(char ch)  // converts given char to enum represntation
 void Game::play()  //  this is where the magic happens (!)
 {
 	Direction cur_dic =UP, next_dic = UP; // initialzing for the switch 
+
 	Ghost ghost1(Point(11, 6)), ghost2(Point(14, 6));
+
 	br.printBoard();
 	do
 	{
@@ -86,7 +88,10 @@ void Game::play()  //  this is where the magic happens (!)
 		{
 			updateDics(cur_dic, next_dic);// assign users input to nextdic and save the previous as cur
 		}
-		if (WALL!=br.NextCellCont(next_dic, pac.getPos().getCoord()))   // checks if next move is a wall 
+
+
+		if (WALL!=br.nextCellCont(next_dic, pac.getPos().getCoord()))   // checks if next move is a wall 
+
 		{
 			//Movement(next_dic)
 		}
@@ -103,7 +108,30 @@ void Game::play()  //  this is where the magic happens (!)
 		}
 		 
 		
+
 	} while (1);/*!Over(pac, breadcrum*/
+
+void Game::movement(Direction dic)
+{
+	const unsigned int& _x = pac.getPos().getCoord()[0], &_y = pac.getPos().getCoord()[1];   //extraction of pacman current position.
+
+	cellcontent cell_c = br.nextCellCont(dic, pac.getPos().getCoord());
+
+	gotoxy(_x * 2, _y); 
+	cout << " ";  //deleting previous pacman symbol from board.
+
+	pac.updateMove(dic);  // move pacman in cur_direction
+	gotoxy(_x * 2, _y);
+	cout << "C";
+
+	if (cell_c == FOOD)
+	{
+		score++;
+		br.changeFood2Path(br.getCell(_x, _y));
+	}
+
+
+
 }
 
 

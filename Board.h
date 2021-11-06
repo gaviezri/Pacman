@@ -1,6 +1,6 @@
 #pragma once
 #include "Cell.h"
-#include <conio.h>
+#include <conio.h>  // Y tho?
 
 const short ROWS = 13;
 const short COLS = 26;
@@ -14,21 +14,24 @@ class Board
 public:
 	Board();
 	void printBoard();
-	cellcontent NextCellCont(Direction dic, const unsigned short* _pos);
-	/*void EatCrumbs(const unsigned short* _pos) //breadcrumbs method
+	cellcontent nextCellCont(Direction dic, const unsigned short* _pos);
+
+	void changeFood2Path(Cell cur)
 	{
-		if (cells[_pos[0]][_pos[1]]);
+		cur.setMyContent(PATH);
 	}
-	*/
-	//void updateCell(unsigned short x, unsigned short y, cellcontent cont);
+
+	Cell getCell(short _x, short _y)
+	{
+		return cells[_x][_y];
+	}
+
 };
 
 inline bool isSecretdoor(int i, int j)//secret passage check by coord
 {
 	return (i == 7 && (j == 0 || j == 25));
 }
-
-
 
 
 inline bool IsOnBorder(int i, int j) { return (i == 0 || i == ROWS - 1 || j == 0 || j == COLS - 1); }

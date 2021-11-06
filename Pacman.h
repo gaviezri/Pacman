@@ -7,12 +7,10 @@ class Pacman
 	char avatar = 'C';
 	Point pos;
 	short HP = 3;   //pacmans health
+	Point def_pos = Point(13, 9);  // for printing
 
 public:
-	Pacman( Point _pos)
-	{
-		pos = _pos;
-	}
+	Pacman() : pos(def_pos) {}
 	
 	short getHP()
 	{
