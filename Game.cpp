@@ -65,17 +65,6 @@ void  Game::printInstructions()
 	
 }
 
-/*Direction Game::charToDic(char ch)  // converts given char to enum represntation
-{
-	if (ch == 'w' || ch == 'W' || ch == -32) return UP;
-	if (ch == 's' || ch == 'S' || ch == 80) return DOWN;
-	if (ch == 'a' || ch == 'A' || ch == 75) return LEFT;
-	if (ch == 'd' || ch == 'D' || ch == 77) return RIGHT;
-	if (ch == 'p' || ch == 'P') return PAUSE;
-	if (ch == 27) return ESC; 
-	return DEF;
-}*/
-
 void Game::play()  //  this is where the magic happens (!)
 {
 	Direction cur_dic = UP, next_dic = UP; // initialzing for the switch 
@@ -114,24 +103,25 @@ void Game::play()  //  this is where the magic happens (!)
 }
 void Game::movement(Direction dic)
 {
-	const unsigned int& _x = pac.getPos().getCoord()[0], &_y = pac.getPos().getCoord()[1];   //extraction of pacman current position.
-
+	//const unsigned int& _x = pac.getPos().getCoord()[0], &_y = pac.getPos().getCoord()[1];   //extraction of pacman current position.
+	
 	short cell_c = br.nextCellCont(dic, pac.getPos().getCoord());
 
-	gotoxy(_x * 2, _y); 
+	gotoxy(pac.getPos().getCoord()[0] * 2, pac.getPos().getCoord()[1]);
 	cout << " ";  //deleting previous pacman symbol from board.
 
 	pac.updateMove(dic);  // move pacman in cur_direction
-	gotoxy(_x * 2, _y);
+
+	gotoxy(pac.getPos().getCoord()[0] * 2, pac.getPos().getCoord()[1]);
 	cout << "C";
 
 	if (cell_c == FOOD)
 	{
 		score++;
-		br.changeFood2Path(br.getCell(_x, _y));
+		br.changeFood2Path(br.getCell(pac.getPos().getCoord()[0], pac.getPos().getCoord()[1]));
 	}
 
-
+	Sleep(700);
 
 }
 
@@ -139,22 +129,11 @@ void Game::movement(Direction dic)
 void Game::updateDics(Direction& cur, Direction& nxt)
 {
 	char move;
-	
-		_getch(); // skip the [
-		cur = nxt;
-		switch (move = _getch()) { // the real value
-		case 'A':
-			nxt = UP;
-			break;
-		case 'B':
-			nxt = DOWN;
-			break;
-		case 'C':
-			nxt = RIGHT;
-			break;
-		case 'D':
-			nxt = LEFT;
-			break;
-		}// PAUSE, ESC , DEF
+	move = _getch();
+	cur = nxt;
+	if (move == 'w' || move == 'W') nxt = UP;
+	if (move == 's' || move == 'S') nxt = DOWN;
+	if (move == 'a' || move == 'A') nxt = LEFT;
+	if (move == 'd' || move == 'D') nxt = RIGHT;
 	
 }
