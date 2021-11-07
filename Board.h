@@ -8,9 +8,8 @@ const short COLS = 26;
 
 class Board
 {
-	Cell cells[ROWS][COLS];	// the cell of the board
- 	short int breadcrumbs = 10;//count breadcrumbs!
-	
+	Cell cells[ROWS][COLS];	// CHANGED!
+ 		
 public:
 	Board();
 	void printBoard();
@@ -23,7 +22,7 @@ public:
 
 	Cell getCell(short _x, short _y)
 	{
-		return cells[_x][_y];
+		return cells[_y][_x];
 	}
 
 };
