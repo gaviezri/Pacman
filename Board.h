@@ -9,12 +9,14 @@ const short COLS = 26;
 class Board
 {
 	Cell cells[ROWS][COLS];	// CHANGED!
+	bool colored;
  		
 public:
 	Board();
 	void printBoard();
 	short nextCellCont(Direction dic, const unsigned short* _pos);
-
+	void setcolor(bool val) { colored = val; }
+	bool getcolor() { return colored; }
 	void changeFood2Path(Cell cur)
 	{
 		cur.setMyContent(PATH);

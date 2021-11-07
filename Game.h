@@ -6,6 +6,7 @@
 
 class Game
 {
+	bool colored = false;
 	short int choice;
 	bool win;
 	bool pause = false;

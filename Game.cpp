@@ -1,11 +1,19 @@
-#include "Game.h"
+﻿#include "Game.h"
+
+
+
+
 
 
 void Game::printMenu()
 {
+	short color;
+	cout << "for color mode enter 1, for B&W enter 0 : ";
+	cin >> color;
+	br.setcolor(color == 1 ? true : false);
+	
 	system("cls");
-
-	cout << "#############################################" << endl << endl;
+	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m") << "#############################################" << endl << endl;
 	cout << " Welcome to Gal & Omri's version of PACMAN !" << endl;
 	cout << " Please select one of the following options :" << endl;
 	cout << " 1) Start a new game" << endl << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
@@ -125,7 +133,7 @@ void Game::movement(Direction dic)
 	pac.updateMove(dic);  // move pacman in cur_direction
 
 	gotoxy(pac.getPos().getCoord()[0] * 2, pac.getPos().getCoord()[1]);
-	cout << "C";
+	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m")<<"C";
 
 	if (cell_c == FOOD)
 	{
@@ -143,11 +151,11 @@ void Game::updateDics(Direction& cur, Direction& nxt)
 	char move;
 	move = _getch();
 	
-	if (move == 'w' || move == 'W') nxt = UP;
-	if (move == 's' || move == 'S') nxt = DOWN;
-	if (move == 'a' || move == 'A') nxt = LEFT;
-	if (move == 'd' || move == 'D') nxt = RIGHT;
-	if (move == 'p' || move == 'P') pause = true;
+	if (move == 'w' || move == 'W' || move == '\'') nxt = UP;
+	if (move == 's' || move == 'S' || move == 'ד') nxt = DOWN;
+	if (move == 'a' || move == 'A' || move == 'ש') nxt = LEFT;
+	if (move == 'd' || move == 'D' || move == 'ג') nxt = RIGHT;
+	if (move == 'p' || move == 'P' || move == 'פ') pause = true;
 	
 }
 
