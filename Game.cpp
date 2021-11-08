@@ -7,6 +7,9 @@
 
 void Game::printMenu()
 {
+	ResetGame();
+	br = Board();
+	system("cls");
 	short color;
 	cout << "for color mode enter 1, for B&W enter 0 : ";
 	cin >> color;
@@ -68,102 +71,111 @@ void  Game::printInstructions()
 
 	while (!_kbhit());  /*  the player will let us know that he finished reading and ready to start again*/
 	_getch(); /*  "removes" the key used from screen*/
-
-	Game::printMenu();	
-	
+	printMenu();	
 }
 
 void Game::play()  //  this is where the magic happens (!)
 {
-	bool TEST;
-	Direction cur_dic=DEF , next_dic = DEF; // initialzing for the switch 
-
+	Direction cur_dic=DEF , next_dic = DEF, last_dic = DEF; // initialzing for the switch 
 	Ghost ghost1(Point(11, 6)), ghost2(Point(14, 6));
 
 	br.printBoard();
 	updateDics(cur_dic);//game is frozen until first hit
 	do
-	{
+	{	
 		if (_kbhit())
-		{
-			updateDics(cur_dic, next_dic);// assign users input to nextdic and save the previous as cur -- NOT WORKING WELL E_RELEVENT ASSCI KEYS VALUES.
-		}
-		if (pause)	
+			updateDics(next_dic);// assign next move to next_dic
+		if (pause)	// if P / p was hit
 			pauseGAME();
-		
-		if (WALL != br.nextCellCont(next_dic, pac.getPos().getCoord()))   // checks if next move is a wall RECOGNIZE NEXT AS PATH?!
+		if (pac.isPortaling()) // user cannot engage pacman while he is tunneling, like mario going inside pipes
+		{
+			movement(last_dic);
+			cur_dic = last_dic;
+		}
+		else if (WALL != br.nextCellCont(next_dic, pac.getPos().getCoord()))  //advance to next direction if its not a wall
 		{
 			movement(next_dic);
-			cur_dic = next_dic;
-			next_dic = DEF;
+			last_dic = cur_dic = next_dic;// remember the new directio
+			next_dic = DEF; // default the next direction
 		}
-		else if (WALL != br.nextCellCont(cur_dic, pac.getPos().getCoord()))
-		{
+		else if (WALL != br.nextCellCont(cur_dic, pac.getPos().getCoord())) // advance in current direction if the 
+		{																	// requested next isnt possible
 			movement(cur_dic);
+			last_dic = cur_dic;
 		}
+	
 		if (pac.Collision(ghost1, ghost2))
 		{
-			//resetCharacterAndPrintingBREADCRUMBSifNecessary
-			pac.HitByGhost();
+			pac.HitByGhost(); 
+			//reset ghosts
+			// pauseGAME();
 		}
 
-		TEST = !Over();
+	} while (!Over());
+	if (win == true)
+		Winner();
+	else
+	{
+		//Loser();
+	}
+	
+}
 
-	} while (TEST);
+void Game::ResetGame()
+{
+	pac.resetMe();
+	score = 0;
+	pause = false;
+	win = false;
+	choice = 0;
+	colored = false;
+	
+}
+void Game::Winner()
+{
+	system("cls");
+	cout << "CONGRATULATIONS! You have beaten the damned ghosts and eaten 136 breadcrumbs , champ." << endl;
+	Sleep(5000);
+	printMenu();
 }
 
 void Game::pauseGAME()
 {
 	gotoxy(12, 20);
 	cout << "Press Any Key To Continue.";
-	while (!_getch());
+	_getch();
 	pause = false;
 	gotoxy(12, 20);
 	cout << "                           ";
 }
 void Game::movement(Direction dic)
 {
-	//const unsigned int& _x = pac.getPos().getCoord()[0], &_y = pac.getPos().getCoord()[1];   //extraction of pacman current position.
-	
-	short cell_c = br.nextCellCont(dic, pac.getPos().getCoord());
+	const unsigned short* initial_pacman_pos = pac.getPos().getCoord(), *updated_pacman_pos;   //extraction of pacman current position.
+	short cell_c = br.nextCellCont(dic, initial_pacman_pos);
 
-	gotoxy(pac.getPos().getCoord()[0] * 2, pac.getPos().getCoord()[1]);
-	cout << " ";  //deleting previous pacman symbol from board.
+	pac.updateMove(dic,br.getcolor());  // move pacman in cur_direction !! PRINTING AND DELETING CRUMBS HERE
 
-	pac.updateMove(dic);  // move pacman in cur_direction
-
-	gotoxy(pac.getPos().getCoord()[0] * 2, pac.getPos().getCoord()[1]);
-	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m")<<"C";
+	updated_pacman_pos = pac.getPos().getCoord();
 
 	if (cell_c == FOOD)
 	{
 		score++;
-		br.changeFood2Path(br.getCell(pac.getPos().getCoord()[0], pac.getPos().getCoord()[1]));
+		br.changeFood2Path(br.getCell(updated_pacman_pos[0], updated_pacman_pos[1]));
 	}
-
-	Sleep(500);
-
+	Sleep(90);
 }
 
 
-void Game::updateDics(Direction& cur, Direction& nxt)
+void Game::updateDics( Direction& nxt)
 {
 	char move;
 	move = _getch();
-	
 	if (move == 'w' || move == 'W' || move == '\'') nxt = UP;
 	if (move == 's' || move == 'S' || move == 'ד') nxt = DOWN;
 	if (move == 'a' || move == 'A' || move == 'ש') nxt = LEFT;
 	if (move == 'd' || move == 'D' || move == 'ג') nxt = RIGHT;
 	if (move == 'p' || move == 'P' || move == 'פ') pause = true;
-	
+	if (move == 27){/*reset game*/ printMenu(); }
 }
 
-void Game::updateDics(Direction& cur)
-{
-	char move;
-	move = _getch();
-	if (move == 'a' || move == 'A') cur = LEFT;
-	if (move == 'd' || move == 'D') cur = RIGHT;
 
-}

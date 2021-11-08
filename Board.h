@@ -17,12 +17,12 @@ public:
 	short nextCellCont(Direction dic, const unsigned short* _pos);
 	void setcolor(bool val) { colored = val; }
 	bool getcolor() { return colored; }
-	void changeFood2Path(Cell cur)
+	void changeFood2Path(Cell& cur)//must be given by reference!
 	{
 		cur.setMyContent(PATH);
 	}
 
-	Cell getCell(short _x, short _y)
+	Cell& getCell(const short _x,const short _y)
 	{
 		return cells[_y][_x];
 	}
