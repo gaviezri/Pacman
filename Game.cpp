@@ -1,11 +1,19 @@
-#include "Game.h"
+﻿#include "Game.h"
+
+
+
+
 
 
 void Game::printMenu()
 {
+	short color;
+	cout << "for color mode enter 1, for B&W enter 0 : ";
+	cin >> color;
+	br.setcolor(color == 1 ? true : false);
+	
 	system("cls");
-
-	cout << "#############################################" << endl << endl;
+	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m") << "#############################################" << endl << endl;
 	cout << " Welcome to Gal & Omri's version of PACMAN !" << endl;
 	cout << " Please select one of the following options :" << endl;
 	cout << " 1) Start a new game" << endl << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
@@ -67,39 +75,51 @@ void  Game::printInstructions()
 
 void Game::play()  //  this is where the magic happens (!)
 {
-	Direction cur_dic = UP, next_dic = UP; // initialzing for the switch 
+	bool TEST;
+	Direction cur_dic=DEF , next_dic = DEF; // initialzing for the switch 
 
 	Ghost ghost1(Point(11, 6)), ghost2(Point(14, 6));
 
 	br.printBoard();
+	updateDics(cur_dic);//game is frozen until first hit
 	do
 	{
 		if (_kbhit())
 		{
 			updateDics(cur_dic, next_dic);// assign users input to nextdic and save the previous as cur -- NOT WORKING WELL E_RELEVENT ASSCI KEYS VALUES.
 		}
-
-
+		if (pause)	
+			pauseGAME();
+		
 		if (WALL != br.nextCellCont(next_dic, pac.getPos().getCoord()))   // checks if next move is a wall RECOGNIZE NEXT AS PATH?!
-
 		{
 			movement(next_dic);
+			cur_dic = next_dic;
+			next_dic = DEF;
 		}
 		else if (WALL != br.nextCellCont(cur_dic, pac.getPos().getCoord()))
 		{
-
 			movement(cur_dic);
 		}
-
 		if (pac.Collision(ghost1, ghost2))
 		{
 			//resetCharacterAndPrintingBREADCRUMBSifNecessary
 			pac.HitByGhost();
 		}
 
+		TEST = !Over();
 
+	} while (TEST);
+}
 
-	} while (1);/*!Over(pac, breadcrum*/
+void Game::pauseGAME()
+{
+	gotoxy(12, 20);
+	cout << "Press Any Key To Continue.";
+	while (!_getch());
+	pause = false;
+	gotoxy(12, 20);
+	cout << "                           ";
 }
 void Game::movement(Direction dic)
 {
@@ -113,7 +133,7 @@ void Game::movement(Direction dic)
 	pac.updateMove(dic);  // move pacman in cur_direction
 
 	gotoxy(pac.getPos().getCoord()[0] * 2, pac.getPos().getCoord()[1]);
-	cout << "C";
+	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m")<<"C";
 
 	if (cell_c == FOOD)
 	{
@@ -121,7 +141,7 @@ void Game::movement(Direction dic)
 		br.changeFood2Path(br.getCell(pac.getPos().getCoord()[0], pac.getPos().getCoord()[1]));
 	}
 
-	Sleep(700);
+	Sleep(500);
 
 }
 
@@ -130,10 +150,20 @@ void Game::updateDics(Direction& cur, Direction& nxt)
 {
 	char move;
 	move = _getch();
-	cur = nxt;
-	if (move == 'w' || move == 'W') nxt = UP;
-	if (move == 's' || move == 'S') nxt = DOWN;
-	if (move == 'a' || move == 'A') nxt = LEFT;
-	if (move == 'd' || move == 'D') nxt = RIGHT;
 	
+	if (move == 'w' || move == 'W' || move == '\'') nxt = UP;
+	if (move == 's' || move == 'S' || move == 'ד') nxt = DOWN;
+	if (move == 'a' || move == 'A' || move == 'ש') nxt = LEFT;
+	if (move == 'd' || move == 'D' || move == 'ג') nxt = RIGHT;
+	if (move == 'p' || move == 'P' || move == 'פ') pause = true;
+	
+}
+
+void Game::updateDics(Direction& cur)
+{
+	char move;
+	move = _getch();
+	if (move == 'a' || move == 'A') cur = LEFT;
+	if (move == 'd' || move == 'D') cur = RIGHT;
+
 }
