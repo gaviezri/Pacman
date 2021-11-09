@@ -104,27 +104,30 @@
  {
 	 unsigned short x = _pos[0], y = _pos[1];
 	
+if (x - 1 >= 0 && x + 1 < 26)//index control to prevent runtime when approaching secret passages
+		 switch (dic)
+		 {
+		 case UP:
+			 return (cells[--y][x].getMyContent());
 
-	 switch (dic)
-	 {
-	 case UP:
-		 return (cells[--y][x].getMyContent());
+			 break;
+		 case DOWN:
+			 return (cells[++y][x].getMyContent());
+			 break;
+		 case LEFT:
+			 return (cells[y][--x].getMyContent());
+			 break;
+		 case RIGHT:
+			 return (cells[y][++x].getMyContent());
+			 break;
+		 case DEF:
+			//conditions for secret passage
 
-		 break;
-	 case DOWN:
-		 return (cells[++y][x].getMyContent());
-		 break;
-	 case LEFT:
-		 return (cells[y][--x].getMyContent());
-		 break;
-	 case RIGHT:
-		 return (cells[y][++x].getMyContent());
-		 break;
-
-	 default:
-		 return WALL;
-		 break;
-	 }
+		 default:
+			 return WALL;
+			 break;
+		 }
+	 else return PATH;// secret passage
  }
 	 
  
@@ -133,7 +136,8 @@ void Board::printBoard()
 
 		//                      1                   2       
 		//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
-     cout<< (getcolor() == true ? "\033[34m" : "\033[37m")<<"###################################################" << endl//0
+     cout<< (getcolor() == true ? "\033[34m" : "\033[37m")
+		<< "###################################################" << endl//0
 		<< "# . . ### . . . . . . . . . . . . . . . . ### . . #" << endl//1 // play occurs on even indexes cells only (because of spaces between chars
 		<< "# . ##### . ### . ############### . ### . ##### . #" << endl//2
 		<< "# . . . . . ### . . . . . . . . . . ### . . . . . #" << endl//3

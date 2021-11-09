@@ -15,14 +15,14 @@ class Game
 	Pacman pac;
 
 public://score funcs!
+	void Winner();
 	void pauseGAME();
-	void updateDics(Direction& cur, Direction& nxt);
 	void updateDics(Direction& cur);
 	void printMenu();
 	void setChoice();
 	void printInstructions();
 	void play();
-	//Direction charToDic(char ch);
+	void ResetGame();
 	void movement(Direction dic);
 	bool Over()//indicator to end game loop
 	{

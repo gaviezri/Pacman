@@ -8,7 +8,7 @@ enum Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,ESC=12,DEF};
 
 class Point {
 	unsigned short coord[2];
-
+	friend class Pacman;
 public:
 	Point(unsigned short _x = 1, unsigned short _y = 1)
 	{
@@ -29,5 +29,5 @@ public:
 };
 
 
-void gotoxy(int x, int y);
+void gotoxy(int x=0, int y=0);
 
