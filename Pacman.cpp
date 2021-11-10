@@ -1,5 +1,19 @@
 #include "Pacman.h"
+#include "Ghost.h"
 
+
+void Pacman::movement(Direction dic, Board& br,short& score)
+{
+	short cell_c = br.nextCellCont(dic, pos.coord);
+	updateMove(dic, br.getcolor());
+
+	if (cell_c == FOOD)
+	{
+		score++;
+		br.changeFood2Path(br.getCell(pos.coord[0], pos.coord[1]));
+	}
+	Sleep(100);
+}
 void Pacman::updateMove(Direction dic, bool colored)
 {
 	gotoxy(2 * pos.coord[0], pos.coord[1]);// putting cursor on pac's place and run it over with space

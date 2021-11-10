@@ -3,6 +3,7 @@
 
 void Game::printMenu()
 {
+	cout << "\033[37m";
 	ResetGame();
 	br = Board();
 	system("cls");
@@ -23,7 +24,7 @@ void Game::printMenu()
 
 void  Game::setChoice()
 {
-	cin >> choice;
+	choice = _getch() - 48;
 	system("cls");
 
 	while(choice != 1 && choice != 8 && choice != 9)    /*  makes sure that the player chose one of the given options*/
@@ -33,7 +34,7 @@ void  Game::setChoice()
 		cout << "Please select one of the following options." << endl;
 		cout << " 1) Stat a new game" << endl << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl;
 
-		cin >> choice;
+		choice = _getch()-48;
 		system("cls");
 	}
 
@@ -81,35 +82,29 @@ void Game::play()  //  this is where the magic happens (!)
 			pauseGAME();
 		if (pac.isPortaling()) // user cannot engage pacman while he is tunneling, like mario going inside pipes
 		{
-			movement(last_dic);
+			pac.movement(last_dic,br,score);
 			cur_dic = last_dic;
 		}
 		else if (WALL != br.nextCellCont(next_dic, pac.getPos().getCoord()))  //advance to next direction if its not a wall
 		{
-			movement(next_dic);
+			pac.movement(next_dic, br, score);
 			last_dic = cur_dic = next_dic;// remember the new directio
 			next_dic = DEF; // default the next direction
 		}
 		else if (WALL != br.nextCellCont(cur_dic, pac.getPos().getCoord())) // advance in current direction if the 
 		{																	// requested next isnt possible
-			movement(cur_dic);
+			pac.movement(cur_dic,br,score);
 			last_dic = cur_dic;
 		}
-	
-		/*if (pac.Collision(ghost1, ghost2))
-		{
-			pac.HitByGhost(); 
-			//reset character
-			// pauseGAME();
-		}*/
-
+// ghost movement every other iteration
+// Collision method here 
+    
 	} while (!Over());
 	if (win == true)
 		Winner();
 	else
-	{
-		//Loser();
-	}
+		Loser();
+	
 	
 }
 
@@ -128,8 +123,18 @@ void Game::ResetGame()
 void Game::Winner()
 {
 	system("cls");
-	cout << "CONGRATULATIONS! You have beaten the damned ghosts and eaten 136 breadcrumbs , champ." << endl;
-	Sleep(5000);
+	gotoxy(0, 5);
+	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m")<<"CONGRATULATIONS! You've eaten all the breadcrumbs (Rewards will be sent upon request)." << endl;
+	pauseGAME();
+	printMenu();
+}
+
+void Game::Loser()
+{
+	system("cls");
+	gotoxy(11, 5);
+	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m") << "Yikes! better luck next time..." << endl;
+	pauseGAME();
 	printMenu();
 }
 
@@ -141,22 +146,6 @@ void Game::pauseGAME()
 	pause = false;
 	gotoxy(12, 20);
 	cout << "                           ";
-}
-void Game::movement(Direction dic)
-{
-	const unsigned short* initial_pacman_pos = pac.getPos().getCoord(), *updated_pacman_pos;   //extraction of pacman current position.
-	short cell_c = br.nextCellCont(dic, initial_pacman_pos);
-
-	pac.updateMove(dic,br.getcolor());  // move pacman in cur_direction !! PRINTING AND DELETING CRUMBS HERE
-
-	updated_pacman_pos = pac.getPos().getCoord();
-
-	if (cell_c == FOOD)
-	{
-		score++;
-		br.changeFood2Path(br.getCell(updated_pacman_pos[0], updated_pacman_pos[1]));
-	}
-	Sleep(90);
 }
 
 

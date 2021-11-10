@@ -2,7 +2,6 @@
 #include "GhostBehaviour.h"
 #include "Board.h"
 
-
 class Ghost {
 	const char avatar = 'G';
 	Point cur_pos;
