@@ -9,6 +9,8 @@ enum Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,ESC=12,DEF};
 class Point {
 	unsigned short coord[2];
 	friend class Pacman;
+	friend class Ghost;
+	
 public:
 	Point(unsigned short _x = 1, unsigned short _y = 1)
 	{
@@ -24,7 +26,7 @@ public:
 
 	void setCoord(int _x, int _y);
 
-	void updateCoord(Direction dic);
+	void updateCoord(Direction dic, const char& avatar);
 
 };
 

@@ -5,10 +5,10 @@
 
 class Pacman
 {
-	char avatar = 'C';
+	const char avatar = 'C';
 	Point pos;
 	short HP = 3;   //pacmans health
-	Point def_pos = Point(13, 9);  // for printing
+	const Point def_pos = Point(13, 9);  // for printing
 	bool inPortal=false;
 
 public:

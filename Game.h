@@ -1,5 +1,5 @@
 #pragma once
-#include "Board.h"
+#include "Ghost.h"
 #include "Pacman.h"
 
 
@@ -13,8 +13,11 @@ class Game
 	short score = 0;
 	Board br;
 	Pacman pac;
+	Ghost g1;
+	Ghost g2;
 
 public://score funcs!
+	Game() { Ghost g1(Point(14, 7), LEFT), g2(Point(13, 7), RIGHT); };
 	void Winner();
 	void pauseGAME();
 	void updateDics(Direction& cur);

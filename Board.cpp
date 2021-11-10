@@ -1,7 +1,5 @@
 ﻿#include "Board.h"
 
-
-
  Board::Board()
  {
 	 for (int y = 0; y < ROWS; y++)//HARDCODED
@@ -100,7 +98,7 @@
 	 }
  }
 	
- short Board::nextCellCont(Direction dic, const unsigned short* _pos)   // checks if next move is a wall
+ short Board::nextCellCont(Direction dic, const unsigned short* _pos) const  // checks if next move is a wall
  {
 	 unsigned short x = _pos[0], y = _pos[1];
 	
@@ -130,7 +128,7 @@ if (x - 1 >= 0 && x + 1 < 26)//index control to prevent runtime when approaching
 	 else return PATH;// secret passage
  }
 	 
- 
+
 void Board::printBoard() 
 {			
 

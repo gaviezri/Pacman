@@ -4,7 +4,7 @@ void Pacman::updateMove(Direction dic, bool colored)
 {
 	gotoxy(2 * pos.coord[0], pos.coord[1]);// putting cursor on pac's place and run it over with space
 	cout << " ";
-	pos.updateCoord(dic);
+	pos.updateCoord(dic,'C');
 	if ((pos.coord[0] < 3 || (pos.coord[0] > 22)) && pos.coord[1] == 7)
 		inPortal = true;
 	else

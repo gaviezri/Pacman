@@ -16,7 +16,7 @@ class Cell
 	Point myCoord;
 
 public:
-	short getMyContent()
+	short getMyContent() const
 	{
 		return myContent;
 	}
