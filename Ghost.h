@@ -1,8 +1,7 @@
 #pragma once
-#include "Point.h"
-#include "Cell.h"//might interfere with precompiling
-#include "GhostBehaviour.h"
 
+#include "GhostBehaviour.h"
+#include "Board.h"
 
 class Ghost {
 	char avatar = '?';

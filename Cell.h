@@ -12,11 +12,11 @@ const short FOOD = 2;
 
 class Cell
 {
-	short myContent;
+	mutable short myContent;
 	Point myCoord;
 
 public:
-	short getMyContent()
+	short getMyContent() const
 	{
 		return myContent;
 	}

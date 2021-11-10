@@ -14,9 +14,9 @@ class Board
 public:
 	Board();
 	void printBoard();
-	short nextCellCont(Direction dic, const unsigned short* _pos);
+	short nextCellCont(Direction dic, const unsigned short* _pos) const;
 	void setcolor(bool val) { colored = val; }
-	bool getcolor() { return colored; }
+	bool getcolor() const { return colored; }
 	void changeFood2Path(Cell& cur)//must be given by reference!
 	{
 		cur.setMyContent(PATH);
