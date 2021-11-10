@@ -1,7 +1,5 @@
 ﻿#include "Board.h"
 
-
-
  Board::Board()
  {
 	 for (int y = 0; y < ROWS; y++)//HARDCODED
@@ -130,7 +128,7 @@ if (x - 1 >= 0 && x + 1 < 26)//index control to prevent runtime when approaching
 	 else return PATH;// secret passage
  }
 	 
- 
+
 void Board::printBoard() 
 {			
 

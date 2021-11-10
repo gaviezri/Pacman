@@ -1,10 +1,6 @@
 ﻿#include "Game.h"
 
 
-
-
-
-
 void Game::printMenu()
 {
 	cout << "\033[37m";
@@ -34,6 +30,7 @@ void  Game::setChoice()
 	while(choice != 1 && choice != 8 && choice != 9)    /*  makes sure that the player chose one of the given options*/
 	{
 		cout << "Invalid choice!" << endl;
+
 		cout << "Please select one of the following options." << endl;
 		cout << " 1) Stat a new game" << endl << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl;
 
@@ -74,7 +71,6 @@ void  Game::printInstructions()
 void Game::play()  //  this is where the magic happens (!)
 {
 	Direction cur_dic=DEF , next_dic = DEF, last_dic = DEF; // initialzing for the switch 
-	Ghost ghost1(Point(11, 6)), ghost2(Point(14, 6));
 
 	br.printBoard();
 	updateDics(cur_dic);//game is frozen until first hit
@@ -100,14 +96,9 @@ void Game::play()  //  this is where the magic happens (!)
 			pac.movement(cur_dic,br,score);
 			last_dic = cur_dic;
 		}
-	
-		if (pac.Collision(ghost1, ghost2))
-		{
-			pac.HitByGhost(); 
-			//reset players
-			// pauseGAME();
-		}
-	
+// ghost movement every other iteration
+// Collision method here 
+    
 	} while (!Over());
 	if (win == true)
 		Winner();
@@ -120,12 +111,15 @@ void Game::play()  //  this is where the magic happens (!)
 void Game::ResetGame()
 {
 	pac.resetMe();
+	g1.resetMe();
+	g2.resetMe();
 	score = 0;
 	pause = false;
 	win = false;
 	choice = 0;
 	colored = false;
 }
+
 void Game::Winner()
 {
 	system("cls");

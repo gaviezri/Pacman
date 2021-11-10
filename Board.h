@@ -27,6 +27,11 @@ public:
 		return cells[_y][_x];
 	}
 
+	const Cell getCell(const short _x, const short _y) const
+	{
+		return cells[_y][_x];
+	}
+
 };
 
 inline bool isSecretdoor(int i, int j)//secret passage check by coord
