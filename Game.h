@@ -7,16 +7,16 @@
 class Game
 {
 	bool colored = false;
-	char choice;
-	bool win;
+	char choice=0;
+	bool win=false;
 	bool pause = false;
 	short score = 0;
 	Board br;
 	Pacman pac;
-	Ghost g1;
-	Ghost g2;
-	Game() { Ghost g1(Point(14, 7), LEFT), g2(Point(13, 7), RIGHT); };
+	Ghost g1 = Ghost(Point(11, 7), LEFT);
+	Ghost g2 = Ghost(Point(14, 7), RIGHT);
 public:
+
 	void Loser();
 	void Winner();
 	void pauseGAME();

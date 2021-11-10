@@ -134,7 +134,7 @@ void Board::printBoard()
 
 		//                      1                   2       
 		//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
-     cout<< (getcolor() == true ? "\033[34m" : "\033[37m")
+     cout<< (getcolor() ? "\033[34m" : "\033[37m")
 		<< "###################################################" << endl//0
 		<< "# . . ### . . . . . . . . . . . . . . . . ### . . #" << endl//1 // play occurs on even indexes cells only (because of spaces between chars
 		<< "# . ##### . ### . ############### . ### . ##### . #" << endl//2
