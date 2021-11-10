@@ -104,17 +104,16 @@ void Game::play()  //  this is where the magic happens (!)
 		if (pac.Collision(ghost1, ghost2))
 		{
 			pac.HitByGhost(); 
-			//reset ghosts
+			//reset players
 			// pauseGAME();
 		}
-		Loser();
+	
 	} while (!Over());
 	if (win == true)
 		Winner();
 	else
-	{
-		//Loser();
-	}
+		Loser();
+	
 	
 }
 
@@ -130,7 +129,8 @@ void Game::ResetGame()
 void Game::Winner()
 {
 	system("cls");
-	cout << "CONGRATULATIONS! You've eaten all the breadcrumbs (Rewards will be sent upon request)." << endl;
+	gotoxy(0, 5);
+	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m")<<"CONGRATULATIONS! You've eaten all the breadcrumbs (Rewards will be sent upon request)." << endl;
 	pauseGAME();
 	printMenu();
 }
@@ -138,7 +138,8 @@ void Game::Winner()
 void Game::Loser()
 {
 	system("cls");
-	cout << "Yikes! better luck next time..." << endl;
+	gotoxy(11, 5);
+	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m") << "Yikes! better luck next time..." << endl;
 	pauseGAME();
 	printMenu();
 }
