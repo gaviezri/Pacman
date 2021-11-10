@@ -86,18 +86,18 @@ void Game::play()  //  this is where the magic happens (!)
 			pauseGAME();
 		if (pac.isPortaling()) // user cannot engage pacman while he is tunneling, like mario going inside pipes
 		{
-			movement(last_dic);
+			pac.movement(last_dic,br,score);
 			cur_dic = last_dic;
 		}
 		else if (WALL != br.nextCellCont(next_dic, pac.getPos().getCoord()))  //advance to next direction if its not a wall
 		{
-			movement(next_dic);
+			pac.movement(next_dic, br, score);
 			last_dic = cur_dic = next_dic;// remember the new directio
 			next_dic = DEF; // default the next direction
 		}
 		else if (WALL != br.nextCellCont(cur_dic, pac.getPos().getCoord())) // advance in current direction if the 
 		{																	// requested next isnt possible
-			movement(cur_dic);
+			pac.movement(cur_dic,br,score);
 			last_dic = cur_dic;
 		}
 	
@@ -152,22 +152,6 @@ void Game::pauseGAME()
 	pause = false;
 	gotoxy(12, 20);
 	cout << "                           ";
-}
-void Game::movement(Direction dic)
-{
-	const unsigned short* initial_pacman_pos = pac.getPos().getCoord(), *updated_pacman_pos;   //extraction of pacman current position.
-	short cell_c = br.nextCellCont(dic, initial_pacman_pos);
-
-	pac.updateMove(dic,br.getcolor());  // move pacman in cur_direction !! PRINTING AND DELETING CRUMBS HERE
-
-	updated_pacman_pos = pac.getPos().getCoord();
-
-	if (cell_c == FOOD)
-	{
-		score++;
-		br.changeFood2Path(br.getCell(updated_pacman_pos[0], updated_pacman_pos[1]));
-	}
-	Sleep(90);
 }
 
 

@@ -100,7 +100,7 @@
 	 }
  }
 	
- short Board::nextCellCont(Direction dic, const unsigned short* _pos)   // checks if next move is a wall
+ short Board::nextCellCont(Direction dic, const unsigned short* _pos) const  // checks if next move is a wall
  {
 	 unsigned short x = _pos[0], y = _pos[1];
 	

@@ -12,6 +12,7 @@ class Pacman
 	bool inPortal=false;
 
 public:
+	void movement(Direction dic, Board& br, short&);
 	bool isPortaling() { return inPortal; }
 	void Portaling(bool mode) { inPortal = mode; }
 	Pacman() { pos = def_pos; };

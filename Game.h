@@ -14,7 +14,7 @@ class Game
 	Board br;
 	Pacman pac;
 
-public://score funcs!
+public:
 	void Loser();
 	void Winner();
 	void pauseGAME();
