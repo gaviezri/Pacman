@@ -96,6 +96,9 @@ void Game::play()  //  this is where the magic happens (!)
 			pac.movement(cur_dic,br,score);
 			last_dic = cur_dic;
 		}
+		g1.Movement(br);
+		g2.Movement(br);
+
 // ghost movement every other iteration
 // Collision method here 
     
