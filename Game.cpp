@@ -7,6 +7,7 @@
 
 void Game::printMenu()
 {
+	cout << "\033[37m";
 	ResetGame();
 	br = Board();
 	system("cls");
@@ -27,20 +28,16 @@ void Game::printMenu()
 
 void  Game::setChoice()
 {
-	cin >> choice;
+	choice = _getch() - 48;
 	system("cls");
 
 	while(choice != 1 && choice != 8 && choice != 9)    /*  makes sure that the player chose one of the given options*/
 	{
 		cout << "Invalid choice!" << endl;
-
-		/*std::cin.clear();
-		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');*/  // need to ask about this
-
 		cout << "Please select one of the following options." << endl;
 		cout << " 1) Stat a new game" << endl << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl;
 
-		cin >> choice;
+		choice = _getch()-48;
 		system("cls");
 	}
 
@@ -110,7 +107,7 @@ void Game::play()  //  this is where the magic happens (!)
 			//reset ghosts
 			// pauseGAME();
 		}
-
+		Loser();
 	} while (!Over());
 	if (win == true)
 		Winner();
@@ -129,13 +126,20 @@ void Game::ResetGame()
 	win = false;
 	choice = 0;
 	colored = false;
-	
 }
 void Game::Winner()
 {
 	system("cls");
-	cout << "CONGRATULATIONS! You have beaten the damned ghosts and eaten 136 breadcrumbs , champ." << endl;
-	Sleep(5000);
+	cout << "CONGRATULATIONS! You've eaten all the breadcrumbs (Rewards will be sent upon request)." << endl;
+	pauseGAME();
+	printMenu();
+}
+
+void Game::Loser()
+{
+	system("cls");
+	cout << "Yikes! better luck next time..." << endl;
+	pauseGAME();
 	printMenu();
 }
 

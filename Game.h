@@ -7,7 +7,7 @@
 class Game
 {
 	bool colored = false;
-	short int choice;
+	char choice;
 	bool win;
 	bool pause = false;
 	short score = 0;
@@ -15,6 +15,7 @@ class Game
 	Pacman pac;
 
 public://score funcs!
+	void Loser();
 	void Winner();
 	void pauseGAME();
 	void updateDics(Direction& cur);
