@@ -1,17 +1,15 @@
 ﻿#include "Game.h"
-void NewRound(Pacman& pac,Ghost& g1,Ghost& g2,Board& br,short& score, bool& colored)
+void Game::NewRound()
 {
-	pac.HitByGhost();
-	pac.resetMe();
-	g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
-	g2.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
-	pac.movement(DEF, br, score);
-	g1.printMe(colored);
-	g2.printMe(colored);
 	if (pac.getHP() != 0)
 	{
-		Game::pauseGAME();
+		pac.HitByGhost();
 		pac.printHP(colored);
+		pauseGAME();
+		pac.resetMe();
+		g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
+		g2.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
+		pac.movement(DEF, br, score);
 	}
 }
 
@@ -91,25 +89,18 @@ void Game::play()  //  this is where the magic happens (!)
 	br.printBoard();
 	updateDics(cur_dic);//game is frozen until first hit
 	pac.printHP(colored);
-	printScore(colored);
+	printScore();
 	pac.movement(DEF, br, score);
 	do
-	{	
-		if (everyothermove)
-		{
-			g1.Movement(br);
-			g2.Movement(br);
-			everyothermove = false;
-		}
-		else
-			everyothermove = true;
-		if (Collision())
-			NewRound(pac,g1,g2,br,score,colored);
-
+	{
 		if (_kbhit())
 			updateDics(next_dic);// assign next move to next_dic
 		if (pause)	// if P / p was hit
 			pauseGAME();
+		if (_kbhit())
+			updateDics(next_dic);// in case user ended PAUSE with the new move
+		
+
 		if (pac.isPortaling()) // user cannot engage pacman while he is tunneling, like mario going inside pipes
 		{
 			pac.movement(last_dic, br, score);//-------------------->>>>> TODO PRINT SCORE METHOD
@@ -128,12 +119,22 @@ void Game::play()  //  this is where the magic happens (!)
 		}
 		else
 			Sleep(300);
+		if (Collision())
+			NewRound();
+		if (everyothermove)
+		{
+			g1.Movement(br);
+			g2.Movement(br);
+			everyothermove = false;
+		}
+		else
+			everyothermove = true;
 		
 		
 		 if (Collision())
-			 NewRound(pac, g1, g2, br, score, colored);
-				
-		 printScore(colored);
+			 NewRound();
+		 cout.flush();
+		 printScore();
 	} while (!Over());
 	if (win == true)
 		Winner();
@@ -150,6 +151,13 @@ bool Game::Collision()
 		return true;
 	return false;
 	
+}
+
+void Game::printScore()
+{
+	 gotoxy(2, 14);
+	 
+	 cout << (colored ? "\033[29m" : "\033[37m") << "SCORE: " << score;
 }
 
 void Game::ResetGame()
