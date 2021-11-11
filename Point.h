@@ -3,7 +3,7 @@
 #include <Windows.h>
 using namespace std;
 
-enum Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,ESC=12,DEF};
+enum Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,STAY=12,DEF};
 
 
 class Point {
@@ -30,6 +30,6 @@ public:
 
 };
 
-
+void ShowConsoleCursor(bool showFlag = false);
 void gotoxy(int x=0, int y=0);
 

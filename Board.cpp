@@ -118,8 +118,6 @@ if (x - 1 >= 0 && x + 1 < 26)//index control to prevent runtime when approaching
 		 case RIGHT:
 			 return (cells[y][++x].getMyContent());
 			 break;
-		 case DEF:
-			//conditions for secret passage
 
 		 default:
 			 return WALL;
