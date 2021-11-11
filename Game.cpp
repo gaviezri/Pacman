@@ -21,7 +21,7 @@ void Game::printMenu()
 	system("cls");
 	short color;
 	cout << "for color mode enter 1, for B&W enter 0 : ";
-	cin >> color;
+	color = _getch() - 48;
 	br.setcolor(color == 1 ? true : false);
 	
 	system("cls");
