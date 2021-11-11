@@ -21,5 +21,5 @@ public:
 	void Movement(const Board& br);
 	void updateMove(Direction dic, bool colored, short cont);
 	void printMe(bool colored) { cout << (colored == true ? "\033[31m" : "\033[37m") << avatar; }
-	void resetMe() { cur_pos = def_pos; def_moves_count = 0; }
+	void resetMe(short cont,bool colored) { gotoxy(2*cur_pos.coord[0], cur_pos.coord[1]); cout << (colored == true ? "\033[34m" : "\033[37m")<< (cont == PATH ? " " : "."); cur_pos = def_pos; def_moves_count = 0; }
 };
