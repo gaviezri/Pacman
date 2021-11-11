@@ -1,15 +1,15 @@
 ﻿#include "Game.h"
 void Game::NewRound()
 {
+	cout << "\a"; // SOUND FOR COLLISON!
 	if (pac.getHP() != 0)
 	{
-		pac.HitByGhost();
-		pac.printHP(colored);
+		pac.HitByGhost();// -1 hp
+		pac.printHP(colored); // 
 		pauseGAME();
-		pac.resetMe();
-		g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
-		g2.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
-		pac.movement(DEF, br, score);
+		pac.resetMe();// reset pac pos
+		g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);//rest ghosts and print their previous cell content back
+		g2.resetMe(br.getCell(g2.getPos()[0], g2.getPos()[1]).getMyContent(), colored);
 	}
 }
 
@@ -82,15 +82,18 @@ void  Game::printInstructions()
 
 void Game::play()  //  this is where the magic happens (!)
 {	
+	ShowConsoleCursor(false);
 	pac.resetHP();
 	colored = br.getcolor();
 	bool everyothermove = true;
 	Direction cur_dic=DEF , next_dic = DEF, last_dic = DEF; // initialzing for the switch 
 	br.printBoard();
-	updateDics(cur_dic);//game is frozen until first hit
-	pac.printHP(colored);
+	pac.printHP(colored); 
 	printScore();
-	pac.movement(DEF, br, score);
+	pac.movement(DEF, br, score);   // PRINTING
+	g1.Movement(br);				//	CHARACTERS BEFORE GAME STARTS
+	g2.Movement(br);				//
+	updateDics(cur_dic);//game is frozen until first hit1
 	do
 	{
 		if (_kbhit())
@@ -100,12 +103,15 @@ void Game::play()  //  this is where the magic happens (!)
 		if (_kbhit())
 			updateDics(next_dic);// in case user ended PAUSE with the new move
 		
+		if (next_dic == STAY)
+			cur_dic = STAY;
 
 		if (pac.isPortaling()) // user cannot engage pacman while he is tunneling, like mario going inside pipes
 		{
 			pac.movement(last_dic, br, score);//-------------------->>>>> TODO PRINT SCORE METHOD
 			cur_dic = last_dic;
 		}
+
 		else if (WALL != br.nextCellCont(next_dic, pac.getPos()))  //advance to next direction if its not a wall
 		{
 			pac.movement(next_dic, br, score);
@@ -131,7 +137,7 @@ void Game::play()  //  this is where the magic happens (!)
 			everyothermove = true;
 		
 		
-		 if (Collision())
+	 if (Collision())
 			 NewRound();
 		 cout.flush();
 		 printScore();
@@ -206,11 +212,11 @@ void Game::updateDics( Direction& nxt)
 	char move;
 	move = _getch();
 	if (move == 'w' || move == 'W' || move == '\'') nxt = UP;
-	if (move == 's' || move == 'S' || move == 'ד') nxt = DOWN;
+	if (move == 'x' || move == 'X' || move == 'ס') nxt = DOWN;
 	if (move == 'a' || move == 'A' || move == 'ש') nxt = LEFT;
 	if (move == 'd' || move == 'D' || move == 'ג') nxt = RIGHT;
-	if (move == 'p' || move == 'P' || move == 'פ') pause = true;
-	if (move == 27){/*reset game*/ printMenu(); }
+	if (move == 's' || move == 'S' || move == 'ד') nxt = STAY;
+	if (move == 'p' || move == 'P' || move == 'פ' || move == 27) pause = true;
 }
 
 
