@@ -1,5 +1,19 @@
 ﻿#include "Game.h"
-
+void NewRound(Pacman& pac,Ghost& g1,Ghost& g2,Board& br,short& score, bool& colored)
+{
+	pac.HitByGhost();
+	pac.resetMe();
+	g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
+	g2.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
+	pac.movement(DEF, br, score);
+	g1.printMe(colored);
+	g2.printMe(colored);
+	if (pac.getHP() != 0)
+	{
+		Game::pauseGAME();
+		pac.printHP(colored);
+	}
+}
 
 void Game::printMenu()
 {
@@ -69,53 +83,80 @@ void  Game::printInstructions()
 }
 
 void Game::play()  //  this is where the magic happens (!)
-{
+{	
+	pac.resetHP();
+	colored = br.getcolor();
+	bool everyothermove = true;
 	Direction cur_dic=DEF , next_dic = DEF, last_dic = DEF; // initialzing for the switch 
-
 	br.printBoard();
 	updateDics(cur_dic);//game is frozen until first hit
+	pac.printHP(colored);
+	printScore(colored);
+	pac.movement(DEF, br, score);
 	do
 	{	
+		if (everyothermove)
+		{
+			g1.Movement(br);
+			g2.Movement(br);
+			everyothermove = false;
+		}
+		else
+			everyothermove = true;
+		if (Collision())
+			NewRound(pac,g1,g2,br,score,colored);
+
 		if (_kbhit())
 			updateDics(next_dic);// assign next move to next_dic
 		if (pause)	// if P / p was hit
 			pauseGAME();
 		if (pac.isPortaling()) // user cannot engage pacman while he is tunneling, like mario going inside pipes
 		{
-			pac.movement(last_dic,br,score);
+			pac.movement(last_dic, br, score);//-------------------->>>>> TODO PRINT SCORE METHOD
 			cur_dic = last_dic;
 		}
-		else if (WALL != br.nextCellCont(next_dic, pac.getPos().getCoord()))  //advance to next direction if its not a wall
+		else if (WALL != br.nextCellCont(next_dic, pac.getPos()))  //advance to next direction if its not a wall
 		{
 			pac.movement(next_dic, br, score);
 			last_dic = cur_dic = next_dic;// remember the new directio
 			next_dic = DEF; // default the next direction
 		}
-		else if (WALL != br.nextCellCont(cur_dic, pac.getPos().getCoord())) // advance in current direction if the 
+		else if (WALL != br.nextCellCont(cur_dic, pac.getPos())) // advance in current direction if the 
 		{																	// requested next isnt possible
-			pac.movement(cur_dic,br,score);
+			pac.movement(cur_dic, br, score);
 			last_dic = cur_dic;
 		}
-		g1.Movement(br);
-		g2.Movement(br);
-
-// ghost movement every other iteration
-// Collision method here 
-    
+		else
+			Sleep(300);
+		
+		
+		 if (Collision())
+			 NewRound(pac, g1, g2, br, score, colored);
+				
+		 printScore(colored);
 	} while (!Over());
 	if (win == true)
 		Winner();
 	else
 		Loser();
-	
+}
+
+bool Game::Collision()
+{
+	const unsigned short* PAC = pac.getPos(), *G1 = g1.getPos(), *G2 = g2.getPos();
+	if (PAC[0] == G1[0] && PAC[1] == G1[1])
+		return true;
+	if (PAC[0] == G2[0] && PAC[1] == G2[1])
+		return true;
+	return false;
 	
 }
 
 void Game::ResetGame()
 {
 	pac.resetMe();
-	g1.resetMe();
-	g2.resetMe();
+	g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
+	g2.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
 	score = 0;
 	pause = false;
 	win = false;

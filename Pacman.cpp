@@ -1,6 +1,11 @@
 #include "Pacman.h"
 #include "Ghost.h"
 
+void Pacman::printHP(bool colored)
+{
+	gotoxy(39, 14); cout << "                           ";
+	gotoxy(39, 14); cout << (colored == true ? "\033[34m" : "\033[37m") <<"LIVES: "; for (int i = 0; i < HP; i++) cout << (colored == true ? "\033[33m" : "\033[37m") << avatar << " ";
+}
 
 void Pacman::movement(Direction dic, Board& br,short& score)
 {
@@ -12,7 +17,7 @@ void Pacman::movement(Direction dic, Board& br,short& score)
 		score++;
 		br.changeFood2Path(br.getCell(pos.coord[0], pos.coord[1]));
 	}
-	Sleep(100);
+	Sleep(300);
 }
 void Pacman::updateMove(Direction dic, bool colored)
 {

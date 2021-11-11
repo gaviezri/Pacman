@@ -37,29 +37,33 @@ void Ghost::Movement(const Board& br)//FIX BUGS HERE
 		updateMove(UP, br.getcolor(), 0);
 		def_moves_count++;
 	}
-	else if (def_moves_count == 4 || def_moves_count == 3)
+	else if (def_moves_count == 4 || def_moves_count == 5)
 	{
 		cur_move = first_move;
 		updateMove(cur_move , color, 1);
+		def_moves_count++;
 	}
 	else
 	{
 		short cont_around[4], wall_counter = 0, next_cont;
 		bool path_around[4];
-		cont_around[UP] = br.getCell(cur_pos.coord[0], --cur_pos.coord[1]).getMyContent(),
-			cont_around[DOWN] = br.getCell(cur_pos.coord[0], ++cur_pos.coord[1]).getMyContent(),
-			cont_around[LEFT] = br.getCell(--cur_pos.coord[0], cur_pos.coord[1]).getMyContent(),
-			cont_around[RIGHT] = br.getCell(++cur_pos.coord[0], cur_pos.coord[1]).getMyContent();
-
-		for (auto cont : cont_around)
+		cont_around[UP] = br.getCell(cur_pos.coord[0], cur_pos.coord[1]-1).getMyContent(),
+		cont_around[DOWN] = br.getCell(cur_pos.coord[0],1+cur_pos.coord[1]).getMyContent(),
+			cont_around[LEFT] = br.getCell(cur_pos.coord[0]-1, cur_pos.coord[1]).getMyContent(),
+			cont_around[RIGHT] = br.getCell(1+cur_pos.coord[0], cur_pos.coord[1]).getMyContent();
+		if (cur_pos.coord[0] == 4 && cur_pos.coord[1] == 7)
+			cont_around[LEFT] = WALL;
+		if (cur_pos.coord[0] == 21 && cur_pos.coord[1] == 7)
+			cont_around[RIGHT] = WALL;
+		for (int i = 0 ;i<4; i ++)
 		{
-			if (cont == WALL)
+			if (cont_around[i] == WALL)
 			{
 				wall_counter++; // counting walls around ghost pos
-				path_around[cont] = false;
+				path_around[i] = false;
 			}
 			else
-				path_around[cont] = true;
+				path_around[i] = true;
 		}
 		Direction op_dic;
 
@@ -67,34 +71,36 @@ void Ghost::Movement(const Board& br)//FIX BUGS HERE
 
 		path_around[op_dic] = false;  // We want the ghost to treat the opposite direction as if it was a wall.
 
-		if (next_cont == WALL)
+		if (next_cont == WALL || wall_counter == 1 ) // T Or L or DeadEnd  junction approaching T from side or from front
 			switch (wall_counter)
 			{
 			case 3:
-				updateMove(cur_move = op_dic, color, br.getCell(cur_pos.coord[0], cur_pos.coord[1]).getMyContent());
+				updateMove(cur_move = op_dic, color, br.getCell(cur_pos.coord[0], cur_pos.coord[1]).getMyContent());// Dead-End go opposite direction
 				break;
 			case 2:
-				for (int i = 0; i < 4; ++i)
-				{
-					if (path_around[i])
+					switch (rand() % 2)// two ways available, opposite direction or another one thats availabe RANDOMLY :)
 					{
-						updateMove(cur_move = Direction(i), color, br.getCell(cur_pos.coord[0], cur_pos.coord[1]).getMyContent());
-						break;
+						case 0:// opposite
+							updateMove(cur_move = op_dic, color, br.getCell(cur_pos.coord[0], cur_pos.coord[1]).getMyContent());
+							break;
+						case 1://the other possible
+							for(int i =0;i<4;i++)
+								if (path_around[i])
+								{
+									updateMove(cur_move = Direction(i), color, br.getCell(cur_pos.coord[0], cur_pos.coord[1]).getMyContent());
+									break;
+								}
 					}
-				}
-				break;
-			case 1:
+					break;	
+			case 1: // approaching T junction in the split (from the root to the top T)
 				Direction twoOptions[2];
 				for (int j = 0, i = 0; i < 4; ++i)    // we look for the two non-WALL options
 					if (path_around[i]) twoOptions[j++] = (Direction)i;
-
 				updateMove(cur_move = twoOptions[rand() % 2], color, br.getCell(cur_pos.coord[0], cur_pos.coord[1]).getMyContent());  // we randomly choose one of the possible directions and move the ghost there
-				break;
 			}
-
 		else
 			updateMove(cur_move, color, br.getCell(cur_pos.coord[0], cur_pos.coord[1]).getMyContent());  // we randomly choose one of the possible directions and move the ghost there
-	}
+	}	
 }
 
 

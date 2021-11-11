@@ -12,7 +12,7 @@
 				 cells[y][x].setMyContent(WALL);
 			 else if (y == 1)
 			 {
-				 if (x == 3 || x == 4 || x == 21 || x == 22)
+				 if (x==13)
 					 cells[y][x].setMyContent(WALL);
 				 else
 					 cells[y][x].setMyContent(FOOD);
@@ -40,7 +40,7 @@
 			 }
 			 else if (y == 5)
 			 {
-				 if (x == 3 || x == 22)
+				 if (x == 12 || x == 13)
 					 cells[y][x].setMyContent(WALL);
 				 else
 					 cells[y][x].setMyContent(FOOD);
@@ -136,11 +136,11 @@ void Board::printBoard()
 		//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
      cout<< (getcolor() ? "\033[34m" : "\033[37m")
 		<< "###################################################" << endl//0
-		<< "# . . ### . . . . . . . . . . . . . . . . ### . . #" << endl//1 // play occurs on even indexes cells only (because of spaces between chars
+		<< "# . . . . . . . . . . . . # . . . . . . . . . . . #" << endl//1 // play occurs on even indexes cells only (because of spaces between chars
 		<< "# . ##### . ### . ############### . ### . ##### . #" << endl//2
 		<< "# . . . . . ### . . . . . . . . . . ### . . . . . #" << endl//3
 		<< "# . ########### . ############### . ########### . #" << endl//4
-		<< "# . . # . . . . . . . . . . . . . . . . . . # . . #" << endl//5
+		<< "# . . . . . . . . . . . ### . . . . . . . . . . . #" << endl//5
 		<< "####### . ### . #####         ##### . ### . #######" << endl//6
 		<< "        . . . . . ####       #### . . . . .        " << endl//7
 		<< "####### . # . ####################### . # . #######" << endl//8
