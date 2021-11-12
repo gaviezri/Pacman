@@ -14,7 +14,7 @@ void Point::updateCoord(Direction dic, const char& avatar)
 	if (avatar == 'C' && coord[0] == 0 && coord[1] == 7 && dic == LEFT)//entering left secret passage;
 		coord[0] = 25; //transport to right side of board
 	else if (avatar == 'C' && coord[0] == 25 && coord[1] == 7 && dic == RIGHT) //entering right secret passage
-		coord[0] = 0;
+		coord[0] = 0;// ...
 
 	else
 		switch (dic)
@@ -38,7 +38,7 @@ void Point::updateCoord(Direction dic, const char& avatar)
 		}
 
 }
-void ShowConsoleCursor(bool showFlag)
+void ShowConsoleCursor(bool showFlag)// To hide Cursor on console 
 {
 	HANDLE out = GetStdHandle(STD_OUTPUT_HANDLE);
 

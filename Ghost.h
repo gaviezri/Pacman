@@ -1,5 +1,4 @@
 #pragma once
-#include "GhostBehaviour.h"
 #include "Board.h"
 
 class Ghost {

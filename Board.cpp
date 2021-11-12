@@ -2,7 +2,7 @@
 
  Board::Board()
  {
-	 for (int y = 0; y < ROWS; y++)//HARDCODED
+	 for (int y = 0; y < ROWS; y++)//HARDCODED initialization of board cells matrix content
 	 {
 		 for (int x = 0; x < COLS; x++) 
 		 {	
@@ -98,7 +98,7 @@
 	 }
  }
 	
- short Board::nextCellCont(Direction dic, const unsigned short* _pos) const  // checks if next move is a wall
+ short Board::nextCellCont(Direction dic, const unsigned short* _pos) const  // checks whats the content of the next 
  {
 	 unsigned short x = _pos[0], y = _pos[1];
 	
@@ -131,7 +131,7 @@ void Board::printBoard()
 {			
 
 		//                      1                   2       
-		//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
+		//  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5  :: --Game Index--
      cout<< (getcolor() ? "\033[34m" : "\033[37m")
 		<< "###################################################" << endl//0
 		<< "# . . . . . . . . . . . . # . . . . . . . . . . . #" << endl//1 // play occurs on even indexes cells only (because of spaces between chars
@@ -140,13 +140,13 @@ void Board::printBoard()
 		<< "# . ########### . ############### . ########### . #" << endl//4
 		<< "# . . . . . . . . . . . ### . . . . . . . . . . . #" << endl//5
 		<< "####### . ### . #####         ##### . ### . #######" << endl//6
-		<< "        . . . . . ####       #### . . . . .        " << endl//7
+		<< "        . . . . . ####       #### . . . . .        " << endl//7//secret passage
 		<< "####### . # . ####################### . # . #######" << endl//8
 		<< "# . . . . . . # . . . .     . . . . # . . . . . . #" << endl//9
 		<< "# . # . ### . # . ############### . # . ### . # . #" << endl//10
 		<< "# . # . . . . . . . . ####### . . . . . . . . # . #" << endl//11
 		<< "###################################################";//12
-} 	    //  012345678901234567890123456789012345678901234567890
+} 	    //  012345678901234567890123456789012345678901234567890  ::  --Actual Index--
 		//            1         2         3         4         5
 
 
