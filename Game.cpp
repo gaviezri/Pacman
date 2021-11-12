@@ -1,23 +1,23 @@
 ﻿#include "Game.h"
-void Game::NewRound()
+void Game::NewRound() // when pac meets ghost
 {
 	cout << "\a"; // SOUND FOR COLLISON!
 	if (pac.getHP() != 0)
 	{
 		pac.HitByGhost();// -1 hp
-		pac.printHP(colored); // 
-		pauseGAME();
+		pac.printHP(colored); // update remaining lives on screen
 		pac.resetMe();// reset pac pos
-		g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);//rest ghosts and print their previous cell content back
+		g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);//reset ghosts and print their previous cell content back
 		g2.resetMe(br.getCell(g2.getPos()[0], g2.getPos()[1]).getMyContent(), colored);
+		pauseGAME();
 	}
 }
 
 void Game::printMenu()
 {
-	cout << "\033[37m";
+	cout << "\033[37m";// to reset color loaded on cout
 	ResetGame();
-	br = Board();
+	br = Board();// reset br
 	system("cls");
 	short color;
 	cout << "for color mode enter 1, for B&W enter 0 : ";
@@ -39,7 +39,7 @@ void  Game::setChoice()
 	choice = _getch() - 48;
 	system("cls");
 
-	while(choice != 1 && choice != 8 && choice != 9)    /*  makes sure that the player chose one of the given options*/
+	while(choice != 1 && choice != 8 && choice != 9)    //  makes sure that the player chose one of the given options
 	{
 		cout << "Invalid choice!" << endl;
 
@@ -59,7 +59,7 @@ void  Game::setChoice()
 		printInstructions();
 		break;
 	case 9:
-		cout << "Thanks for playing!! see you next time!";
+		cout << endl << endl << endl << "          Thanks for playing!! see you next time!" << endl << endl << endl << endl;
 		exit(1);
 		break; 
 	default:
@@ -75,14 +75,14 @@ void  Game::printInstructions()
 	cout << " To move UP = 'W'" << endl << " To move DOWN = 'X'" << endl << " To move LEFT = 'A'" << endl << " To move RIGHT = 'D'"<<endl<<"To stay in your place = S" << endl;
 	cout << " Press any key for main menu" << endl;
 
-	while (!_kbhit());  /*  the player will let us know that he finished reading and ready to start again*/
-	_getch(); /*  "removes" the key used from screen*/
+	while (!_kbhit());  //  the player will let us know that he finished reading and ready to start again
+	_getch(); //  "removes" the key used from screen
 	printMenu();	
 }
 
 void Game::play()  //  this is where the magic happens (!)
 {	
-	ShowConsoleCursor(false);
+	ShowConsoleCursor(false); 
 	pac.resetHP();
 	colored = br.getcolor();
 	bool everyothermove = true;
@@ -98,12 +98,12 @@ void Game::play()  //  this is where the magic happens (!)
 	{
 		if (_kbhit())
 			updateDics(next_dic);// assign next move to next_dic
-		if (pause)	// if P / p was hit
+		if (pause)	// if P / p /Esc was hit
 			pauseGAME();
 		if (_kbhit())
 			updateDics(next_dic);// in case user ended PAUSE with the new move
 		
-		if (next_dic == STAY)
+		if (next_dic == STAY)// pac is now frozen on the current cell until next input is recieved
 			cur_dic = STAY;
 
 		if (pac.isPortaling()) // user cannot engage pacman while he is tunneling, like mario going inside pipes
@@ -127,28 +127,27 @@ void Game::play()  //  this is where the magic happens (!)
 			Sleep(300);
 		if (Collision())
 			NewRound();
-		if (everyothermove)
+		if (everyothermove)//ghost movement manager that makes ghost move everyother move that pacman makes
 		{
 			g1.Movement(br);
 			g2.Movement(br);
-			everyothermove = false;
+			everyothermove = false;// switch off
 		}
 		else
-			everyothermove = true;
+			everyothermove = true;// switch on
 		
 		
-	 if (Collision())
-			 NewRound();
-		 cout.flush();
+	 if (Collision())//if one of the ghosts and pacman share the same cell
+			 NewRound();//update necessary info and reset avatars to default positions
 		 printScore();
 	} while (!Over());
 	if (win == true)
-		Winner();
+		Winner();// cout message
 	else
-		Loser();
+		Loser();// kanal
 }
 
-bool Game::Collision()
+bool Game::Collision()// ghost and pac share same cell
 {
 	const unsigned short* PAC = pac.getPos(), *G1 = g1.getPos(), *G2 = g2.getPos();
 	if (PAC[0] == G1[0] && PAC[1] == G1[1])
@@ -168,8 +167,8 @@ void Game::printScore()
 
 void Game::ResetGame()
 {
-	pac.resetMe();
-	g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
+	pac.resetMe();//return to def pos 
+	g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);// return to def pos and print back the content of the cell the ghost was on
 	g2.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
 	score = 0;
 	pause = false;
@@ -200,7 +199,7 @@ void Game::pauseGAME()
 {
 	gotoxy(12, 20);
 	cout << "Press Any Key To Continue.";
-	_getch();
+	_getch();//stall the program until a key is hit
 	pause = false;
 	gotoxy(12, 20);
 	cout << "                           ";

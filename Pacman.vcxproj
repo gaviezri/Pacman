@@ -143,21 +143,14 @@
     <ClInclude Include="Cell.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Ghost.h" />
-
-    <ClInclude Include="GhostBehaviour.h" />
-
     <ClInclude Include="Pacman.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
-    <ClCompile Include="Cell.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Ghost.cpp" />
-
-    <ClCompile Include="GhostBehaviour.cpp" />
-
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Pacman.cpp" />
     <ClCompile Include="Point.cpp" />
