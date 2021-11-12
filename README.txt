@@ -3,4 +3,4 @@
  
  This is Our version of Pacman, besides the basic features we added: 'Blinking' score, PC alarm when collision with ghosts, some nice colors.
 
-First try with OOP Programing
+First try with OOP
