@@ -111,7 +111,7 @@ void Game::play()  //  this is where the magic happens (!)
 			pac.movement(last_dic, br, score);//-------------------->>>>> TODO PRINT SCORE METHOD
 			cur_dic = last_dic;
 		}
-
+ 
 		else if (WALL != br.nextCellCont(next_dic, pac.getPos()))  //advance to next direction if its not a wall
 		{
 			pac.movement(next_dic, br, score);
