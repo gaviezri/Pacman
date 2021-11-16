@@ -2,9 +2,9 @@
 void Game::NewRound() // when pac meets ghost
 {
 	cout << "\a"; // SOUND FOR COLLISON!
+	pac.HitByGhost();// -1 hp
 	if (pac.getHP() != 0)
 	{
-		pac.HitByGhost();// -1 hp
 		pac.printHP(colored); // update remaining lives on screen
 		pac.resetMe();// reset pac pos
 		g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);//reset ghosts and print their previous cell content back
@@ -20,7 +20,7 @@ void Game::printMenu()
 	br = Board();// reset br
 	system("cls");
 	short color;
-	cout << "for color mode enter 1, for B&W enter 0 : ";
+	cout << "for color mode enter 1, for B&W enter anything else : ";
 	color = _getch() - 48;
 	br.setcolor(color == 1 ? true : false);
 	
