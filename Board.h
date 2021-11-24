@@ -6,6 +6,7 @@ const short ROWS = 13;
 const short COLS = 26;
 
 
+
 class Board
 {
 	Cell cells[ROWS][COLS];

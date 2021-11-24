@@ -27,17 +27,34 @@ void Game::NewRound() // when pac meets ghost
 	{
 		pac.printHP(colored); // update remaining lives on screen
 		pac.resetMe();// reset pac pos
+		gotoxy(2*pac.getPos()[0],pac.getPos()[1]);
+		pac.printMe(colored);
 		g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);//reset ghosts and print their previous cell content back
 		g2.resetMe(br.getCell(g2.getPos()[0], g2.getPos()[1]).getMyContent(), colored);
 		pauseGAME();
 	}
 }
 
+void Game::setDif()
+{
+	cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	    	
+	char ch=-1;
+	while (ch != 0 && ch != 1 && ch != 2)
+	{
+		cout << "0 = \"Novice\"" << endl << "1 = \"Good\"" << endl << "2 = \"Best\"" << endl;
+		cout << "selection: ";
+		ch = _getch()-48;
+	}
+	Ghost::setDif(ch);
+	system("cls");
+	cout << "LET'S GO!";
+	Sleep(2000);
+	system("cls");
+}
+
 void Game::printMenu()
 {
-	cout << "\033[37m";// to reset color loaded on cout
-	system("cls");
-	PacmanLogo();
 	system("cls");
 	ResetGame();
 	br = Board();// reset br
@@ -51,10 +68,9 @@ void Game::printMenu()
 	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m") << "#############################################" << endl << endl;
 	cout << " Welcome to Gal & Omri's version of PACMAN !" << endl;
 	cout << " Please select one of the following options :" << endl;
-	cout << " 1) Start a new game" << endl << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
+	cout << " 1) Start a new game" << endl<< " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
 	cout << "#############################################" << endl;
 	setChoice();
-
 }
 
 void  Game::setChoice()
@@ -62,12 +78,12 @@ void  Game::setChoice()
 	choice = _getch() - 48;
 	system("cls");
 
-	while(choice != 1 && choice != 8 && choice != 9)    //  makes sure that the player chose one of the given options
+	while(choice != 1 && choice != 8 && choice != 9 )    //  makes sure that the player chose one of the given options
 	{
 		cout << "Invalid choice!" << endl;
 
 		cout << "Please select one of the following options." << endl;
-		cout << " 1) Stat a new game" << endl << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl;
+		cout << " 1) Start a new game" << endl  << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
 
 		choice = _getch()-48;
 		system("cls");
@@ -76,13 +92,14 @@ void  Game::setChoice()
 	switch (choice)
 	{
 	case 1:
-		Game::play();
+		Engine();
 		break;
 	case 8:
 		printInstructions();
 		break;
 	case 9:
 		cout << endl << endl << endl << "          Thanks for playing!! see you next time!" << endl << endl << endl << endl;
+		Sleep(3000);
 		exit(1);
 		break; 
 	default:
@@ -103,15 +120,15 @@ void  Game::printInstructions()
 	printMenu();	
 }
 
-void Game::play()  //  this is where the magic happens (!)
-{	
-	ShowConsoleCursor(false); 
+void Game::Engine()
+{
+	setDif();
 	pac.resetHP();
 	colored = br.getcolor();
 	bool everyothermove = true;
-	Direction cur_dic=DEF , next_dic = DEF, last_dic = DEF; // initialzing for the switch 
+	Direction cur_dic = DEF, next_dic = DEF, last_dic = DEF; // initialzing for the switch 
 	br.printBoard();
-	pac.printHP(colored); 
+	pac.printHP(colored);
 	printScore();
 	pac.movement(DEF, br, score);   // PRINTING
 	g1.Movement(br);				//	CHARACTERS BEFORE GAME STARTS
@@ -127,7 +144,7 @@ void Game::play()  //  this is where the magic happens (!)
 			printMenu();
 		if (_kbhit())
 			updateDics(next_dic);// in case user ended PAUSE with the new move
-		
+
 		if (next_dic == STAY)// pac is now frozen on the current cell until next input is recieved
 			cur_dic = STAY;
 
@@ -160,16 +177,25 @@ void Game::play()  //  this is where the magic happens (!)
 		}
 		else
 			everyothermove = true;// switch on
-		
-		
-	 if (Collision())//if one of the ghosts and pacman share the same cell
-			 NewRound();//update necessary info and reset avatars to default positions
-		 printScore();
+
+
+		if (Collision())//if one of the ghosts and pacman share the same cell
+			NewRound();//update necessary info and reset avatars to default positions
+		printScore();
 	} while (!Over());
 	if (win == true)
 		Winner();// cout message
 	else
 		Loser();// kanal
+}
+
+void Game::play()  //  this is where the magic happens (!)
+{	
+	ShowConsoleCursor(false);
+	cout << "\033[37m";// to reset color loaded on cout
+	system("cls");
+	PacmanLogo();
+	printMenu();
 }
 
 bool Game::Collision()// ghost and pac share same cell

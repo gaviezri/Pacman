@@ -1,18 +1,32 @@
 #pragma once
+
 #include "Board.h"
 
+
+
+
+constexpr enum  Difficulty {
+	NOVICE = 0, GOOD = 1, BEST = 2
+};
+
 class Ghost {
+
+
+
+private:
 	const char avatar = 'G';
 	Point cur_pos;
 	Point def_pos;
 	Direction first_move;
 	Direction cur_move = DEF;
-//	friend class Game;
 	static short def_moves_count;
-
+	static Difficulty diffic;
+	friend class Game;
 public:
+	static void setDif(int );
+	static Difficulty getDif();
 	const unsigned short* getPos() { return cur_pos.getCoord(); }
-	//moving func
+	
 	void PrintME() { cout << avatar; }
 	
 	Ghost(Point _pos, Direction first) { cur_pos = def_pos = _pos; first_move=first; } // (13,7) (14,7) 

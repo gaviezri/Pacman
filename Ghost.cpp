@@ -1,5 +1,27 @@
 #include "Ghost.h"
+ Difficulty Ghost::diffic=NOVICE;
 
+ void Ghost::setDif(int dif)
+{
+	switch (dif)
+	{
+	case 0:
+		diffic = NOVICE;
+		break;
+	case 1:
+		diffic = GOOD;
+		break;
+	case 2:
+		diffic = BEST;
+		break;
+	}
+	
+}
+
+Difficulty Ghost::getDif()
+{
+	return Ghost::diffic;
+}
 
 short Ghost::def_moves_count=0;
 

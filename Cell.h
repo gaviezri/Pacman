@@ -2,9 +2,9 @@
 
 #include "Point.h"
 
-/* remove headers*/
 
-//enum cellcontent {PATH = 0 , WALL = 1 , FOOD = 2 };
+
+
 const short WALL = 1;
 const short PATH = 0;
 const short FOOD = 2;
