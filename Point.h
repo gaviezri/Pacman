@@ -23,6 +23,15 @@ public:
 		return coord;
 	}
 
+	const unsigned short getX()
+	{
+		return coord[0];
+	}
+	const unsigned short getY()
+	{
+		return coord[1];
+	}
+
 
 	void setCoord(int _x, int _y);
 

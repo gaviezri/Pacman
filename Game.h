@@ -12,9 +12,7 @@ class Game
 	short score=0;
 	bool pause;
 	Board br;
-	Pacman pac;
-	Ghost g1 = Ghost(Point(11, 7), LEFT);
-	Ghost g2 = Ghost(Point(14, 7), RIGHT);
+
 public:
 	void setDif();
 	void NewRound();
