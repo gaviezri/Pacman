@@ -93,8 +93,6 @@
 					 cells[y][x].setMyContent(FOOD);
 			 }
 		 }
-
-
 	 }
  }
 	
@@ -107,7 +105,6 @@ if (x - 1 >= 0 && x + 1 < 26)//index control to prevent runtime when approaching
 		 {
 		 case UP:
 			 return (cells[--y][x].getMyContent());
-
 			 break;
 		 case DOWN:
 			 return (cells[++y][x].getMyContent());

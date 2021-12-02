@@ -1,9 +1,5 @@
 #pragma once
-
 #include "Point.h"
-
-
-
 
 const short WALL = 1;
 const short PATH = 0;

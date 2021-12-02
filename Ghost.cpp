@@ -1,4 +1,5 @@
 #include "Ghost.h"
+
  Difficulty Ghost::diffic=NOVICE;
 
  void Ghost::setDif(int dif)
@@ -51,9 +52,11 @@ void nextContAndOpDic(Direction dic, Direction& op_dic, short& next_cont, short*
 	}
 }
 
-void Ghost::Movement(const Board& br)//getting board by reference hence const to avoid corruption & memory efficient matters
+void Ghost::Movement(const _Board& br)//getting board by reference hence const to avoid corruption & memory efficient matters
 {
-	bool color = br.getcolor();            
+	//	bool color = br.getcolor();            
+	// needs to get color bool from game.
+
 	if (def_moves_count < 4)								// this section is to make the ghost leave their cage safely and unharmed.
 	{														//
 		updateMove(UP, br.getcolor(), 0);					// the 1st 3 moves of the ghost is UP-UP->Left/Right
@@ -67,10 +70,10 @@ void Ghost::Movement(const Board& br)//getting board by reference hence const to
 	}
 	else
 	{
-		short cont_around[4], wall_counter = 0, next_cont;		//wall counter count actual walls, path around just indicate wether there is a path and we are manipulating the opposite direction to act
-		// as a wall by changing path_around. and keep wall_counter for real
-		bool path_around[4]; // bool array that indicate by index using enum if theres a path in a given direction
-		cont_around[UP] = br.getCell(cur_pos.coord[0], cur_pos.coord[1]-1).getMyContent(),		//assigning the array of the cells content around current ghost
+		char cont_around[4], next_cont;		//wall counter count actual walls, path around just indicate wether there is a path and we are manipulating the opposite direction to act
+		short wall_counter = 0;            // as a wall by changing path_around. and keep wall_counter for real
+		bool path_around[4];              // bool array that indicate by index using enum if theres a path in a given direction
+		cont_around[UP] = 		//assigning the array of the cells content around current ghost
 		cont_around[DOWN] = br.getCell(cur_pos.coord[0],1+cur_pos.coord[1]).getMyContent(),		// position on the beggining of her move.
 			cont_around[LEFT] = br.getCell(cur_pos.coord[0]-1, cur_pos.coord[1]).getMyContent(),
 			cont_around[RIGHT] = br.getCell(1+cur_pos.coord[0], cur_pos.coord[1]).getMyContent();
