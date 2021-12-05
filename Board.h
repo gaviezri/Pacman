@@ -1,26 +1,45 @@
 #pragma once
-#include "Cell.h"
 #include <conio.h> 
-
-const short ROWS = 13;
-const short COLS = 26;
+#include <vector>
+#include <fstream>
+#include <sstream>
+#include "Pacman.h"
+#include "Ghost.h"
+using std::vector;
 
 
 
 class Board
 {
-	Cell cells[ROWS][COLS];
-	bool colored;
- 		
+	vector<string> Org_map, Play_map;    // We creat 2 identical maps; one to keep for new game beginnings 
+	Pacman pac;						   // and one to play and change in real time.
+	vector<Ghost> ghosts;
+	Point legend;
+	short rows = 0, cols = 0;
+	short breadcrumbs = 0;
+	
+
 public:
 	Board();
-	//void printBoard();
-	//short nextCellCont(Direction dic, const unsigned short* _pos) const;
-	//void setcolor(bool val) { colored = val; }
-	//bool getcolor() const { return colored; }
-	//void changeFood2Path(Cell& cur)	{cur.setMyContent(PATH);}
+	void create_map_from_file();
 	
-	// Overloading getcell by reference is used to change cell content when needed, const to protect board data & efficency 
+	vector<string>& getPlay_map() { return Play_map; }
+	const Point& getlegend() const { return legend; }
+	
+	Pacman& Pac() { return pac; }
+	void movePac(Direction dic, bool colored, short& score);
 
+	const vector<Ghost>& Ghosts() { return ghosts; }
+	void moveGhost(bool colored);
+
+	short getCrumbs() { return breadcrumbs; }
+	char nextCellCont(Point pos, Direction dic);      // returns map-cell contant in a given postion.
+	void changeFood2Path(Point pos) { Play_map[pos.getY()][pos.getX()] = ' '; }
+
+	bool Collision();
+	void printMap(bool colored);
+
+	void resetMap();
+	void resetCharacters() { pac.resetMe(); for (auto g : ghosts) g.resetMe(); }
+	void nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around);
 };
-

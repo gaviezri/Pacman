@@ -1,41 +1,43 @@
 #pragma once
-#include "Board.h"
-#include "Board_2.0.h"  // might rise errors (infinite mutual includings.
+#include "primary_creatures.h"
+#include <vector>
 
-constexpr enum  Difficulty {
+ enum class Difficulty {
+ 
 	NOVICE = 0, GOOD = 1, BEST = 2
 };
 
-class Ghost {
-private:
-	Point cur_pos;
-	Point def_pos;
+ class behaviour
+ {
 
-	Direction first_move;
-	static short def_moves_count;
+ };
 
-	Direction cur_move = DEF;
+
+class Ghost:public primary_creatures {
+
+	Direction cur_move = Direction::UP;
 	static Difficulty diffic;
-	friend class Game;
+	behaviour _behaviour;
+
+	//friend class Game;
 public:
+	Direction getcurDic() { return cur_move; }
+	Direction setcurDic(Direction dic) { cur_move = dic; return cur_move; }
 	static void setDif(int );
 	static Difficulty getDif();
 
-	Point getPos() { return cur_pos; }
+	Point getPos() { return pos; }
 	
 	
-	Ghost(Point _pos, Direction first) { cur_pos = def_pos = _pos; first_move=first; }
+	Ghost(Point _pos) { pos = def_pos = _pos;avatar = 'G'; }
 
-	void resetMe(short cont, bool colored)
-	{
-		gotoxy(2 * cur_pos.coord[0], cur_pos.coord[1]);
-		cout << (colored == true ? "\033[34m" : "\033[37m") << (cont == PATH ? " " : ".");
-		cur_pos = def_pos;
-		def_moves_count = 0;
-	}
+	void AnalyzeAround(char* conts,bool* paths,vector<string> map,const short& rows, const short& cols,short&);
 
-	void Movement(const _Board& br);
+	void resetMe(){pos = def_pos;}
+	void printMe(bool colored){ gotoxy(pos.getX(), pos.getY()); cout << (colored ? "\033[33m" : "\033[37m") << 'G'; }
+
 
 	void updateMove(Direction dic, bool colored, short cont);
 
 };
+

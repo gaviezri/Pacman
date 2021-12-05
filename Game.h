@@ -1,6 +1,5 @@
 #pragma once
-#include "Ghost.h"
-#include "Pacman.h"
+#include "Board.h"
 
 
 
@@ -15,8 +14,14 @@ class Game
 
 public:
 	void setDif();
-	void NewRound();
-	void printScore(); 
+	void Color(){
+		short cho;
+		cout << "for color mode enter 1, for B&W enter anything else : ";
+		cin >> cho;
+		cho == 1 ? colored = true : colored = false;
+	}
+	//void NewRound();
+	void printScore(Point); 
 	void Loser();
 	void Winner();
 	void pauseGAME();
@@ -26,15 +31,15 @@ public:
 	void printInstructions();
 	void play();
 	void ResetGame();
-	bool Collision();
+	void printlegend(Point pt, short hp) { if(pt!=Point(-1,-1)) gotoxy(pt.getX(), pt.getY()); cout << (colored == true ? "\033[33m" : "\033[37m") << "SCORE:" << " " << score << "\t\t" << "LIVES:"; for (int i = 0; i < hp; i++)cout<< (colored == true ? "\033[33m" : "\033[37m") << " C"; }
 	bool Over()//indicator to end game loop
 	{
-		if (pac.getHP() == 0)
+		if (br.Pac().getHP() == 0)
 		{
 			win = false;
 			return true;
 		}
-		if (score == 139)
+		if (score == br.getCrumbs())
 		{
 			win = true;
 			return true;

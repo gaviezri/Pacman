@@ -1,25 +1,41 @@
 ﻿#include "Game.h"
+void PacmanLogo();
 
-void PacmanLogo()
+void Game::play()  //  this is where the magic happens (!)
 {
-	gotoxy(0,10);
-	cout << "     ___        ___           ___           ___           ___           ___" << endl
-		<< "    /  /\\      /  /\\         /  /\\         /__/\\         /  /\\         /__/\\" << endl
-		<< "   /  /::\\    /  /::\\       /  /:/        |  |::\\       /  /::\\        \\  \\:\\" << endl
-		<< "  /  /:/\\:\\  /  /:/\\:\\     /  /:/         |  |:|:\\     /  /:/\\:\\        \\  \\:\\" << endl
-		<< " /  /:/~/:/ /  /:/~/::\\   /  /:/  ___   __|__|:|\\:\\   /  /:/~/::\\   _____\\__\\:\\" << endl
-		<< "/__/:/ /:/ /__/:/ /:/\\:\\ /__/:/  /  /\\ /__/::::| \\:\\ /__/:/ /:/\\:\\ /__/::::::::\\" << endl
-		<< "\\  \\:\\/:/  \\  \\:\\/:/__\\/ \\  \\:\\ /  /:/ \\  \\:\\~~\\__\\/ \\  \\:\/:/__\\/  \\  \\:\\~~\\~~\\/" << endl
-		<< " \\  \\::/    \\  \\::/       \\  \\:\\  /:/   \\  \\:\\        \\  \\::/       \\  \\:\\ ~~~		"<< endl
-		<< "  \\  \\:\\     \\  \\:\\        \\  \\:\\/:/     \\  \\:\\        \\  \\:\\        \\  \\:\\" << endl
-		<< "   \\  \\:\\     \\  \\:\\        \\  \\::/       \\  \\:\\        \\  \\:\\        \\  \\:\\" << endl
-		<< "    \\__\\/      \\__\\/         \\__\\/         \\__\\/         \\__\\/         \\__\\/ ";
-
-	Sleep(2500);
+	ShowConsoleCursor(false);
+	cout << "\033[37m";// to reset color loaded on cout
 	system("cls");
+	PacmanLogo();
+	Color();
+	system("cls");
+menu:
+	printMenu();
+	setChoice();
+	switch (choice)
+	{
+	case 1:
+		Engine();
+		ResetGame();
+		break;
+	case 8:
+		printInstructions();
+		break;
+	case 9:
+		cout << endl << endl << endl << "          Thanks for playing!! see you next time!" << endl << endl << endl << endl;
+		Sleep(3000);
+		exit(1);
+		break;
+	default:
+		break;
+	}
+	goto menu;
 }
 
-void Game::NewRound() // when pac meets ghost
+
+
+
+/*void Game::NewRound() // when pac meets ghost
 {
 	cout << "\a"; // SOUND FOR COLLISON!
 	pac.HitByGhost();// -1 hp
@@ -34,9 +50,10 @@ void Game::NewRound() // when pac meets ghost
 		pauseGAME();
 	}
 }
-
+*/
 void Game::setDif()
 {
+	system("cls");
 	cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
 	    	
 	char ch=-1;
@@ -55,55 +72,29 @@ void Game::setDif()
 
 void Game::printMenu()
 {
-	system("cls");
-	ResetGame();
-	br = Board();// reset br
-	system("cls");
-	short color;
-	cout << "for color mode enter 1, for B&W enter anything else : ";
-	color = _getch() - 48;
-	br.setcolor(color == 1 ? true : false);
 	
 	system("cls");
-	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m") << "#############################################" << endl << endl;
+	cout << (colored ? "\033[33m" : "\033[37m") << "#############################################" << endl << endl;
 	cout << " Welcome to Gal & Omri's version of PACMAN !" << endl;
 	cout << " Please select one of the following options :" << endl;
 	cout << " 1) Start a new game" << endl<< " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
 	cout << "#############################################" << endl;
-	setChoice();
 }
 
 void  Game::setChoice()
 {
 	choice = _getch() - 48;
-	system("cls");
+	
 
 	while(choice != 1 && choice != 8 && choice != 9 )    //  makes sure that the player chose one of the given options
 	{
+		system("cls");
 		cout << "Invalid choice!" << endl;
 
 		cout << "Please select one of the following options." << endl;
 		cout << " 1) Start a new game" << endl  << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
 
 		choice = _getch()-48;
-		system("cls");
-	}
-
-	switch (choice)
-	{
-	case 1:
-		Engine();
-		break;
-	case 8:
-		printInstructions();
-		break;
-	case 9:
-		cout << endl << endl << endl << "          Thanks for playing!! see you next time!" << endl << endl << endl << endl;
-		Sleep(3000);
-		exit(1);
-		break; 
-	default:
-		break;
 	}
 }
 
@@ -116,23 +107,20 @@ void  Game::printInstructions()
 	cout << endl<<" Press any key for main menu" << endl;
 
 	while (!_kbhit());  //  the player will let us know that he finished reading and ready to start again
-	_getch(); //  "removes" the key used from screen
-	printMenu();	
+	_getch(); //  "removes" the key used from screen	
 }
 
 void Game::Engine()
 {
-	setDif();
-	pac.resetHP();
-	colored = br.getcolor();
+	setDif(); // sets the difficulty of the ghosts
+	br.Pac().resetHP();
 	bool everyothermove = true;
-	Direction cur_dic = DEF, next_dic = DEF, last_dic = DEF; // initialzing for the switch 
-	br.printBoard();
-	pac.printHP(colored);
-	printScore();
-	pac.movement(DEF, br, score);   // PRINTING
-	g1.Movement(br);				//	CHARACTERS BEFORE GAME STARTS
-	g2.Movement(br);				//
+	Direction cur_dic = Direction::DEF, next_dic = Direction::DEF, last_dic = Direction:: DEF; // initialzing for the switch 
+	br.printMap(colored);
+	printlegend(br.getlegend(), br.Pac().getHP());
+	br.Pac().PrintMe(colored);   // PRINTING
+	for (auto g : br.Ghosts())
+		g.PrintMe(colored);
 	updateDics(cur_dic);//game is frozen until first hit1
 	do
 	{
@@ -140,48 +128,43 @@ void Game::Engine()
 			updateDics(next_dic);// assign next move to next_dic
 		if (pause)	// if P / p /Esc was hit
 			pauseGAME();
-		if (next_dic == MENU)
+		if (next_dic == Direction::QUIT)
 			printMenu();
 		if (_kbhit())
 			updateDics(next_dic);// in case user ended PAUSE with the new move
 
-		if (next_dic == STAY)// pac is now frozen on the current cell until next input is recieved
-			cur_dic = STAY;
+		if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
+			cur_dic = Direction::STAY;
 
-		if (pac.isPortaling()) // user cannot engage pacman while he is tunneling, like mario going inside pipes
+	
+		else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(),next_dic))  //advance to next direction if its not a wall
 		{
-			pac.movement(last_dic, br, score);//-------------------->>>>> TODO PRINT SCORE METHOD
-			cur_dic = last_dic;
-		}
-
-		else if (WALL != br.nextCellCont(next_dic, pac.getPos()))  //advance to next direction if its not a wall
-		{
-			pac.movement(next_dic, br, score);
+			br.movePac(next_dic, colored,score);
 			last_dic = cur_dic = next_dic;// remember the new directio
-			next_dic = DEF; // default the next direction
+			next_dic = Direction::DEF; // default the next direction
 		}
-		else if (WALL != br.nextCellCont(cur_dic, pac.getPos())) // advance in current direction if the 
+		else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(), cur_dic)) // advance in current direction if the 
 		{																	// requested next isnt possible
-			pac.movement(cur_dic, br, score);
+			br.movePac(cur_dic, colored, score);
 			last_dic = cur_dic;
 		}
-		else
-			Sleep(300);
-		if (Collision())
-			NewRound();
+
+		Sleep(300);
+		if (br.Collision());
+			//NewRound();
 		if (everyothermove)//ghost movement manager that makes ghost move everyother move that pacman makes
 		{
-			g1.Movement(br);
-			g2.Movement(br);
+			br.moveGhost(colored);
+
 			everyothermove = false;// switch off
 		}
 		else
 			everyothermove = true;// switch on
 
 
-		if (Collision())//if one of the ghosts and pacman share the same cell
-			NewRound();//update necessary info and reset avatars to default positions
-		printScore();
+		if (br.Collision());//if one of the ghosts and pacman share the same cell
+			//NewRound();//update necessary info and reset avatars to default positions
+		printScore(br.getlegend());
 	} while (!Over());
 	if (win == true)
 		Winner();// cout message
@@ -189,38 +172,19 @@ void Game::Engine()
 		Loser();// kanal
 }
 
-void Game::play()  //  this is where the magic happens (!)
-{	
-	ShowConsoleCursor(false);
-	cout << "\033[37m";// to reset color loaded on cout
-	system("cls");
-	PacmanLogo();
-	printMenu();
-}
 
-bool Game::Collision()// ghost and pac share same cell
-{
-	const unsigned short* PAC = pac.getPos(), *G1 = g1.getPos(), *G2 = g2.getPos();
-	if (PAC[0] == G1[0] && PAC[1] == G1[1])
-		return true;
-	if (PAC[0] == G2[0] && PAC[1] == G2[1])
-		return true;
-	return false;
-	
-}
 
-void Game::printScore()
+
+void Game::printScore(Point legend)
 {
-	 gotoxy(2, 14);
+	 gotoxy(legend.getX(),legend.getY());
 	 
 	 cout << (colored ? "\033[29m" : "\033[37m") << "SCORE: " << score;
 }
 
 void Game::ResetGame()
 {
-	pac.resetMe();//return to def pos 
-	g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);// return to def pos and print back the content of the cell the ghost was on
-	g2.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);
+	br.resetCharacters();
 	score = 0;
 	pause = false;
 	win = false;
@@ -232,18 +196,17 @@ void Game::Winner()
 {
 	system("cls");
 	gotoxy(0, 5);
-	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m")<<"CONGRATULATIONS! You've eaten all the breadcrumbs (Rewards will be sent upon request)." << endl;
+	cout << (colored ? "\033[33m" : "\033[37m")<<"CONGRATULATIONS! You've eaten all the breadcrumbs (Rewards will be sent upon request)." << endl;
 	pauseGAME();
-	printMenu();
+
 }
 
 void Game::Loser()
 {
 	system("cls");
 	gotoxy(11, 5);
-	cout << (br.getcolor() == true ? "\033[33m" : "\033[37m") << "Yikes! better luck next time..." << endl;
+	cout << (colored ? "\033[33m" : "\033[37m") << "Yikes! better luck next time..." << endl;
 	pauseGAME();
-	printMenu();
 }
 
 void Game::pauseGAME()
@@ -261,13 +224,32 @@ void Game::updateDics( Direction& nxt)
 {
 	char move;
 	move = _getch();
-	if (move == 'w' || move == 'W' || move == '\'') nxt = UP;
-	if (move == 'x' || move == 'X' || move == 'ס') nxt = DOWN;
-	if (move == 'a' || move == 'A' || move == 'ש') nxt = LEFT;
-	if (move == 'd' || move == 'D' || move == 'ג') nxt = RIGHT;
-	if (move == 's' || move == 'S' || move == 'ד') nxt = STAY;
+	if (move == 'w' || move == 'W' || move == '\'') nxt = Direction::UP;
+	if (move == 'x' || move == 'X' || move == 'ס') nxt = Direction::DOWN;
+	if (move == 'a' || move == 'A' || move == 'ש') nxt = Direction::LEFT;
+	if (move == 'd' || move == 'D' || move == 'ג') nxt = Direction::RIGHT;
+	if (move == 's' || move == 'S' || move == 'ד') nxt = Direction::STAY;
 	if (move == 'p' || move == 'P' || move == 'פ' || move == 27) pause = true;
-	if (move == '\t') nxt = MENU;
+	if (move == '\t') nxt = Direction::QUIT;
 }
 
 
+
+void PacmanLogo()
+{
+	gotoxy(0, 10);
+	cout << "     ___        ___           ___           ___           ___           ___" << endl
+		<< "    /  /\\      /  /\\         /  /\\         /__/\\         /  /\\         /__/\\" << endl
+		<< "   /  /::\\    /  /::\\       /  /:/        |  |::\\       /  /::\\        \\  \\:\\" << endl
+		<< "  /  /:/\\:\\  /  /:/\\:\\     /  /:/         |  |:|:\\     /  /:/\\:\\        \\  \\:\\" << endl
+		<< " /  /:/~/:/ /  /:/~/::\\   /  /:/  ___   __|__|:|\\:\\   /  /:/~/::\\   _____\\__\\:\\" << endl
+		<< "/__/:/ /:/ /__/:/ /:/\\:\\ /__/:/  /  /\\ /__/::::| \\:\\ /__/:/ /:/\\:\\ /__/::::::::\\" << endl
+		<< "\\  \\:\\/:/  \\  \\:\\/:/__\\/ \\  \\:\\ /  /:/ \\  \\:\\~~\\__\\/ \\  \\:\/:/__\\/  \\  \\:\\~~\\~~\\/" << endl
+		<< " \\  \\::/    \\  \\::/       \\  \\:\\  /:/   \\  \\:\\        \\  \\::/       \\  \\:\\ ~~~		" << endl
+		<< "  \\  \\:\\     \\  \\:\\        \\  \\:\\/:/     \\  \\:\\        \\  \\:\\        \\  \\:\\" << endl
+		<< "   \\  \\:\\     \\  \\:\\        \\  \\::/       \\  \\:\\        \\  \\:\\        \\  \\:\\" << endl
+		<< "    \\__\\/      \\__\\/         \\__\\/         \\__\\/         \\__\\/         \\__\\/ ";
+
+	Sleep(2500);
+	system("cls");
+}
