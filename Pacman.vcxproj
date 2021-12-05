@@ -140,17 +140,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
-    <ClInclude Include="Board_2.0.h" />
-    <ClInclude Include="Cell.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Ghost.h" />
     <ClInclude Include="Pacman.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="primary_creatures.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Board.cpp" />
-    <ClCompile Include="Board_2.0.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Ghost.cpp" />
     <ClCompile Include="main.cpp" />

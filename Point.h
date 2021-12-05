@@ -3,16 +3,14 @@
 #include <Windows.h>
 using namespace std;
 
-enum Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,STAY=12,DEF,MENU};
-
+enum class Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,STAY=12,DEF,QUIT};
+enum class Content {WALL = (int)'#', PATH = (int)' ', FOOD = (int)'.' };
 
 class Point {
 	unsigned short coord[2];
-	friend class Pacman;
-	friend class Ghost;
 	
 public:
-	Point(unsigned short _x = 1, unsigned short _y = 1)
+	Point(unsigned short _x = -1, unsigned short _y =  -1)
 	{
 		coord[0] = _x;
 		coord[1] = _y;
@@ -32,10 +30,14 @@ public:
 		return coord[1];
 	}
 
-
+	void portals(Direction dic,short,short);
+	
 	void setCoord(int _x, int _y);
 
-	void updateCoord(Direction dic, const char& avatar);
+	bool operator==(const Point&);
+	bool operator!=(const Point&)const;
+
+	void updateCoord(Direction dic);
 
 };
 

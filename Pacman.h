@@ -1,25 +1,21 @@
 #pragma once
-#include "Point.h"
-#include "Board.h"
+#include "primary_creatures.h"
 
 
-class Pacman
+class Pacman:public primary_creatures
 {
-	Point pos;  
-	short HP = 3;   //pacmans health
-	Point def_pos;  // for printing	
 
+	short HP = 3;   //pacmans health
+	
 public:
-	void movement(Direction dic, Board& br, short&);
-	Pacman(Point p) { pos = def_pos = p; };
+	Pacman(Point p) { pos = def_pos = p, avatar = 'C'; };
 	Pacman() {};
-	void resetMe() { pos = def_pos; }
-	short getHP(){return HP;}
-	void printHP(bool s);
+	short getHP() { return HP; }
 	void resetHP() { HP = 3; }
-	void HitByGhost() { --HP; gotoxy(2 * pos.coord[0], pos.coord[1]); cout << " ";  pos = def_pos; }
-	void updateMove(Direction dic, bool colored);
+	void HitByGhost() { --HP; gotoxy(2 * pos.getX(), pos.getY()); cout << " ";  pos = def_pos; }
+	void updateMove(Direction dic, bool colored,short,short);
 	Point getPos() { return pos; }
+	void PrintMe(bool colored) { gotoxy(pos.getX(), pos.getY()); cout << (colored ? "\033[33m" : "\033[37m") << 'C'; }
 };
 
 
