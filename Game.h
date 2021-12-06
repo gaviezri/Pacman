@@ -18,6 +18,7 @@ public:
 	void setDif();
 	void Color(){
 		short cho;
+		setTextColor(Color::WHITE);
 		cout << "for color mode enter 1, for B&W enter anything else : ";
 		cin >> cho;
 		cho == 1 ? colored = true : colored = false;

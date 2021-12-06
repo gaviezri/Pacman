@@ -1,6 +1,7 @@
 ﻿#include "Game.h"
 void PacmanLogo()
 {
+	setTextColor(Color::LIGHTMAGENTA);
 	gotoxy(0, 8);
 	cout << "     ___        ___           ___           ___           ___           ___" << endl
 		<< "    /  /\\      /  /\\         /  /\\         /__/\\         /  /\\         /__/\\" << endl
@@ -21,7 +22,7 @@ void PacmanLogo()
 void Game::play()  //  this is where the magic happens (!)
 {
 	ShowConsoleCursor(false);
-	cout << "\033[37m";// to reset color loaded on cout
+	setTextColor(Color::WHITE);
 	system("cls");
 	PacmanLogo();
 	Color();
@@ -51,13 +52,22 @@ menu:
 
 void Game::printlegend(Point pt, short hp)
 {
+	setTextColor(Color::WHITE);
 	if (br.getLegend_flag()) {
 		gotoxy(pt.getX(), pt.getY());
-
-		cout << (colored == true ? "\033[33m" : "\033[37m") << "SCORE:" << " " << score << "\t\t" << "LIVES:";
-
+		if (colored)
+			setTextColor(Color::LIGHTBLUE);
+		cout << "SCORE:";
+		if (colored)
+			setTextColor(Color::LIGHTRED);
+		cout << score << "\t\t";
+		if (colored)
+			setTextColor(Color::LIGHTBLUE);
+		cout << "LIVES:";
+		if (colored)
+			setTextColor(Color::YELLOW);
 		for (int i = 0; i < hp; i++)
-			cout << (colored == true ? "\033[33m" : "\033[37m") << " C";
+			cout << " C";
 	}
 }
 
@@ -73,8 +83,8 @@ void Game::NewRound() // when pac meets ghost    ----- NEEDS TO BE CHECKED WHEN 
 		printlegend(br.getlegend(), br.Pac().getHP());   // update remaining lives on screen 
 
 		br.Pac().resetMe();// reset pac pos
-		gotoxy(2*(br.Pac().getPos().getX()), br.Pac().getPos().getY());
-		br.Pac().PrintMe(colored);
+		gotoxy((br.Pac().getPos().getX()), br.Pac().getPos().getY());
+		br.Pac().printMe(colored);
 
 		for (int i = 0; i < br.Ghosts().size(); i++) {
 			br.Ghosts(i).resetMe();//reset ghosts 
@@ -105,9 +115,12 @@ void Game::setDif()
 
 void Game::printMenu()
 {
-	
+	if (colored)
+		setTextColor(Color::BROWN);
+	else
+		setTextColor(Color::WHITE);
 	system("cls");
-	cout << (colored ? "\033[33m" : "\033[37m") << "#############################################" << endl << endl;
+	cout << "#############################################" << endl << endl;
 	cout << " Welcome to Gal & Omri's version of PACMAN !" << endl;
 	cout << " Please select one of the following options :" << endl;
 	cout << " 1) Start a new game" << endl<< " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
@@ -151,9 +164,9 @@ void Game::Engine()
 	Direction cur_dic = Direction::DEF, next_dic = Direction::DEF, last_dic = Direction:: DEF; // initialzing for the switch 
 	br.printMap(colored);
 	printlegend(br.getlegend(), br.Pac().getHP());
-	br.Pac().PrintMe(colored);   // PRINTING
+	br.Pac().printMe(colored);   // PRINTING
 	for (auto g : br.Ghosts())
-		g.PrintMe(colored);
+		g.printMe(colored);
 	updateDics(cur_dic);//game is frozen until first hit1
 	do
 	{
@@ -171,7 +184,7 @@ void Game::Engine()
 
 
 		else if (br.portals(cur_dic,br.Pac().getPos()))
-			br.Pac().PrintMe(colored);
+			br.Pac().printMe(colored);
     
 		else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(),next_dic))  //advance to next direction if its not a wall
 		{
@@ -215,9 +228,10 @@ void Game::Engine()
 
 void Game::printScore(Point legend)
 {
-	 gotoxy(legend.getX(),legend.getY());
-	 
-	 cout << (colored ? "\033[29m" : "\033[37m") << "SCORE: " << score;
+	 gotoxy(legend.getX()+6,legend.getY());//6 is a magic number represents the length of "SCORE:"
+	 if(colored)
+		 setTextColor(Color::LIGHTRED);
+	 cout  << score;
 }
 
 void Game::ResetGame()
@@ -234,7 +248,9 @@ void Game::Winner()
 {
 	system("cls");
 	gotoxy(0, 5);
-	cout << (colored ? "\033[33m" : "\033[37m")<<"CONGRATULATIONS! You've eaten all the breadcrumbs (Rewards will be sent upon request)." << endl;
+	if (colored)
+		setTextColor(Color::LIGHTCYAN);
+	cout <<"CONGRATULATIONS! You've beaten all the stages (Rewards will be sent upon request)." << endl;
 	pauseGAME();
 
 }
@@ -243,7 +259,9 @@ void Game::Loser()
 {
 	system("cls");
 	gotoxy(11, 5);
-	cout << (colored ? "\033[33m" : "\033[37m") << "Yikes! better luck next time..." << endl;
+	if(colored) 
+		setTextColor(Color::LIGHTRED);
+	cout <<  "Yikes! better luck next time..." << endl;
 	pauseGAME();
 }
 
