@@ -4,7 +4,7 @@ bool const to_X = true;
 bool const to_Y = false;
 Board::Board()
 {
-	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa2.txt", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
+	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa2.screen", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
 	string tmp_line;
 
 	short  sum_cols = 0;

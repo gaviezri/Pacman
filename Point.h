@@ -43,8 +43,8 @@ public:
 		return coord;
 	}
 
-	const unsigned short getX(){return coord[0];}
-	const unsigned short getY(){return coord[1];}
+	const unsigned short getX()const{return coord[0];}
+	const unsigned short getY()const{return coord[1];}
 	
 	void setX(unsigned short x) { coord[0] = x; }
 	void setY(unsigned short y) { coord[1] = y; }
