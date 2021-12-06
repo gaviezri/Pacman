@@ -12,7 +12,7 @@ class Point {
 	void ClearPac_updateCoord(unsigned short newval, bool Xflag);
 
 public:
-	Point(unsigned short _x = -1, unsigned short _y =  -1)
+	Point(unsigned short _x = 50, unsigned short _y =  50)
 	{
 		coord[0] = _x;
 		coord[1] = _y;
@@ -21,6 +21,15 @@ public:
 	const unsigned short* getCoord()
 	{
 		return coord;
+	}
+
+	void setX(int x)
+	{
+		coord[0] = x;
+	}
+	void setY(int y)
+	{
+		coord[1] = y;
 	}
 
 	const unsigned short getX()
