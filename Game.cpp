@@ -63,8 +63,7 @@ void Game::printlegend(Point pt, short hp)
 
 
 
-void Game::NewRound() // when pac meets ghost    ----- NEEDS TO BE CHECKED WHEN COLLISION WILL BE POSIBLE
-{
+void Game::NewRound() // when pac meets ghost    need to make the ghosts print the previus char in the location of collision
 	cout << "\a"; // SOUND FOR COLLISON!
 	br.Pac().HitByGhost();// -1 hp
 	
@@ -73,10 +72,11 @@ void Game::NewRound() // when pac meets ghost    ----- NEEDS TO BE CHECKED WHEN 
 		printlegend(br.getlegend(), br.Pac().getHP());   // update remaining lives on screen 
 
 		br.Pac().resetMe();// reset pac pos
-		gotoxy(2*(br.Pac().getPos().getX()), br.Pac().getPos().getY());
+		gotoxy(br.Pac().getPos().getX(), br.Pac().getPos().getY());
 		br.Pac().PrintMe(colored);
 
 		for (int i = 0; i < br.Ghosts().size(); i++) {
+			cout << (colored ? "\033[34m" : "\033[37m") << (br. == (int)Content::PATH ? " " : "."); // checks cells contant and print it
 			br.Ghosts(i).resetMe();//reset ghosts 
 			br.Ghosts(i).printMe(colored);
 		}

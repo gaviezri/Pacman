@@ -2,9 +2,10 @@
 
 bool const to_X = true;
 bool const to_Y = false;
+
 Board::Board()
 {
-	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa1.txt", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
+	ifstream myFile("C:\\Users\\Omri\\Desktop\\mapa1.txt", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
 	string tmp_line;
 
 	short  sum_cols = 0;
@@ -13,6 +14,7 @@ Board::Board()
 	{
 		getline(myFile, tmp_line);
 		Org_map.push_back(tmp_line);
+		if (tmp_line.length() == 0) --rows;
 
 		create_map_from_file();                    // initializing visual cells map from given file
 
@@ -52,6 +54,8 @@ void Board::create_map_from_file()
 		case '&':
 			Org_map[y][x] = ' ';
 			legend = Point(x, y);
+			legend_flag = true;
+			if (Org_map[y].length() == 1) --rows;
 			break;
 		}
 	}
@@ -132,11 +136,13 @@ void Board::movePac(Direction dic, bool colored, short& score)
 		changeFood2Path(pac.getPos());
 	}
 }
+
 bool Board::isOnBorder(Point pos)
 {
 	unsigned short X = pos.getX(), Y = pos.getY();
 	return (X == 0 || Y == 0 || X == Play_map[Y].length() - 1 || Y == rows - 1);
 }
+
 void Board::AnalyzeAround(Ghost g, char* conts, bool* paths)
 {
 	int i = 0;
@@ -236,7 +242,6 @@ bool Board::isTopBorder(const unsigned& X, const unsigned& Y)
 	return true;
 
 }
-
 
 bool Board::portals(Direction dic,Point& pos)
 {
