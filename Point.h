@@ -9,7 +9,6 @@ enum class Content {WALL = (int)'#', PATH = (int)' ', FOOD = (int)'.' };
 
 class Point {
 	unsigned short coord[2];
-	void ClearPac_updateCoord(unsigned short newval, bool Xflag);
 
 public:
 	Point(unsigned short _x = -1, unsigned short _y =  -1)
@@ -17,20 +16,16 @@ public:
 		coord[0] = _x;
 		coord[1] = _y;
 	}
-
 	const unsigned short* getCoord()
 	{
 		return coord;
 	}
 
-	const unsigned short getX()
-	{
-		return coord[0];
-	}
-	const unsigned short getY()
-	{
-		return coord[1];
-	}
+	const unsigned short getX(){return coord[0];}
+	const unsigned short getY(){return coord[1];}
+	
+	void setX(unsigned short x) { coord[0] = x; }
+	void setY(unsigned short y) { coord[1] = y; }
 
 
 	void setCoord(int _x, int _y);
@@ -40,9 +35,9 @@ public:
 	Point operator+(const Point& other);
 	Point operator-(const Point& other);
 
-	bool portals(Direction dic,vector<string>);
+	bool portals(Direction dic,const vector<string>&,const short&);
 	void updateCoord(Direction);
-	static bool isBlank(char);
+	void ClearPac_updateCoord(unsigned short newval, bool Xflag);
 };
 
 void ShowConsoleCursor(bool showFlag = false);
