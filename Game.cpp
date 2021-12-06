@@ -147,7 +147,7 @@ void Game::Engine()
 		if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
 			cur_dic = Direction::STAY;
 
-		else if (br.Pac().getPos().portals(cur_dic, br.getPlay_map()))
+		else if (br.portals(cur_dic,br.Pac().getPos()))
 			br.Pac().PrintMe(colored);
 				
 		else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(),next_dic))  //advance to next direction if its not a wall
