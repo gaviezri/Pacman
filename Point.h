@@ -11,7 +11,7 @@ class Point {
 	unsigned short coord[2];
 
 public:
-	Point(unsigned short _x = -1, unsigned short _y =  -1)
+	Point(unsigned short _x = 50, unsigned short _y =  50)
 	{
 		coord[0] = _x;
 		coord[1] = _y;
@@ -26,7 +26,6 @@ public:
 	
 	void setX(unsigned short x) { coord[0] = x; }
 	void setY(unsigned short y) { coord[1] = y; }
-
 
 	void setCoord(int _x, int _y);
 

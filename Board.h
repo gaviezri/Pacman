@@ -15,6 +15,7 @@ class Board
 	Pacman pac;						   // and one to play and change in real time.
 	vector<Ghost> ghosts;
 	Point legend;
+	bool legend_flag = false;
 	short rows = 0, cols = 0;
 	short breadcrumbs = 0;
 private:
@@ -30,7 +31,7 @@ public:
 	
 	vector<string>& getPlay_map() { return Play_map; }
 	const Point& getlegend() const { return legend; }
-	
+	bool getLegend_flag() const { return legend_flag; }
 	Pacman& Pac() { return pac; }
 	void movePac(Direction dic, bool colored, short& score);
 	short getCrumbs() { return breadcrumbs; }
@@ -38,6 +39,7 @@ public:
 	void nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around);
 
 	const vector<Ghost>& Ghosts() { return ghosts; }
+	Ghost& Ghosts(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
 	void moveGhost(bool colored);
 
 	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }

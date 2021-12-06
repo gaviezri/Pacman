@@ -1,5 +1,22 @@
 ﻿#include "Game.h"
-void PacmanLogo();
+void PacmanLogo()
+{
+	gotoxy(0, 8);
+	cout << "     ___        ___           ___           ___           ___           ___" << endl
+		<< "    /  /\\      /  /\\         /  /\\         /__/\\         /  /\\         /__/\\" << endl
+		<< "   /  /::\\    /  /::\\       /  /:/        |  |::\\       /  /::\\        \\  \\:\\" << endl
+		<< "  /  /:/\\:\\  /  /:/\\:\\     /  /:/         |  |:|:\\     /  /:/\\:\\        \\  \\:\\" << endl
+		<< " /  /:/~/:/ /  /:/~/::\\   /  /:/  ___   __|__|:|\\:\\   /  /:/~/::\\   _____\\__\\:\\" << endl
+		<< "/__/:/ /:/ /__/:/ /:/\\:\\ /__/:/  /  /\\ /__/::::| \\:\\ /__/:/ /:/\\:\\ /__/::::::::\\" << endl
+		<< "\\  \\:\\/:/  \\  \\:\\/:/__\\/ \\  \\:\\ /  /:/ \\  \\:\\~~\\__\\/ \\  \\:\/:/__\\/  \\  \\:\\~~\\~~\\/" << endl
+		<< " \\  \\::/    \\  \\::/       \\  \\:\\  /:/   \\  \\:\\        \\  \\::/       \\  \\:\\ ~~~		" << endl
+		<< "  \\  \\:\\     \\  \\:\\        \\  \\:\\/:/     \\  \\:\\        \\  \\:\\        \\  \\:\\" << endl
+		<< "   \\  \\:\\     \\  \\:\\        \\  \\::/       \\  \\:\\        \\  \\:\\        \\  \\:\\" << endl
+		<< "    \\__\\/      \\__\\/         \\__\\/         \\__\\/         \\__\\/         \\__\\/ ";
+
+	Sleep(2000);
+	system("cls");
+}
 
 void Game::play()  //  this is where the magic happens (!)
 {
@@ -32,34 +49,49 @@ menu:
 	goto menu;
 }
 
+void Game::printlegend(Point pt, short hp)
+{
+	if (br.getLegend_flag()) {
+		gotoxy(pt.getX(), pt.getY());
+
+		cout << (colored == true ? "\033[33m" : "\033[37m") << "SCORE:" << " " << score << "\t\t" << "LIVES:";
+
+		for (int i = 0; i < hp; i++)
+			cout << (colored == true ? "\033[33m" : "\033[37m") << " C";
+	}
+}
 
 
 
-/*void Game::NewRound() // when pac meets ghost
+void Game::NewRound() // when pac meets ghost    ----- NEEDS TO BE CHECKED WHEN COLLISION WILL BE POSIBLE
 {
 	cout << "\a"; // SOUND FOR COLLISON!
-	pac.HitByGhost();// -1 hp
-	if (pac.getHP() != 0)
+	br.Pac().HitByGhost();// -1 hp
+	
+	if (br.Pac().getHP() != 0)
 	{
-		pac.printHP(colored); // update remaining lives on screen
-		pac.resetMe();// reset pac pos
-		gotoxy(2*pac.getPos()[0],pac.getPos()[1]);
-		pac.printMe(colored);
-		g1.resetMe(br.getCell(g1.getPos()[0], g1.getPos()[1]).getMyContent(), colored);//reset ghosts and print their previous cell content back
-		g2.resetMe(br.getCell(g2.getPos()[0], g2.getPos()[1]).getMyContent(), colored);
+		printlegend(br.getlegend(), br.Pac().getHP());   // update remaining lives on screen 
+
+		br.Pac().resetMe();// reset pac pos
+		gotoxy(2*(br.Pac().getPos().getX()), br.Pac().getPos().getY());
+		br.Pac().PrintMe(colored);
+
+		for (int i = 0; i < br.Ghosts().size(); i++) {
+			br.Ghosts(i).resetMe();//reset ghosts 
+			br.Ghosts(i).printMe(colored);
+		}
 		pauseGAME();
 	}
 }
-*/
+
 void Game::setDif()
 {
-	
+	system("cls");
+	cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
 	    	
 	char ch=-1;
 	while (ch != 0 && ch != 1 && ch != 2)
 	{
-		system("cls");
-		cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
 		cout << "0 = \"Novice\"" << endl << "1 = \"Good\"" << endl << "2 = \"Best\"" << endl;
 		cout << "selection: ";
 		ch = _getch()-48;
@@ -110,25 +142,15 @@ void  Game::printInstructions()
 	while (!_kbhit());  //  the player will let us know that he finished reading and ready to start again
 	_getch(); //  "removes" the key used from screen	
 }
-void Game::ghosts_movemaker()
-{
-	if (everyothermove)//ghost movement manager that makes ghost move everyother move that pacman makes
-		{
-			br.moveGhost(colored);
 
-			everyothermove = false;// switch off
-		}
-		else
-			everyothermove = true;// switch on
-}
 void Game::Engine()
 {
 	setDif(); // sets the difficulty of the ghosts
 	br.Pac().resetHP();
-	
+	bool everyothermove = true;
 	Direction cur_dic = Direction::DEF, next_dic = Direction::DEF, last_dic = Direction:: DEF; // initialzing for the switch 
 	br.printMap(colored);
-	//printlegend(br.getlegend(), br.Pac().getHP());
+	printlegend(br.getlegend(), br.Pac().getHP());
 	br.Pac().PrintMe(colored);   // PRINTING
 	for (auto g : br.Ghosts())
 		g.PrintMe(colored);
@@ -136,7 +158,7 @@ void Game::Engine()
 	do
 	{
 		if (_kbhit())
-			updateDics(next_dic);// assign next move to next_dic    
+			updateDics(next_dic);// assign next move to next_dic
 		if (pause)	// if P / p /Esc was hit
 			pauseGAME();
 		if (next_dic == Direction::QUIT)
@@ -147,9 +169,10 @@ void Game::Engine()
 		if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
 			cur_dic = Direction::STAY;
 
+
 		else if (br.portals(cur_dic,br.Pac().getPos()))
 			br.Pac().PrintMe(colored);
-				
+    
 		else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(),next_dic))  //advance to next direction if its not a wall
 		{
 			br.movePac(next_dic, colored,score);
@@ -163,15 +186,23 @@ void Game::Engine()
 		}
 
 		Sleep(300);
-		if (br.Collision());
-			//NewRound();
-		
-		ghosts_movemaker();
+		if (br.Collision())
+			NewRound();
+
+		if (everyothermove)//ghost movement manager that makes ghost move everyother move that pacman makes
+		{
+			br.moveGhost(colored);
+
+			everyothermove = false;// switch off
+		}
+		else
+			everyothermove = true;// switch on
 
 
-		if (br.Collision());//if one of the ghosts and pacman share the same cell
-			//NewRound();//update necessary info and reset avatars to default positions
-//		printScore(br.getlegend());
+		if (br.Collision())//if one of the ghosts and pacman share the same cell
+			NewRound();//update necessary info and reset avatars to default positions
+		if(br.getLegend_flag())
+			printScore(br.getlegend());
 	} while (!Over());
 	if (win == true)
 		Winner();// cout message
@@ -242,21 +273,3 @@ void Game::updateDics( Direction& nxt)
 
 
 
-void PacmanLogo()
-{
-	gotoxy(0, 10);
-	cout << "     ___        ___           ___           ___           ___           ___" << endl
-		<< "    /  /\\      /  /\\         /  /\\         /__/\\         /  /\\         /__/\\" << endl
-		<< "   /  /::\\    /  /::\\       /  /:/        |  |::\\       /  /::\\        \\  \\:\\" << endl
-		<< "  /  /:/\\:\\  /  /:/\\:\\     /  /:/         |  |:|:\\     /  /:/\\:\\        \\  \\:\\" << endl
-		<< " /  /:/~/:/ /  /:/~/::\\   /  /:/  ___   __|__|:|\\:\\   /  /:/~/::\\   _____\\__\\:\\" << endl
-		<< "/__/:/ /:/ /__/:/ /:/\\:\\ /__/:/  /  /\\ /__/::::| \\:\\ /__/:/ /:/\\:\\ /__/::::::::\\" << endl
-		<< "\\  \\:\\/:/  \\  \\:\\/:/__\\/ \\  \\:\\ /  /:/ \\  \\:\\~~\\__\\/ \\  \\:\/:/__\\/  \\  \\:\\~~\\~~\\/" << endl
-		<< " \\  \\::/    \\  \\::/       \\  \\:\\  /:/   \\  \\:\\        \\  \\::/       \\  \\:\\ ~~~		" << endl
-		<< "  \\  \\:\\     \\  \\:\\        \\  \\:\\/:/     \\  \\:\\        \\  \\:\\        \\  \\:\\" << endl
-		<< "   \\  \\:\\     \\  \\:\\        \\  \\::/       \\  \\:\\        \\  \\:\\        \\  \\:\\" << endl
-		<< "    \\__\\/      \\__\\/         \\__\\/         \\__\\/         \\__\\/         \\__\\/ ";
-
-	Sleep(2500);
-	system("cls");
-}

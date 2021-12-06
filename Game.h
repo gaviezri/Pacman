@@ -22,7 +22,7 @@ public:
 		cin >> cho;
 		cho == 1 ? colored = true : colored = false;
 	}
-	//void NewRound();
+	void NewRound();
 	void printScore(Point); 
 	void Loser();
 	void Winner();
@@ -33,7 +33,7 @@ public:
 	void printInstructions();
 	void play();
 	void ResetGame();
-	void printlegend(Point pt, short hp) { if(pt!=Point(-1,-1)) gotoxy(pt.getX(), pt.getY()); cout << (colored == true ? "\033[33m" : "\033[37m") << "SCORE:" << " " << score << "\t\t" << "LIVES:"; for (int i = 0; i < hp; i++)cout<< (colored == true ? "\033[33m" : "\033[37m") << " C"; }
+	void printlegend(Point pt, short hp);
 	bool Over()//indicator to end game loop
 	{
 		if (br.Pac().getHP() == 0)
