@@ -1,4 +1,9 @@
 #include "Point.h"
+
+
+void setTextColor(Color colorToSet) {
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), (int)colorToSet);
+}
 void gotoxy(int x, int y)
 {
 	static HANDLE h = NULL;

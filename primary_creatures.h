@@ -10,7 +10,9 @@ protected:
 
 public:
 	void resetMe() { pos = def_pos; }
-	void PrintMe(bool colored) { gotoxy(pos.getX(), pos.getY()); cout << (colored ? "\033[33m" : "\033[37m") << avatar; }
+	void printMe(bool colored) {
+		gotoxy(pos.getX(), pos.getY()); if (colored) { if (avatar == 'C')setTextColor(Color::BROWN); else if (avatar == 'G')setTextColor(Color::RED); else setTextColor(Color::WHITE); cout << avatar; }
+	}
 
 };
 

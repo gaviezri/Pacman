@@ -4,7 +4,7 @@ bool const to_X = true;
 bool const to_Y = false;
 Board::Board()
 {
-	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa1.txt", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
+	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa2.txt", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
 	string tmp_line;
 
 	short  sum_cols = 0;
@@ -52,6 +52,8 @@ void Board::create_map_from_file()
 		case '&':
 			Org_map[y][x] = ' ';
 			legend = Point(x, y);
+			legend_flag = true;
+			if (Org_map[y].length() == 1) --rows;
 			break;
 		}
 	}
@@ -59,7 +61,7 @@ void Board::create_map_from_file()
 
 void Board::printMap(bool colored)
 {
-	for (int i = 0; i < rows; ++i) cout<<(colored ? "\033[34m" : "\033[37m") << Play_map[i] << endl;
+	for (int i = 0; i < rows; ++i) { if (colored) setTextColor(Color::BLUE); else setTextColor(Color::WHITE);  cout << Play_map[i] << endl; }
 }
 
 void Board::nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around)

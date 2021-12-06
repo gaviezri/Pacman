@@ -2,10 +2,32 @@
 #include <iostream>
 #include <Windows.h>
 #include <vector>
+
+enum class Color
+{
+	BLACK = 0,
+	BLUE = 1,
+	GREEN = 2,
+	CYAN = 3,
+	RED = 4,
+	MAGENTA = 5,
+	BROWN = 6,
+	LIGHTGREY = 7,
+	DARKGREY = 8,
+	LIGHTBLUE = 9,
+	LIGHTGREEN = 10,
+	LIGHTCYAN = 11,
+	LIGHTRED = 12,
+	LIGHTMAGENTA = 13,
+	YELLOW = 14,
+	WHITE = 15
+};
 using namespace std;
 
 enum class Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,STAY=12,DEF,QUIT};
 enum class Content {WALL = (int)'#', PATH = (int)' ', FOOD = (int)'.' };
+void setTextColor(Color colorToSet);
+
 
 class Point {
 	unsigned short coord[2];
