@@ -7,7 +7,6 @@ void gotoxy(int x, int y)
 	COORD c = { x, y };
 	SetConsoleCursorPosition(h, c);
 }
-bool Point::isBlank(char a) { return a == ' ' || a == '%' || a=='.'; }
 
 
 void Point::setCoord(int _x, int _y)
@@ -16,7 +15,7 @@ void Point::setCoord(int _x, int _y)
 	coord[1] = _y;
 }
 
-void Point::ClearPac_updateCoord(unsigned short newval,bool Xflag) 
+void Point::ClearPac_updateCoord(unsigned short newval, bool Xflag)
 {
 	gotoxy(coord[0], coord[1]);
 	cout << " ";
@@ -27,22 +26,7 @@ void Point::ClearPac_updateCoord(unsigned short newval,bool Xflag)
 
 }
 
-bool Point::portals(Direction dic, vector<string> map)
-{
-	
-	if (coord[0] == 0 && dic == Direction::LEFT && isBlank(map[coord[1]][map[coord[1]].length() - 1]))// Left -> Right
-	{
-		ClearPac_updateCoord(map[coord[1]].length() - 1, true);
-		return true;
-	}
-	else if (coord[0] == map[coord[1]].length() - 1 && dic == Direction::RIGHT && isBlank(map[coord[1]][0])) //Right -> Left
-	{
-		ClearPac_updateCoord( 0 , true);
-		return true;
-	}
-	return false;
-	
-}
+
 
 void Point::updateCoord(Direction dic)
 {
