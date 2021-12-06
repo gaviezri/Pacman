@@ -25,9 +25,9 @@ void Game::play()  //  this is where the magic happens (!)
 	setTextColor(Color::WHITE);
 	system("cls");
 	PacmanLogo();
+menu:
 	Color();
 	system("cls");
-menu:
 	printMenu();
 	setChoice();
 	switch (choice)
@@ -82,26 +82,30 @@ void Game::NewRound() // when pac meets ghost    ----- NEEDS TO BE CHECKED WHEN 
 	{
 		printlegend(br.getlegend(), br.Pac().getHP());   // update remaining lives on screen 
 
-		br.Pac().resetMe();// reset pac pos
-		gotoxy((br.Pac().getPos().getX()), br.Pac().getPos().getY());
+		
+		br.Pac().clearMe();
+		br.Pac().resetMe();
 		br.Pac().printMe(colored);
 
 		for (int i = 0; i < br.Ghosts().size(); i++) {
+			Ghost& G = br.Ghosts(i);
+			G.clearMe(colored,br.getPlay_map()[G.getPos().getY()][G.getPos().getX()]);
 			br.Ghosts(i).resetMe();//reset ghosts 
 			br.Ghosts(i).printMe(colored);
 		}
-		pauseGAME();
+		pause = true;
 	}
 }
 
 void Game::setDif()
 {
-	system("cls");
-	cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	
 	    	
 	char ch=-1;
 	while (ch != 0 && ch != 1 && ch != 2)
 	{
+		system("cls");
+		cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
 		cout << "0 = \"Novice\"" << endl << "1 = \"Good\"" << endl << "2 = \"Best\"" << endl;
 		cout << "selection: ";
 		ch = _getch()-48;
@@ -170,12 +174,14 @@ void Game::Engine()
 	updateDics(cur_dic);//game is frozen until first hit1
 	do
 	{
+	
 		if (_kbhit())
 			updateDics(next_dic);// assign next move to next_dic
-		if (pause)	// if P / p /Esc was hit
+	PAUSE:
+		if(pause)// if P / p /Esc was hit
 			pauseGAME();
 		if (next_dic == Direction::QUIT)
-			printMenu();
+			return;
 		if (_kbhit())
 			updateDics(next_dic);// in case user ended PAUSE with the new move
 
@@ -200,7 +206,10 @@ void Game::Engine()
 
 		Sleep(300);
 		if (br.Collision())
+		{
 			NewRound();
+			goto PAUSE;
+		}
 
 		if (everyothermove)//ghost movement manager that makes ghost move everyother move that pacman makes
 		{
@@ -211,9 +220,11 @@ void Game::Engine()
 		else
 			everyothermove = true;// switch on
 
-
 		if (br.Collision())//if one of the ghosts and pacman share the same cell
+		{
 			NewRound();//update necessary info and reset avatars to default positions
+			goto PAUSE;
+		}
 		if(br.getLegend_flag())
 			printScore(br.getlegend());
 	} while (!Over());
@@ -267,12 +278,13 @@ void Game::Loser()
 
 void Game::pauseGAME()
 {
-	gotoxy(12, 20);
-	cout << "Press Any Key To Continue.";
-	_getch();//stall the program until a key is hit
+	gotoxy(br.getlegend().getX(), br.getlegend().getY());
+	system("pause");
 	pause = false;
-	gotoxy(12, 20);
-	cout << "                           ";
+	gotoxy(br.getlegend().getX(), br.getlegend().getY());
+	cout << "                                  ";
+	gotoxy(br.getlegend().getX(), br.getlegend().getY());
+	printlegend(br.getlegend(), br.Pac().getHP());
 }
 
 
