@@ -35,6 +35,10 @@ public:
 	short getCrumbs() { return breadcrumbs; }
 	char nextCellCont(Point pos, Direction dic);      // returns map-cell contant in a given postion.
 	void changeFood2Path(Point pos) { Play_map[pos.getY()][pos.getX()] = ' '; }
+	bool isBlankOnBorder(Point pos);
+	bool isOnBorder(Point pos);
+
+	void AnalyzeAround(Ghost g, char* conts, bool* paths);
 
 	bool Collision();
 	void printMap(bool colored);
