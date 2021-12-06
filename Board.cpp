@@ -2,7 +2,7 @@
 
 Board::Board()
 {
-	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa1.txt", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
+	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa2.txt", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
 	string tmp_line;
 
 	short  sum_cols = 0;
@@ -123,8 +123,7 @@ void Board::resetMap()      // copying the original map to the play map.
 void Board::movePac(Direction dic, bool colored, short& score)
 {
 	char cell_c = nextCellCont(pac.getPos(), dic);
-	pac.updateMove(dic, colored,rows,cols);
-
+	pac.updateMove(dic, colored,Play_map);
 	if (cell_c == '.')
 	{
 		score++;
@@ -133,62 +132,91 @@ void Board::movePac(Direction dic, bool colored, short& score)
 	
 
 }
+void Board::AnalyzeAround(Ghost g, char* conts, bool* paths)
+{
+	int i = 0;
+	Point gPos = g.getPos();
+	unsigned short Y = gPos.getY(), X = gPos.getX();
 
+
+	conts[int(Direction::UP)] = Play_map[Y - 1][X],	//assigning the array of the cells content around current ghost
+		conts[int(Direction::DOWN)] = Play_map[Y + 1][X],	// position on the beggining of her move.
+		conts[(int)Direction::LEFT] = Play_map[Y][X - 1],
+		conts[(int)Direction::RIGHT] = Play_map[Y][X + 1];
+
+	
+	if (isOnBorder((gPos - Point(1, 0))))
+		conts[int(Direction::LEFT)] = (char)Content::WALL;
+	if (isOnBorder((gPos - Point(0, 1))))
+		conts[int(Direction::UP)] = (char)Content::WALL;
+	if (isOnBorder((gPos + Point(1, 0))))
+		conts[int(Direction::RIGHT)] = (char)Content::WALL;
+	if (isOnBorder((gPos + Point(0, 1))))
+		conts[int(Direction::DOWN)] = (char)Content::WALL;
+
+	for ( i = 0; i < 4; i++)
+	{
+		if (conts[i] == (char)Content::WALL)
+		{
+			paths[i] = false;
+		}
+		else
+			paths[i] = true;
+	}
+}
+bool Board::isOnBorder(Point pos)
+{
+	unsigned short X = pos.getX(), Y = pos.getY();
+	return (X == 0 || Y == 0 || X == Play_map[Y].length() - 1 || Y == rows-1);
+}
+bool Board::isBlankOnBorder(Point pos)
+{
+	return(isOnBorder(pos) && isblank(Play_map[pos.getY()][pos.getX()]));
+}
+
+void getOptions(vector<Direction>& d, bool* paths)
+{
+	d.clear();
+	for (int j = 0; j < 4; ++j)
+		if (paths[j])  d.push_back((Direction)j);
+}
 void Board::moveGhost(bool colored)
 {
-
 	char cont_around[4], next_cont;		//wall counter count actual walls, path around just indicate wether there is a path and we are manipulating the opposite direction to act
-	short wall_counter = 0;            // as a wall by changing path_around. and keep wall_counter for real
+	vector<Direction> options;
+	Direction opposite_dic;
 	bool path_around[4];             // bool array that indicate by index using enum if theres a path in a given direction
 	for (int i = 0; i < ghosts.size(); i++)
 	{
-		ghosts[i].AnalyzeAround(cont_around, path_around, Play_map, rows, cols, wall_counter);
-
-
-		Direction opposite_dic;
-
+		AnalyzeAround(ghosts[i], cont_around, path_around);
+	
 		nextContAndOppDic(ghosts[i].getcurDic(), opposite_dic, next_cont, cont_around);//checking whats the next cell's content in the current direction im going and 
 																  // updating my opposite direction
-
 		path_around[(int)opposite_dic] = false;  // We want the ghost to treat the opposite direction as if it was a wall.
 
-		if (next_cont == (int)Content::WALL || wall_counter == 1) //  + Or T Or L Or  or DeadEnd  junction approaching T from side or from front
-			switch (wall_counter)
+		getOptions(options,path_around);
+
+		
+		if (next_cont == (int)Content::WALL) //  + Or T Or L Or  or DeadEnd  junction approaching T from side or from front
+			switch (options.size())
 			{
-			case 3:
-				ghosts[i].updateMove(ghosts[i].setcurDic(opposite_dic), colored,Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);// Dead-End go opposite direction
+			case 0:// Dead-End go opposite direction
+				ghosts[i].updateMove(ghosts[i].setcurDic(opposite_dic), colored,Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
 				break;
-			case 2:
-				/*switch (rand() % 2)// two ways available, opposite direction or another one thats availabe RANDOMLY .... L Junc :)
-				{
-				case 0:// opposite direction
-					ghosts[i].updateMove(ghosts[i].setcurDic(opposite_dic), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
-					break;*/
-				//case 1://direction availabe beside opposite
-					for (int j = 0; j < 4; j++)
-						if (path_around[j])//extracting which direction is possible and using the index equilavnt of enum we update the move.
-						{
-							ghosts[i].updateMove(ghosts[i].setcurDic(Direction(j)), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
-							break;
-						}
-				
+			case 1:// ion
+				ghosts[i].updateMove(ghosts[i].setcurDic(options[0]), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
 				break;
-			case 1: // approaching T junction 
-				Direction twoOptions[2]; // not include the opposite
-				for (int k = 0, j = 0; j < 4 && k<2; ++j)    // we look for the two non-WALL options
-					if (path_around[j]) twoOptions[k++] = (Direction)j;// randomly pick 1 of them which is not the opposite! 
-				ghosts[i].updateMove(ghosts[i].setcurDic(twoOptions[rand() % 2]), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
+			default://T Junc 
+				ghosts[i].updateMove(ghosts[i].setcurDic(options[rand() % (options.size())]), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);// choose randomly from options
 				break;
-			/*case 0:
-				Direction threeOptions[3];
-				for (int k = 0, j = 0; j < 4 && k < 3; ++j)    // we look for the two non-WALL options
-					if (path_around[j]) threeOptions[k++] = (Direction)j;// randomly pick 1 of them which is not the opposite! 
-				ghosts[i].updateMove((ghosts[i].getcurDic() = threeOptions[rand() % 3]), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
-				break;*/
 			}
+		else if (options.size()>=2)
+			ghosts[i].updateMove(ghosts[i].setcurDic(options[rand() % (options.size())]), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);// in a 4 way junc - choose randomly
 		else
-			ghosts[i].updateMove(ghosts[i].getcurDic(), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
-		// no wall? continue same way
+			ghosts[i].updateMove(ghosts[i].getcurDic(), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);// continue same way
+
+		
+
 	}
 }
 

@@ -53,12 +53,13 @@ menu:
 */
 void Game::setDif()
 {
-	system("cls");
-	cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	
 	    	
 	char ch=-1;
 	while (ch != 0 && ch != 1 && ch != 2)
 	{
+		system("cls");
+		cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
 		cout << "0 = \"Novice\"" << endl << "1 = \"Good\"" << endl << "2 = \"Best\"" << endl;
 		cout << "selection: ";
 		ch = _getch()-48;
@@ -109,15 +110,25 @@ void  Game::printInstructions()
 	while (!_kbhit());  //  the player will let us know that he finished reading and ready to start again
 	_getch(); //  "removes" the key used from screen	
 }
+void Game::ghosts_movemaker()
+{
+	if (everyothermove)//ghost movement manager that makes ghost move everyother move that pacman makes
+		{
+			br.moveGhost(colored);
 
+			everyothermove = false;// switch off
+		}
+		else
+			everyothermove = true;// switch on
+}
 void Game::Engine()
 {
 	setDif(); // sets the difficulty of the ghosts
 	br.Pac().resetHP();
-	bool everyothermove = true;
+	
 	Direction cur_dic = Direction::DEF, next_dic = Direction::DEF, last_dic = Direction:: DEF; // initialzing for the switch 
 	br.printMap(colored);
-	printlegend(br.getlegend(), br.Pac().getHP());
+	//printlegend(br.getlegend(), br.Pac().getHP());
 	br.Pac().PrintMe(colored);   // PRINTING
 	for (auto g : br.Ghosts())
 		g.PrintMe(colored);
@@ -125,7 +136,7 @@ void Game::Engine()
 	do
 	{
 		if (_kbhit())
-			updateDics(next_dic);// assign next move to next_dic
+			updateDics(next_dic);// assign next move to next_dic    
 		if (pause)	// if P / p /Esc was hit
 			pauseGAME();
 		if (next_dic == Direction::QUIT)
@@ -136,7 +147,9 @@ void Game::Engine()
 		if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
 			cur_dic = Direction::STAY;
 
-	
+		else if (br.Pac().getPos().portals(cur_dic, br.getPlay_map()))
+			br.Pac().PrintMe(colored);
+				
 		else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(),next_dic))  //advance to next direction if its not a wall
 		{
 			br.movePac(next_dic, colored,score);
@@ -152,19 +165,13 @@ void Game::Engine()
 		Sleep(300);
 		if (br.Collision());
 			//NewRound();
-		if (everyothermove)//ghost movement manager that makes ghost move everyother move that pacman makes
-		{
-			br.moveGhost(colored);
-
-			everyothermove = false;// switch off
-		}
-		else
-			everyothermove = true;// switch on
+		
+		ghosts_movemaker();
 
 
 		if (br.Collision());//if one of the ghosts and pacman share the same cell
 			//NewRound();//update necessary info and reset avatars to default positions
-		printScore(br.getlegend());
+//		printScore(br.getlegend());
 	} while (!Over());
 	if (win == true)
 		Winner();// cout message

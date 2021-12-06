@@ -31,7 +31,7 @@ public:
 	
 	Ghost(Point _pos) { pos = def_pos = _pos;avatar = 'G'; }
 
-	void AnalyzeAround(char* conts,bool* paths,vector<string> map,const short& rows, const short& cols,short&);
+	void AnalyzeAround(char* conts, bool* paths, vector<string> map, const short& rows, short& wall_counter);
 
 	void resetMe(){pos = def_pos;}
 	void printMe(bool colored){ gotoxy(pos.getX(), pos.getY()); cout << (colored ? "\033[33m" : "\033[37m") << 'G'; }

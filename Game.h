@@ -11,8 +11,10 @@ class Game
 	short score=0;
 	bool pause;
 	Board br;
+	bool everyothermove = true;
 
 public:
+	void ghosts_movemaker();
 	void setDif();
 	void Color(){
 		short cho;
