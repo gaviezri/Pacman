@@ -29,7 +29,7 @@ private:
 	//-------------------------pacman movement-----------------------------------
 	bool findBorder_Top(const unsigned short& col, unsigned short& line);
 
-	void create_map_from_file(int map_num);//choose more adequate name
+	
 	void changeFood2Path(Point pos) { Play_map[pos.getY()][pos.getX()] = ' '; }
 	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
 	bool isOnBorder(Point pos);
@@ -43,7 +43,7 @@ private:
 	pair<Direction, int> BestMovement_Util(vector<vector<bool>>canGo, int path_len, Point dest, Point cur, Direction,set<Point>);
 	vector<vector<bool>> createTrackingMap();
 	//-----------------------------ctor-----------------------------------------
-	void create_map_from_file();
+	void create_map_from_file(int map_num);//choose more adequate name
 
 public:
 	Board();

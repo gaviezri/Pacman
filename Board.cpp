@@ -21,7 +21,7 @@ Board::Board()
 {
 	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa2.screen", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
 	string tmp_line;
-
+}
 
 Board::Board()   // loads all game board to maps vector
 {
