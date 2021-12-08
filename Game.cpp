@@ -75,8 +75,6 @@ void Game::printlegend(Point pt, short hp)
 			setTextColor(Color::YELLOW);
 		for (int i = 0; i < hp; i++)
 			cout << " C";
-		for (int i = 0; i < hp; i++)
-			cout << (colored == true ? "\033[33m" : "\033[37m") << " C";
 		gotoxy(pt.getX(), pt.getY()+2);
 		cout << spaces << endl;
 
@@ -186,6 +184,7 @@ void Game::level_progress()
 		for (auto g : br.Ghosts())
 			g.printMe(colored);
 	}
+	
 
 	updateDics(cur_dic);//game is frozen until first hit1
 	do
@@ -203,6 +202,9 @@ void Game::level_progress()
 		
 		pacmanMoves_Dispatcher(next_dic,cur_dic,last_dic);
 		
+		if (br.getLegend_flag())
+			printScore(br.getlegend());
+
 		Sleep(300);
 		if (br.Collision())
 		{
@@ -217,9 +219,7 @@ void Game::level_progress()
 			NewRound();//update necessary info and reset avatars to default positions
 			goto PAUSE;
 		}
-		if (br.getLegend_flag())
-			printScore(br.getlegend());
-
+		
 		++moves_made_this_level;
 	} while (!Over());
 }
@@ -257,7 +257,7 @@ void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direc
 		next_dic = Direction::DEF; // default the next direction
 	}
 	else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(), cur_dic)) // advance in current direction if the 
-	{																	// requested next isnt possible
+	{																     	// requested next isnt possible
 		br.movePac(cur_dic, colored, score);
 		last_dic = cur_dic;
 	}
@@ -276,7 +276,7 @@ void Game::ghostsMoves_Dispatcher()
 
 void Game::printScore(Point legend)
 {
-	 gotoxy(legend.getX()+6,legend.getY());//6 is a magic number represents the length of "SCORE:"
+	 gotoxy(legend.getX()+6,legend.getY()+1);//6 is a magic number represents the length of "SCORE:"
 	 if(colored)
 		 setTextColor(Color::LIGHTRED);
 	 cout  << score;

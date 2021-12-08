@@ -5,12 +5,14 @@ bool const to_Y = false;
 
 const pair<Direction, int> Min2pairs(const pair<Direction, int>& a, const pair<Direction, int>& b)
 {
-	if (a.first == Direction::DEF)
-		return  b;
-	else if (b.first == Direction::DEF)
+	if ((a.first == Direction::DEF && b.first == Direction::DEF))
 		return  a;
+	else if (a.first == Direction::DEF && b.first != Direction::DEF)
+		return  b;
+	else if (a.first != Direction::DEF && b.first == Direction::DEF)
+		return a;
 	else
-		return  a.second <= b.second ? a : b;
+		return a.second < b.second ? a : b;
 }
 const pair<Direction, int> Min4pairs(const pair<Direction, int>& a,const pair<Direction, int>& b,const  pair<Direction, int>& c, const pair<Direction,int>& d)
 {
@@ -27,7 +29,7 @@ Board::Board()   // loads all game board to maps vector
 	{
 		tmp_path = entry.path().string();  
 		
-		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 10) == "screen.txt")    // checkes if path ends with "screen.txt"
+		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 7) == ".screen")    // checkes if path ends with "screen"
 		{
 			screen_files.push_back(entry.path().string());          // if so it adds the path to the path container
 		}
@@ -175,6 +177,12 @@ void Board::movePac(Direction dic, bool colored, short& score)
 	}
 }
 
+bool Board::isInBorder(Point pos)
+{
+	unsigned short X = pos.getX(), Y = pos.getY();
+
+	return ((X > 0 && X< Play_map[Y].length() - 1) &&  (Y > 0 &&  Y < rows - 1));
+}
 
 bool Board::isOnBorder(Point pos)
 {
@@ -285,7 +293,8 @@ vector<vector<bool>> Board::createTrackingMap()
 		for (int col = 0; col < Play_map[row].length(); col++) //creation here
 			if (isOnBorder(Point(col, row)) || Play_map[row][col] == (int)Content::WALL)
 				tmp.push_back(false);
-			else tmp.push_back(true);
+			else 
+				tmp.push_back(true);
 
 		canGo.push_back(tmp);
 	}
@@ -294,31 +303,38 @@ vector<vector<bool>> Board::createTrackingMap()
 
 pair<Direction, int> Board::BestMovement_Util(vector<vector<bool>>canGo, int path_len, Point dest, Point cur, Direction last_went, set<Point> visited)
 {
-	
-	unsigned short cX = cur.getX(), cY = cur.getY();
-	if (!canGo[cY][cX]) // if cant go to curr pos from previous
-	{							
-		return { Direction::DEF,UINT16_MAX }; // return default pair
-	}
-	if ((!visited.empty() && visited.end() != visited.find(cur)))	  //  Or not empty and cur already been visited return default values (==NOT FOUND)
-	{
-		visited.erase(cur);
-		return { Direction::DEF,UINT16_MAX }; // return default pair
-	}
-	pair<Direction, int> up, down, left, right;
-	if (cur == dest)
-	{
-		return { last_went,path_len };
-	}
-	visited.insert(cur);
-	down = BestMovement_Util(canGo,  path_len + 1,dest,cur+Point(0,1),Direction::DOWN, visited);
-	up = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(0, 1),Direction::UP, visited);
-	right = BestMovement_Util(canGo, path_len + 1, dest, cur + Point(1, 0), Direction::RIGHT, visited);
-	left = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(1, 0),  Direction::LEFT, visited);
-
-	return Min4pairs(down, up, right, left);
+	return { Direction::DEF, UINT16_MAX };
 }
+/*	//search for the next best move based on pacman's location and ghosts location using BFS
+	unsigned short cX = cur.getX(), cY = cur.getY();
+	if (/*validmove*)
+	{
+		if ((!visited.empty() && visited.end() != visited.find(cur)))	  //  Or not empty and cur already been visited return default values (==NOT FOUND)
+		{
+			return { Direction::DEF,UINT16_MAX }; // return default pair
+		}
+		if (!canGo[cY][cX]) // if cant go to curr pos from previous
+		{
+			visited.insert(cur);
+				return { Direction::DEF,UINT16_MAX }; // return default pair
+		}
 
+		pair<Direction, int> up, down, left, right;
+		if (cur == dest)
+		{
+			return { last_went,path_len };
+		}
+		visited.insert(cur);
+		down = BestMovement_Util(canGo, path_len + 1, dest, cur + Point(0, 1), Direction::DOWN, visited);
+		up = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(0, 1), Direction::UP, visited);
+		right = BestMovement_Util(canGo, path_len + 1, dest, cur + Point(1, 0), Direction::RIGHT, visited);
+		left = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(1, 0), Direction::LEFT, visited);
+
+		return Min4pairs(down, up, right, left);
+	}
+	return { Direction::DEF,UINT16_MAX }; // return default pair if out of bound
+}
+*/
 void Board::NoviceMovement(const vector<Direction>&options,Direction&opposite_dic,const char& next_cont,bool colored, Ghost& G,const char& content_underme)
 {
 	
