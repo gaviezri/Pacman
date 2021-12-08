@@ -180,11 +180,11 @@ void Game::level_progress()
 	br.printMap(colored);
 	printlegend(br.getlegend(), br.Pac().getHP());
 
-	br.Pac().PrintMe(colored);   // PRINTING
+	br.Pac().printMe(colored);   // PRINTING
 
 	if (!(br.Ghosts().empty())) {
 		for (auto g : br.Ghosts())
-			g.PrintMe(colored);
+			g.printMe(colored);
 	}
 
 	updateDics(cur_dic);//game is frozen until first hit1

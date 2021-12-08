@@ -1,4 +1,6 @@
 #include "Board.h"
+bool const to_X = true;
+bool const to_Y = false;
 
 
 const pair<Direction, int> Min2pairs(const pair<Direction, int>& a, const pair<Direction, int>& b)
@@ -13,14 +15,6 @@ const pair<Direction, int> Min2pairs(const pair<Direction, int>& a, const pair<D
 const pair<Direction, int> Min4pairs(const pair<Direction, int>& a,const pair<Direction, int>& b,const  pair<Direction, int>& c, const pair<Direction,int>& d)
 {
 	return Min2pairs(Min2pairs(a, b), Min2pairs(c, d));
-}
-bool const to_X = true;
-bool const to_Y = false;
-
-Board::Board()
-{
-	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa2.screen", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
-	string tmp_line;
 }
 
 Board::Board()   // loads all game board to maps vector
