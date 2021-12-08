@@ -5,7 +5,6 @@
 
 class Pacman:public primary_creatures
 {
-
 	short HP = 3;   //pacmans health
 	
 public:

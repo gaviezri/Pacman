@@ -1,26 +1,30 @@
 #pragma once
 #include <conio.h> 
-#include <vector>
+#include <filesystem>
+#include <string>
 #include <fstream>
 #include <sstream>
 #include "Pacman.h"
 #include "Ghost.h"
+
 using std::vector;
 
 
 
 class Board
 {
-	vector<string> Org_map, Play_map;    // We creat 2 identical maps; one to keep for new game beginnings 
-	Pacman pac;						   // and one to play and change in real time.
+	vector<vector<string>> Org_maps;       // We creat 2 identical maps; one to keep for new game beginnings (each time we switch map we update the play map)
+	vector<string> Play_map;			  // and one to play and change in real time.
+	Pacman pac;						  
 	vector<Ghost> ghosts;
 	Point legend;
 	bool legend_flag = false;
-	short rows = 0, cols = 0;
+	short rows;
 	short breadcrumbs = 0;
+
 private:
 	bool findBorder_Top(const unsigned short& col, unsigned short& line);
-	void create_map_from_file();
+	void create_map_from_file(int map_num);
 	void changeFood2Path(Point pos) { Play_map[pos.getY()][pos.getX()] = ' '; }
 	void AnalyzeAround(Ghost g, char* conts, bool* paths);
 
@@ -28,7 +32,9 @@ private:
 
 public:
 	Board();
-	
+	void scanMap(ifstream myFile, string tmp_line, vector<string>& cur_map);
+	void loadNew_map(int map_num);
+
 	vector<string>& getPlay_map() { return Play_map; }
 	const Point& getlegend() const { return legend; }
 	bool getLegend_flag() const { return legend_flag; }
@@ -53,6 +59,5 @@ public:
 	bool Collision();
 	void printMap(bool colored);
 
-	void resetMap();
 	void resetCharacters() { pac.resetMe(); for (auto g : ghosts) g.resetMe(); }
 };

@@ -57,7 +57,7 @@ void Game::printlegend(Point pt, short hp)
 		string spaces = "                    ";
 		cout << spaces << endl;
 		gotoxy(pt.getX(), pt.getY()+1);
-		cout << (colored == true ? "\033[33m" : "\033[37m") << "SCORE:" << " " << score << "\t \t" << "LIVES:";
+		cout << (colored == true ? "\033[33m" : "\033[37m") << "SCORE:" << " " << score << "\t\t" << "LIVES:";
 		for (int i = 0; i < hp; i++)
 			cout << (colored == true ? "\033[33m" : "\033[37m") << " C";
 		gotoxy(pt.getX(), pt.getY()+2);
