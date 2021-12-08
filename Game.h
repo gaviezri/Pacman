@@ -13,10 +13,14 @@ class Game
 	Board br;
 	bool everyothermove = true;
 
+	void pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direction& last_dic);
+	void ghostsMoves_Dispatcher();
+
 public:
-	void ghosts_movemaker();
+	static int moves_made_this_level;
+	//-----------------UI (settings)----------------
 	void setDif();
-	void Color(){
+	void Color() {
 		system("cls");
 		short cho;
 		setTextColor(Color::WHITE);
@@ -24,17 +28,21 @@ public:
 		cin >> cho;
 		cho == 1 ? colored = true : colored = false;
 	}
-	void NewRound();
-	void printScore(Point); 
-	void Loser();
-	void Winner();
-	void pauseGAME();
-	void updateDics(Direction& cur);
 	void printMenu();
 	void setChoice();
 	void printInstructions();
+	//-----------------UI (announcements)----------------
+	void Loser();
+	void Winner();
+	//-----------game-engine-------------------
 	void play();
+	void Engine();
+	void level_progress();
+	void NewRound();
 	void ResetGame();
+	void pauseGAME();
+	void updateDics(Direction& cur);
+	//-------------utilities------------
 	void printlegend(Point pt, short hp);
 	bool Over()//indicator to end game loop
 	{
@@ -51,6 +59,7 @@ public:
 		else
 			return false;
 	}
-	void Engine();
+	void printScore(Point);
+
 };
 

@@ -36,9 +36,6 @@
     <ClInclude Include="primary_creatures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="behavior.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Point.cpp">
@@ -57,9 +54,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Board.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="behavior.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

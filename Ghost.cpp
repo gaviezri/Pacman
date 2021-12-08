@@ -7,13 +7,13 @@
 {
 	switch (dif)
 	{
-	case 0:
+	case 1:
 		diffic = Difficulty::NOVICE;
 		break;
-	case 1:
+	case 2:
 		diffic = Difficulty::GOOD;
 		break;
-	case 2:
+	case 3:
 		diffic = Difficulty::BEST;
 		break;
 	}
@@ -32,12 +32,12 @@ Difficulty Ghost::getDif()
  
  
 
+
 void Ghost::updateMove(Direction dic, bool colored, short cont)
 {
-
 	clearMe(colored, cont);
-
 	pos.updateCoord(dic);
 	printMe(colored);
 }
+
 
