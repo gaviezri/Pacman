@@ -1,7 +1,7 @@
 #pragma once
 #include "primary_creatures.h"
 #include <vector>
-#include "behavior.h"
+
 
  enum class Difficulty {
  

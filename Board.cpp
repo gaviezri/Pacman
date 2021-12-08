@@ -1,59 +1,92 @@
 #include "Board.h"
 
+
 bool const to_X = true;
 bool const to_Y = false;
-Board::Board()
+
+Board::Board()   // loads all game board to maps vector
 {
-	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa2.screen", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
-	string tmp_line;
+	vector<string>  screen_files, tmp_map;
+	string tmp_line,tmp_path;
+	int map_num = 0;
 
-	short  sum_cols = 0;
-
-	while (!myFile.eof())
+	for (auto const& entry : filesystem::directory_iterator("."))  // goes throu all files in the working directory
 	{
-		getline(myFile, tmp_line);
-		Org_map.push_back(tmp_line);
-
-		create_map_from_file();                    // initializing visual cells map from given file
-
-		Play_map.push_back(Org_map[rows++]);  // copying from orignal map to the play map. increment of the rows happens here.
+		tmp_path = entry.path().string();  
 		
-		sum_cols += tmp_line.length();
+		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 10) == "screen.txt")    // checkes if path ends with "screen.txt"
+		{
+			screen_files.push_back(entry.path().string());          // if so it adds the path to the path container
+		}
 	}
 
-	cols = sum_cols / rows;
+	screen_files.shrink_to_fit();
 
-	myFile.close();
+	for (const auto& cur_path : screen_files)    // opens all files and scans them RAW
+	{
+		ifstream myFile(cur_path, ios_base::in);
+		
+		rows = 0;
+
+		Org_maps.push_back(vector<string>());
+
+		while (!myFile.eof()) {
+			getline(myFile, tmp_line);
+
+			Org_maps[map_num].push_back(tmp_line);
+			create_map_from_file(map_num);  // initializing visual cells from Original map one row at a time
+			++rows;
+		}
+
+		myFile.close();
+
+		++map_num;
+	}
+	
+	loadNew_map(0);
 }
 
-void Board::create_map_from_file()
+void Board::loadNew_map(int map_num)
+{
+	Play_map.clear();
+
+	string tmp_line;
+	rows = 0;
+
+	for (int i = 0; i < Org_maps[map_num].size(); ++i) {
+		tmp_line = Org_maps[map_num][rows];
+		if (!(tmp_line.length() == 0 || (tmp_line.length() == 1 && tmp_line[0] == '&')))     // ---  we changed the data structur so there is only one play_map at a time!!! need to ajust
+			Play_map.push_back(Org_maps[map_num][rows++]);  // copying from orignal map to the play map. increment of the rows happens here.
+	}
+}
+
+void Board::create_map_from_file(int map_num)  
 {
 	short y = rows;
 
-	for (int x = 0; x < Org_map[y].length(); ++x)
+	for (int x = 0; x < Org_maps[map_num][y].length(); ++x)
 	{
-		switch (Org_map[y][x])    
+		switch (Org_maps[map_num][y][x])
 		{
 		case ' ':
-			Org_map[y][x] = '.';
+			Org_maps[map_num][y][x] = '.';
 			breadcrumbs++;
 			break;
 		case '%':
-			Org_map[y][x] = ' ';
+			Org_maps[map_num][y][x] = ' ';
 			break;
 		case '$':
-			Org_map[y][x] = ' ';
-			ghosts.push_back(Ghost(Point(x,y))); 
+			Org_maps[map_num][y][x] = ' ';
+			ghosts.push_back(Ghost(Point(x,y)));  //sets def pos
 			break;
 		case '@':
-			Org_map[y][x] = ' ';
-			pac = Pacman(Point(x,y));
+			Org_maps[map_num][y][x] = ' ';
+			pac = Pacman(Point(x,y));    //sets def pos
 			break;
 		case '&':
-			Org_map[y][x] = ' ';
+			Org_maps[map_num][y][x] = ' ';
 			legend = Point(x, y);
 			legend_flag = true;
-			if (Org_map[y].length() == 1) --rows;
 			break;
 		}
 	}
@@ -114,15 +147,6 @@ char Board::nextCellCont(Point pos , Direction dic)
 	}
 }
 
-void Board::resetMap()      // copying the original map to the play map.
-{
-	Play_map.clear();
-
-	for (int i = 0; i < rows; ++i)
-	{
-		Play_map.push_back(Org_map[i]);
-	}
-}
 
 void Board::movePac(Direction dic, bool colored, short& score)
 {
@@ -134,11 +158,13 @@ void Board::movePac(Direction dic, bool colored, short& score)
 		changeFood2Path(pac.getPos());
 	}
 }
+
 bool Board::isOnBorder(Point pos)
 {
 	unsigned short X = pos.getX(), Y = pos.getY();
 	return (X == 0 || Y == 0 || X == Play_map[Y].length() - 1 || Y == rows - 1);
 }
+
 void Board::AnalyzeAround(Ghost g, char* conts, bool* paths)
 {
 	int i = 0;
@@ -225,7 +251,7 @@ bool Board::Collision()
 {
 	for (auto g : ghosts)
 	{
-		if (pac.getPos() == g.getPos())
+		if (pac.getPos().getX() == g.getPos().getX() && pac.getPos().getY() == g.getPos().getY())
 			return true;
 	}
 	return false;
@@ -238,7 +264,6 @@ bool Board::isTopBorder(const unsigned& X, const unsigned& Y)
 	return true;
 
 }
-
 
 bool Board::portals(Direction dic,Point& pos)
 {
