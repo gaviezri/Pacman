@@ -69,10 +69,4 @@ public:
 	const vector<Ghost>& Ghosts() { return ghosts; }
 	Ghost& Ghosts(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
 	void moveGhost(bool colored,int);
-
-
-	bool Collision();
-	void printMap(bool colored);
-	void resetCharacters() { pac.resetMe(); for (auto g : ghosts) g.resetMe(); }
-
 };
