@@ -1,7 +1,21 @@
 #include "Board.h"
 
+const pair<Direction, int> Min2pairs(const pair<Direction, int>& a, const pair<Direction, int>& b)
+{
+	if (a.first == Direction::DEF)
+		return  b;
+	else if (b.first == Direction::DEF)
+		return  a;
+	else
+		return  a.second <= b.second ? a : b;
+}
+const pair<Direction, int> Min4pairs(const pair<Direction, int>& a,const pair<Direction, int>& b,const  pair<Direction, int>& c, const pair<Direction,int>& d)
+{
+	return Min2pairs(Min2pairs(a, b), Min2pairs(c, d));
+}
 bool const to_X = true;
 bool const to_Y = false;
+
 Board::Board()
 {
 	ifstream myFile("C:\\Users\\gavie\\Desktop\\mapa2.screen", ios_base::in);  // need to ask what will be the name of the text files that we will recive!
@@ -97,19 +111,22 @@ char Board::nextCellCont(Point pos , Direction dic)
 	switch (dic)
 	{
 	case Direction::UP:
-		return (Play_map[--y][x]);
+		if(y!=0) return (Play_map[--y][x]);
+		return static_cast<char>(Content::WALL);
 		break;
 	case Direction::DOWN:
 		return (Play_map[++y][x]);
 		break;
 	case Direction::LEFT:
-		return (Play_map[y][--x]);
+		if(x!=0) return (Play_map[y][--x]);
+		return static_cast<char>(Content::WALL);
+
 		break;
 	case Direction::RIGHT:
 		return (Play_map[y][++x]);
 		break;
 	default:
-		return (int)Content::WALL;
+		return static_cast<char>(Content::WALL);
 		break;
 	}
 }
@@ -127,18 +144,21 @@ void Board::resetMap()      // copying the original map to the play map.
 void Board::movePac(Direction dic, bool colored, short& score)
 {
 	char cell_c = nextCellCont(pac.getPos(), dic);
-	pac.updateMove(dic, colored,Play_map);
+	pac.updateMove(dic, colored);
 	if (cell_c == '.')
 	{
 		score++;
 		changeFood2Path(pac.getPos());
 	}
 }
-bool Board::isOnBorder(Point pos)
-{
+
+bool Board::isOnBorder(Point pos)				
+{												
 	unsigned short X = pos.getX(), Y = pos.getY();
-	return (X == 0 || Y == 0 || X == Play_map[Y].length() - 1 || Y == rows - 1);
+	
+	return (X == 0 || Y == 0 || X == Play_map[Y].length() - 1 || Y == rows - 1 || isTopBorder(pos.getX(),pos.getY()) );
 }
+
 void Board::AnalyzeAround(Ghost g, char* conts, bool* paths)
 {
 	int i = 0;
@@ -172,11 +192,6 @@ void Board::AnalyzeAround(Ghost g, char* conts, bool* paths)
 	}
 }
 
-bool Board::isBlankOnBorder(Point pos)
-{
-	return(isOnBorder(pos) && isblank(Play_map[pos.getY()][pos.getX()]));
-}
-
 void getOptions(vector<Direction>& d, bool* paths)
 {
 	d.clear();
@@ -184,41 +199,122 @@ void getOptions(vector<Direction>& d, bool* paths)
 		if (paths[j])  d.push_back((Direction)j);
 }
 
-void Board::moveGhost(bool colored)
+void Board::moveGhost(bool colored,int movesmade)
 {
 	char cont_around[4], next_cont;		//wall counter count actual walls, path around just indicate wether there is a path and we are manipulating the opposite direction to act
 	vector<Direction> options;
 	Direction opposite_dic;
 	bool path_around[4];             // bool array that indicate by index using enum if theres a path in a given direction
-	for (int i = 0; i < ghosts.size(); i++)
+
+	for (auto& G : ghosts)
 	{
-		AnalyzeAround(ghosts[i], cont_around, path_around);
-	
-		nextContAndOppDic(ghosts[i].getcurDic(), opposite_dic, next_cont, cont_around);//checking whats the next cell's content in the current direction im going and 
-																  // updating my opposite direction
+		char content_underme = Play_map[G.getPos().getY()][G.getPos().getX()];// gets the content that the ghost 'steps' on prior to new location
+
+		AnalyzeAround(G, cont_around, path_around);
+
+		nextContAndOppDic(G.getcurDic(), opposite_dic, next_cont, cont_around);//checking whats the next cell's content in the current direction im going and 
+																			  // updating my opposite direction
 		path_around[(int)opposite_dic] = false;  // We want the ghost to treat the opposite direction as if it was a wall.
 
-		getOptions(options,path_around);
+		getOptions(options, path_around);
 
-		
-		if (next_cont == (int)Content::WALL) //  + Or T Or L Or  or DeadEnd  junction approaching T from side or from front
-			switch (options.size())
-			{
-			case 0:	// Dead-End go opposite direction
-				ghosts[i].updateMove(ghosts[i].setcurDic(opposite_dic), colored,Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
-				break;
-			case 1:	//L Junc  - go the only way 
-				ghosts[i].updateMove(ghosts[i].setcurDic(options[0]), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
-				break;
-			default:	//T Junc choose randomly from options
-				ghosts[i].updateMove(ghosts[i].setcurDic(options[rand() % (options.size())]), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
-				break;
-			}
-		else if (options.size()>=2)// in a 4 way junc - choose randomly
-			ghosts[i].updateMove(ghosts[i].setcurDic(options[rand() % (options.size())]), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);
-		else
-			ghosts[i].updateMove(ghosts[i].getcurDic(), colored, Play_map[ghosts[i].getPos().getY()][ghosts[i].getPos().getX()]);// continue same way
+		switch (Ghost::getDif())
+		{
+		case Difficulty::NOVICE:
+			NoviceMovement(options, opposite_dic, next_cont, colored, G,content_underme);
+			break;
+		case Difficulty::GOOD:
+			if (movesmade % 20 > 14) NoviceMovement(options, opposite_dic, next_cont, colored, G,content_underme); 	
+			else BestMovement(options, colored, G,content_underme);
+			break;
+		case Difficulty::BEST:
+			BestMovement(options, colored, G,content_underme);
+			break;
+		}
+	
 	}
+	
+	
+}
+
+
+
+void Board::BestMovement(const vector<Direction>& options, bool colored, Ghost& G,const char& content_underme)
+{
+	Point dest = pac.getPos();
+	vector<vector<bool>> canGo = createTrackingMap();
+	set<Point> visited;
+	Direction dic = BestMovement_Util(canGo, 0, pac.getPos(), G.getPos(), Direction::DEF,visited).first;
+	G.updateMove(dic, colored, content_underme);
+}
+
+vector<vector<bool>> Board::createTrackingMap()
+{//initializing the bool matrix which represent where ghost cango when bfs
+	vector<vector<bool>> canGo;
+
+	canGo.reserve(rows);
+	
+	for (int row = 0; row < rows; row++)
+	{
+		vector<bool> tmp;		
+
+		for (int col = 0; col < Play_map[row].length(); col++) //creation here
+			if (isOnBorder(Point(col, row)) || Play_map[row][col] == (int)Content::WALL)
+				tmp.push_back(false);
+			else tmp.push_back(true);
+
+		canGo.push_back(tmp);
+	}
+	return canGo;
+}
+
+pair<Direction, int> Board::BestMovement_Util(vector<vector<bool>>canGo, int path_len, Point dest, Point cur, Direction last_went, set<Point> visited)
+{
+	
+	unsigned short cX = cur.getX(), cY = cur.getY();
+	if (!canGo[cY][cX]) // if cant go to curr pos from previous
+	{							
+		return { Direction::DEF,UINT16_MAX }; // return default pair
+	}
+	if ((!visited.empty() && visited.end() != visited.find(cur)))	  //  Or not empty and cur already been visited return default values (==NOT FOUND)
+	{
+		visited.erase(cur);
+		return { Direction::DEF,UINT16_MAX }; // return default pair
+	}
+	pair<Direction, int> up, down, left, right;
+	if (cur == dest)
+	{
+		return { last_went,path_len };
+	}
+	visited.insert(cur);
+	down = BestMovement_Util(canGo,  path_len + 1,dest,cur+Point(0,1),Direction::DOWN, visited);
+	up = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(0, 1),Direction::UP, visited);
+	right = BestMovement_Util(canGo, path_len + 1, dest, cur + Point(1, 0), Direction::RIGHT, visited);
+	left = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(1, 0),  Direction::LEFT, visited);
+
+	return Min4pairs(down, up, right, left);
+}
+
+void Board::NoviceMovement(const vector<Direction>&options,Direction&opposite_dic,const char& next_cont,bool colored, Ghost& G,const char& content_underme)
+{
+	
+	if (next_cont == (int)Content::WALL) //  + Or T Or L Or  or DeadEnd  junction approaching T from side or from front
+		switch (options.size())
+		{
+		case 0:	// Dead-End go opposite direction
+			G.updateMove(G.setcurDic(opposite_dic), colored, content_underme);
+			break;
+		case 1:	//L Junc  - go the only way 
+			G.updateMove(G.setcurDic(options[0]), colored, content_underme);
+			break;										   
+		default:	//T Junc choose randomly from options
+			G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored, content_underme);
+			break;
+		}
+	else if (options.size() >= 2)// in a 4 way junc - choose randomly
+	G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored, content_underme);
+	else
+		G.updateMove(G.getcurDic(), colored, content_underme);// continue same way
 }
 
 bool Board::Collision()
@@ -237,33 +333,37 @@ bool Board::isTopBorder(const unsigned& X, const unsigned& Y)
 		return (X > Play_map[Y - 1].length());
 	return true;
 
-}
-
+}	
 
 bool Board::portals(Direction dic,Point& pos)
 {
 	unsigned short idx;
 	unsigned short X = pos.getX();
 	unsigned short Y = pos.getY();
-
+	
 	if (X == 0 && dic == Direction::LEFT && isBlank(Play_map[Y][Play_map[Y].length() - 1]))// Left -> Right
 	{
-		pos.ClearPac_updateCoord(Play_map[Y].length() - 1, to_X);
+		pac.clearMe();
+		pac.setX(Play_map[Y].length() - 1);
+		// print ' ' over pac's last position and update his coord to other side
 		return true;
 	}
 	else if (X == Play_map[Y].length() - 1 && dic == Direction::RIGHT && isBlank(Play_map[Y][0])) //Right -> Left
 	{
-		pos.ClearPac_updateCoord(0, to_X);
+		pac.clearMe();
+		pac.setX(0);
 		return true;
 	}
 	else if (isTopBorder(X, Y) && dic == Direction::UP && isBlank(Play_map[rows - 1][X]))// TOP -> BOTTOM
 	{
-		pos.ClearPac_updateCoord(rows-1, to_Y);
+		pac.clearMe();
+		pac.setY(rows-1);
 		return true;
 	}
 	else if (Y == rows-1 && dic == Direction::DOWN && findBorder_Top(X,idx)) // BOTTOM -> UP
 	{
-		pos.ClearPac_updateCoord(idx, to_Y);
+		pac.clearMe();
+		pac.setY(idx);
 			return true;
 	}
 	return false;

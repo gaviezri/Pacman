@@ -38,25 +38,23 @@ public:
 		coord[0] = _x;
 		coord[1] = _y;
 	}
-	const unsigned short* getCoord()
-	{
-		return coord;
-	}
-
+	//--------------------getters--------------------
 	const unsigned short getX()const{return coord[0];}
 	const unsigned short getY()const{return coord[1];}
-	
+	//-------------setters---------------------
 	void setX(unsigned short x) { coord[0] = x; }
 	void setY(unsigned short y) { coord[1] = y; }
-
+	static bool U_above_D(const Point& U, const Point& D) { return U.coord[1] + 1 == D.coord[1]; }
+	static bool L_left_R(const Point& L, const Point& R) { return R.coord[0]  == L.coord[0] + 1; }
 	void setCoord(int _x, int _y);
-
-	bool operator==(const Point&);
+	//------------------operators-----------------------
+	bool operator==(const Point&)const;
 	bool operator!=(const Point&)const;
-	Point operator+(const Point& other);
-	Point operator-(const Point& other);
+	Point operator+(const Point& other)const;
+	Point operator-(const Point& other)const;
+	bool operator<(const Point& other)const;
 
-	bool portals(Direction dic,const vector<string>&,const short&);
+	//--------positioning&movement------------------------
 	void updateCoord(Direction);
 	void ClearPac_updateCoord(unsigned short newval, bool Xflag);
 };
