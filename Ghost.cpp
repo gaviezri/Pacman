@@ -33,4 +33,11 @@ Difficulty Ghost::getDif()
  
 
 
+void Ghost::updateMove(Direction dic, bool colored, short cont)
+{
+	clearMe(colored, cont);
+	pos.updateCoord(dic);
+	printMe(colored);
+}
+
 

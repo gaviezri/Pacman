@@ -14,6 +14,7 @@ public:
 	void setX(unsigned int x) { pos.setX(x); }
 	void setY(unsigned int y) { pos.setY(y); }
 	void resetMe() { pos = def_pos; }
+
 	void printMe(bool colored) {
 		gotoxy(pos.getX(), pos.getY());
 		if (colored) { if (avatar == 'C')setTextColor(Color::BROWN); else setTextColor(Color::RED); }
@@ -46,5 +47,6 @@ public:
 		gotoxy(pos.getX(), pos.getY());
 		cout <<" "; 
 	}
+
 };
 
