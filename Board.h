@@ -28,12 +28,7 @@ class Board
 private:
 	//-------------------------pacman movement-----------------------------------
 	bool findBorder_Top(const unsigned short& col, unsigned short& line);
-
-	
 	void changeFood2Path(Point pos) { Play_map[pos.getY()][pos.getX()] = ' '; }
-	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
-	bool isOnBorder(Point pos);
-	bool isTopBorder(const unsigned& X, const unsigned& Y);
 	//------------------------ghosts movement------------------------------------
 
 	void nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around);
@@ -54,12 +49,14 @@ public:
 	const Point& getlegend() const { return legend; }
 	bool getLegend_flag() const { return legend_flag; }
 	void resetCharacters() { pac.resetMe(); for (auto& g : ghosts) g.resetMe(); }
-	void resetMap();
 	short getCrumbs() { return breadcrumbs; }
 	char nextCellCont(Point pos, Direction dic);      // returns map content in a given postion.
 	bool Collision();
 	void printMap(bool colored);
-
+	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
+	bool isOnBorder(Point pos);
+	bool isTopBorder(const unsigned& X, const unsigned& Y);
+	bool isInBorder(Point pos);
 	//-------------------pacman---------------------------
 	Pacman& Pac() { return pac; }
 	void movePac(Direction dic, bool colored, short& score);
