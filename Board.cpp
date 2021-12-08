@@ -4,8 +4,6 @@
 bool const to_X = true;
 bool const to_Y = false;
 
-
-
 Board::Board()   // loads all game board to maps vector
 {
 	vector<string>  screen_files, tmp_map;
@@ -96,7 +94,7 @@ void Board::create_map_from_file(int map_num)
 
 void Board::printMap(bool colored)
 {
-	for (int i = 0; i < rows; ++i) cout<<(colored ? "\033[34m" : "\033[37m") << Play_map[i] << endl;
+	for (int i = 0; i < rows; ++i) { if (colored) setTextColor(Color::BLUE); else setTextColor(Color::WHITE);  cout << Play_map[i] << endl; }
 }
 
 void Board::nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around)

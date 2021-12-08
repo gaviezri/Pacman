@@ -17,7 +17,9 @@ public:
 	void ghosts_movemaker();
 	void setDif();
 	void Color(){
+		system("cls");
 		short cho;
+		setTextColor(Color::WHITE);
 		cout << "for color mode enter 1, for B&W enter anything else : ";
 		cin >> cho;
 		cho == 1 ? colored = true : colored = false;

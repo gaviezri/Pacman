@@ -34,8 +34,9 @@ Difficulty Ghost::getDif()
 
 void Ghost::updateMove(Direction dic, bool colored, short cont)
 {
-	gotoxy(pos.getX(), pos.getY());// putting cursor on ghost's place and run it over with the cell contant
-	cout <<(colored ? "\033[34m" : "\033[37m") <<(cont == (int)Content::PATH ? " " : "."); // checks cells contant and print it.
+
+	clearMe(colored, cont);
+
 	pos.updateCoord(dic);
 	printMe(colored);
 }

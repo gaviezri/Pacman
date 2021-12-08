@@ -10,9 +10,22 @@ protected:
 
 public:
 	void resetMe() { pos = def_pos; }
-	void PrintMe(bool colored) { gotoxy(pos.getX(), pos.getY()); cout << (colored ? "\033[33m" : "\033[37m") << avatar; }
-	void setDef_pos(int x, int y) { def_pos.setX(x), def_pos.setY(y); }  // can be deleted (?)
 
-//	virtual void movement() = 0;
+	void printMe(bool colored) {
+		gotoxy(pos.getX(), pos.getY()); if (colored) { if (avatar == 'C')setTextColor(Color::BROWN); else if (avatar == 'G')setTextColor(Color::RED); else setTextColor(Color::WHITE); cout << avatar; }
+	}
+	void clearMe(bool colored,char cont)
+	{
+		gotoxy(pos.getX(), pos.getY()); // putting cursor on character's place and run it over with the cell content
+		if (colored)
+			setTextColor(Color::BLUE);
+		cout << (cont == (int)Content::PATH ? " " : "."); // checks cells content and print it.
+	}
+	void clearMe()
+	{
+		gotoxy(pos.getX(), pos.getY());
+		cout <<" "; 
+	}
+
 };
 

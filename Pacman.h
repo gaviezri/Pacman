@@ -15,8 +15,6 @@ public:
 	void HitByGhost() { --HP; gotoxy(2 * pos.getX(), pos.getY()); cout << " ";  pos = def_pos; }
 	void updateMove(Direction dic, bool colored,vector<string>);
 	Point& getPos() { return pos; }
-	void PrintMe(bool colored) { gotoxy(pos.getX(), pos.getY()); cout << (colored ? "\033[33m" : "\033[37m") << 'C'; }
-
 };
 
 
