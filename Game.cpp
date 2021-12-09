@@ -117,7 +117,7 @@ void Game::setDif()
 	{
 		system("cls");
 		cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-		cout << "1 = \"Novice\"" << endl << "2 = \"Good\"" << endl << "3 = \"Best\"" << endl;
+		cout << "1 = \"Easy\"" << endl << "2 = \"Medium\"" << endl << "3 = \"Expert\"" << endl;
 		cout << "selection: ";
 		ch = _getch()-48;
 	}
@@ -173,7 +173,6 @@ void  Game::printInstructions()
 
 void Game::level_progress()
 {
-	
 	Direction cur_dic = Direction::DEF, next_dic = Direction::DEF, last_dic = Direction::DEF; // initialzing for the switch 
 	br.printMap(colored);
 	printlegend(br.getlegend(), br.Pac().getHP());

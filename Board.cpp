@@ -1,4 +1,6 @@
 #include "Board.h"
+
+const short STUCK = -1;
 bool const to_X = true;
 bool const to_Y = false;
 
@@ -181,7 +183,7 @@ bool Board::isInBorder(Point pos)
 {
 	unsigned short X = pos.getX(), Y = pos.getY();
 
-	return ((X > 0 && X< Play_map[Y].length() - 1) &&  (Y > 0 &&  Y < rows - 1));
+	return ((X >= 0 && X<= Play_map[Y].length() - 1) &&  (Y >= 0 &&  Y <= rows - 1));
 }
 
 bool Board::isOnBorder(Point pos)
@@ -269,15 +271,27 @@ void Board::moveGhost(bool colored,int movesmade)
 	
 }
 
+inline Direction shortestRoute(int up, int down, int left, int right)
+{
+	if (up == STUCK) up = 1+max(max(down, left), right);// ensuring STUCK assigned values will not be the minimals
+	if (down == STUCK) down = 1+max(max(up, left), right);
+	if (left == STUCK) left = 1+max(max(down, up), right);
+	if(right == STUCK) right = 1+max(max(down, up), left);
 
+	if (up == (min(min(up, down), min(left, right)))) return Direction::UP; // returning direction of a shortest path (can be 1 or more)
+	if (down == (min(min(up, down), min(left, right)))) return Direction::DOWN;
+	if (left == (min(min(up, down), min(left, right)))) return Direction::LEFT;
+	if (right == (min(min(up, down), min(left, right)))) return Direction::RIGHT;
+}
 
-void Board::BestMovement(const vector<Direction>& options, bool colored, Ghost& G,const char& content_underme)
+void Board::BestMovement(const vector<Direction>& options, bool colored, Ghost& G,const char& content_underme) // smart ghosts movement maker
 {
 	Point dest = pac.getPos();
-	vector<vector<bool>> canGo = createTrackingMap();
-	set<Point> visited;
-	Direction dic = BestMovement_Util(canGo, 0, pac.getPos(), G.getPos(), Direction::DEF,visited).first;
-	G.updateMove(dic, colored, content_underme);
+	int UP = BestMovement_Util(dest, G.getPos() - Point(0, 1)); 
+	int DOWN = BestMovement_Util(dest, G.getPos() + Point(0, 1));	
+	int LEFT = BestMovement_Util(dest, G.getPos() - Point(1, 0));
+	int RIGHT = BestMovement_Util(dest, G.getPos() + Point(1, 0));
+	G.updateMove(shortestRoute(UP,DOWN,LEFT,RIGHT), colored, content_underme);
 }
 
 vector<vector<bool>> Board::createTrackingMap()
@@ -292,7 +306,7 @@ vector<vector<bool>> Board::createTrackingMap()
 
 		for (int col = 0; col < Play_map[row].length(); col++) //creation here
 			if (isOnBorder(Point(col, row)) || Play_map[row][col] == (int)Content::WALL)
-				tmp.push_back(false);
+				tmp.push_back(false); 
 			else 
 				tmp.push_back(true);
 
@@ -301,40 +315,47 @@ vector<vector<bool>> Board::createTrackingMap()
 	return canGo;
 }
 
-pair<Direction, int> Board::BestMovement_Util(vector<vector<bool>>canGo, int path_len, Point dest, Point cur, Direction last_went, set<Point> visited)
+int Board::BestMovement_Util( Point dest, Point cur)
 {
-	return { Direction::DEF, UINT16_MAX };
-}
-/*	//search for the next best move based on pacman's location and ghosts location using BFS
-	unsigned short cX = cur.getX(), cY = cur.getY();
-	if (/*validmove*)
+	vector<vector<bool>> canGo = createTrackingMap(); // create a boolean map the reflects where can go
+	if (!canGo[cur.getY()][cur.getX()]) // if we are on a wall or sides or out of map
+		return STUCK;
+	queue<pair<Point, int>> steps;
+	canGo[cur.getY()][cur.getX()] = false; // falsify my position preventing circles while tracking (like hensel and gretel leaving bread crumbs behind)
+	//																										and then pacman will eat the bread crumbs :)
+	steps.push({ cur,0 }); 
+	while (!steps.empty())
 	{
-		if ((!visited.empty() && visited.end() != visited.find(cur)))	  //  Or not empty and cur already been visited return default values (==NOT FOUND)
-		{
-			return { Direction::DEF,UINT16_MAX }; // return default pair
-		}
-		if (!canGo[cY][cX]) // if cant go to curr pos from previous
-		{
-			visited.insert(cur);
-				return { Direction::DEF,UINT16_MAX }; // return default pair
-		}
+		pair<Point, int> tmp = steps.front();
+		steps.pop();
 
-		pair<Direction, int> up, down, left, right;
-		if (cur == dest)
+		if (tmp.first == dest)
+			return tmp.second;
+		if (isInBorder(tmp.first - Point(0, 1)) && canGo[tmp.first.getY()-1][tmp.first.getX()]) // GOING UP
 		{
-			return { last_went,path_len };
+			canGo[tmp.first.getY() - 1][tmp.first.getX()] = false;
+			steps.push({ tmp.first - Point(0, 1),tmp.second + 1 });
 		}
-		visited.insert(cur);
-		down = BestMovement_Util(canGo, path_len + 1, dest, cur + Point(0, 1), Direction::DOWN, visited);
-		up = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(0, 1), Direction::UP, visited);
-		right = BestMovement_Util(canGo, path_len + 1, dest, cur + Point(1, 0), Direction::RIGHT, visited);
-		left = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(1, 0), Direction::LEFT, visited);
-
-		return Min4pairs(down, up, right, left);
+		if (isInBorder(tmp.first + Point(0, 1)) && canGo[tmp.first.getY() + 1][tmp.first.getX()]) // DOWN
+		{
+			canGo[tmp.first.getY() + 1][tmp.first.getX()] = false;
+			steps.push({ tmp.first + Point(0, 1),tmp.second + 1 });
+		}
+		if (isInBorder(tmp.first - Point(1, 0)) && canGo[tmp.first.getY()][tmp.first.getX()-1]) // LEFT
+		{
+			canGo[tmp.first.getY()][tmp.first.getX()-1] = false;
+			steps.push({ tmp.first - Point(1, 0),tmp.second + 1 });
+		}
+		if (isInBorder(tmp.first + Point(1, 0)) && canGo[tmp.first.getY()][tmp.first.getX() + 1]) // RIGHT
+		{
+			canGo[tmp.first.getY()][tmp.first.getX() + 1] = false;
+			steps.push({ tmp.first + Point(1, 0),tmp.second + 1 });
+		}
 	}
-	return { Direction::DEF,UINT16_MAX }; // return default pair if out of bound
+	return STUCK;
+	
 }
-*/
+
 void Board::NoviceMovement(const vector<Direction>&options,Direction&opposite_dic,const char& next_cont,bool colored, Ghost& G,const char& content_underme)
 {
 	
