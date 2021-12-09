@@ -6,7 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <utility>    
-#include <set>    
+#include <queue>    
 #include "Pacman.h"
 #include "Ghost.h"
 
@@ -35,7 +35,7 @@ private:
 	void AnalyzeAround(Ghost g, char* conts, bool* paths);
 	void NoviceMovement(const vector<Direction>&, Direction&, const char&, bool, Ghost& G,const char&);
 	void BestMovement(const vector<Direction>& options, bool colored, Ghost& G, const char&);
-	pair<Direction, int> BestMovement_Util(vector<vector<bool>>canGo, int path_len, Point dest, Point cur, Direction,set<Point>);
+	int BestMovement_Util(Point dest, Point cur);
 	vector<vector<bool>> createTrackingMap();
 	//-----------------------------ctor-----------------------------------------
 	void create_map_from_file(int map_num);//choose more adequate name
