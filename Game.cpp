@@ -211,7 +211,7 @@ void Game::level_progress()
 			goto PAUSE;
 		}
 
-		ghostsMoves_Dispatcher();
+		NPCMoves_Dispatcher();
 
 		if (br.Collision())//if one of the ghosts and pacman share the same cell
 		{
@@ -262,15 +262,10 @@ void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direc
 	}
 }
 
-void Game::ghostsMoves_Dispatcher()
+void Game::NPCMoves_Dispatcher()
 {
-	if (everyothermove)//ghost movement manager that makes ghost move everyother move that pacman makes
-	{
-		br.moveGhost(colored,moves_made_this_level);
-		everyothermove = false;// switch off
-	}
-	else
-		everyothermove = true;// switch on
+	 //ghost movement manager that makes ghost move everyother move that pacman makes and moves fruit every 3
+		br.NPCmoveGenerator(colored,moves_made_this_level);
 }
 
 void Game::printScore(Point legend)
