@@ -68,6 +68,14 @@ Board::Board()   // loads all game board to maps vector
 		loadNew_map();  // need to get the number of map that the user chose - default map is 0.
 	}
 }
+bool play_rows_validator(const string& tmp)
+{
+	if (tmp.size() == 0 || tmp.size()==1)
+		return false;
+	else
+	
+		return true;
+}
 
 void Board::loadNew_map()
 {
@@ -81,8 +89,8 @@ void Board::loadNew_map()
 		tmp_line = Org_maps[map_num][i];
 		Play_map.push_back(tmp_line);     // copying from orignal map to the play map. 
 
-		if (!(tmp_line.length() == 0 || (tmp_line.length() == 1 && tmp_line[0] == '&')))  // if the row is not empty and not only & (legened sign) cout them
-			++rows;  // is it really needed?
+		if (play_rows_validator(tmp_line))// if the row is not empty or there is atleast one space 
+			++rows;
 	}
 
 	insert_legend();
@@ -166,6 +174,26 @@ void Board::printMap(bool colored)
 	for (int i = 0; i < Play_map.size(); ++i) { if (colored) setTextColor(Color::BLUE); else setTextColor(Color::WHITE);  cout << Play_map[i] << endl; }
 }
 
+void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& last_dic,const bool & colored, short& score)
+{
+	if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
+		cur_dic = Direction::STAY;
+
+	else if (portals(cur_dic, (Point&)pac.getPos()))
+		pac.printMe(colored);
+
+	else if (int(Content::WALL) != nextCellCont(pac.getPos(), next_dic))  //advance to next direction if its not a wall
+	{
+		movePac(next_dic, colored, score);
+		last_dic = cur_dic = next_dic;// remember the new direction
+		next_dic = Direction::DEF; // default the next direction
+	}
+	else if (int(Content::WALL) != nextCellCont(pac.getPos(), cur_dic)) // advance in current direction if the 
+	{																	       // requested next isnt possible
+		movePac(cur_dic, colored, score);
+		last_dic = cur_dic;
+	}
+}
 
 void Board::movePac(Direction dic, bool colored, short& score)
 {
@@ -177,6 +205,8 @@ void Board::movePac(Direction dic, bool colored, short& score)
 		changeFood2Path(pac.getPos());
 	}
 }
+
+
 
 bool Board::isInBorder(Point pos)
 {
@@ -193,7 +223,9 @@ bool Board::isOnBorder(Point pos)
 	return (X == 0 || Y == 0 || X == Play_map[Y].length() - 1 || Y == rows - 1 );
 }
 
-void Board::AnalyzeAround(NPC g, char* conts, bool* paths)
+
+
+void Board::AnalyzeAround(NPC& g, char* conts, bool* paths)
 {
 	int i = 0;
 	Point gPos = g.getPos();
@@ -275,7 +307,7 @@ char Board::nextCellCont(Point pos, Direction dic)
 		return static_cast<char>(Content::WALL);
 		break;
 	case Direction::RIGHT:
-		if (Play_map[y].length()-1 <= x) return static_cast<char>(Content::PATH); // if the board has no limits the pacman will walk freely on screen.
+		if (Play_map[y].length()-1 <= x) return static_cast<char>(Content::WALL); // if the board has no limits the pacman will consider as walls
 		return (Play_map[y][++x]);
 		break;
 	default:
@@ -311,7 +343,7 @@ void Board::premoveDatacollection(char& next_cont,char* cont_around, bool* path_
 	getOptions(options, path_around);
 }
 
-void Board::NPCmoveGenerator(bool colored,int movesmade)
+void Board::NPCmoveGenerator(bool colored,int movesmade,short& fruitbonus)
 {
 	char cont_around[4], next_cont ;		//wall counter count actual walls, path around just indicate wether there is a path and we are manipulating the opposite direction to act
 	vector<Direction> options;
@@ -337,25 +369,36 @@ void Board::NPCmoveGenerator(bool colored,int movesmade)
 		}
 	
 	}
-	if ((movesmade % 3)==1)
+	premoveDatacollection(next_cont, cont_around, path_around, fruit, opposite_dic, options);
+	if (fruit.isAppearing())
 	{
-		premoveDatacollection(next_cont, cont_around, path_around,fruit, opposite_dic, options);
-		if (!fruit.isAppearing() && fruit.ExposeMe())
+		if ((movesmade % 4) == 1)
+		{
+			NoviceMovement(options, opposite_dic, next_cont, colored, fruit);
+			fruit.step();
+			pacEatsfruit(fruitbonus);
+		}
+		fruit.Disappear(ghosts[rand() % ghosts.size()].getPos());
+		
+	}	
+	else
+	{
+		if(fruit.ExposeMe())
 			fruit.Appear();
 		NoviceMovement(options, opposite_dic, next_cont, colored, fruit);
 		
-		
-		 fruit.Disappear();
-		
-		if (fruit.getPos() == pac.getPos());
-			 //score +=fruit.Eaten();
-
+		fruit.Disappear(ghosts[rand() % ghosts.size()].getPos());
+		 
 	}
 	
 	
 }
 
-
+void Board::pacEatsfruit(short& fruitscore)
+{
+	if (fruit.getPos() == pac.getPos())
+		fruitscore += (fruit.Eaten(ghosts[rand() % ghosts.size()].getPos()) - IntToChar);
+}
 
 
 
@@ -365,19 +408,19 @@ void Board::NoviceMovement(const vector<Direction>& options,const Direction& opp
 		switch (options.size())
 		{
 		case 0:	// Dead-End go opposite direction
-			G.updateMove(G.setcurDic(opposite_dic), colored, G.getCont_under());
+			G.updateMove(G.setcurDic(opposite_dic), colored);
 			break;
 		case 1:	//L Junc  - go the only way 
-			G.updateMove(G.setcurDic(options[0]), colored, G.getCont_under());
+			G.updateMove(G.setcurDic(options[0]), colored);
 			break;
 		default:	//T Junc choose randomly from options
-			G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored, G.getCont_under());
+			G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored);
 			break;
 		}
 	else if (options.size() >= 2)// in a 4 way junc - choose randomly
-		G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored, G.getCont_under());
+		G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored);
 	else
-		G.updateMove(G.getcurDic(), colored, G.getCont_under());// continue same way
+		G.updateMove(G.getcurDic(), colored);// continue same way
 }
 inline bool stuck4ways(int up, int down, int left, int right)
 {
@@ -513,7 +556,7 @@ bool Board::isTopBorder(const unsigned& X, const unsigned& Y)
 {//checking if a give cell is a top border (relatively)
 	if (Y == 0)
 		return true;
-	if (Y > 0 && Play_map[Y - 1].length() >= Play_map[Y].length())
+	if (Y > 0 && (Play_map[Y - 1].length() < Play_map[Y].length()))
 		return (X > Play_map[Y - 1].length());
 	return false;
 

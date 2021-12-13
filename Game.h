@@ -9,6 +9,7 @@ class Game
 	char choice=0;
 	bool win=false;
 	short score=0;
+	short fruitscore = 0;
 	bool pause;
 	Board br;
 
@@ -34,7 +35,17 @@ public:
 	void Loser();
 	void Winner();
 	//-----------game-engine-------------------
-
+	bool maps_available() {
+		if (br.getScreen_files().size() == 0)
+		{
+			system("cls");
+			cout << "EROR 9345: Please make sure you have a valid map in your working directory before entring!";
+			Sleep(3000);
+			system("cls");
+			return false;
+		}
+		return true;
+	}
 	void play();
 	void Engine();
 	void level_progress();

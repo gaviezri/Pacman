@@ -14,7 +14,6 @@ public:
 	void setX(unsigned int x) { pos.setX(x); }
 	void setY(unsigned int y) { pos.setY(y); }
 	void resetMe() { pos = def_pos; }
-
 	void printMe(bool colored) {
 		gotoxy(pos.getX(), pos.getY());
 		if (colored) { if (avatar == 'C')setTextColor(Color::BROWN); else if (avatar == 'G') setTextColor(Color::RED); else setTextColor(Color::LIGHTGREEN); }
@@ -22,19 +21,9 @@ public:
 	}
 
 	//--------------------------------------------movements of creatures------
-	void updateMove(Direction dic, const bool& colored)//pacman
-	{
-		clearMe();
-		pos.updateCoord(dic);
-		printMe(colored);
 
-	}
-	void updateMove(Direction dic, bool colored, short cont)//ghosts
-	{
-		clearMe(colored, cont);
-		pos.updateCoord(dic);
-		printMe(colored);
-	}
+
+	
 	void clearMe(bool colored,char cont)
 	{
 		gotoxy(pos.getX(), pos.getY()); // putting cursor on character's place and run it over with the cell content

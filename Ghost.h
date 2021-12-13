@@ -21,6 +21,12 @@ public:
 	static Difficulty getDif();
 	//----------------ctor--------------------------
 	Ghost(Point _pos) { pos = def_pos = _pos; avatar = 'G'; }
+	void updateMove(Direction dic, bool colored)//ghosts
+	{
+		clearMe(colored, content_underme);
+		pos.updateCoord(dic);
+		printMe(colored);
+	}
 
 };
 

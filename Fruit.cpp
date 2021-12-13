@@ -1,29 +1,30 @@
 #include "Fruit.h"
-const int IntToChar = 48;
-int Fruit::Eaten()
+
+short int Fruit::Eaten(const Point& np)
 {
 	appearing = false;
 	move_counter = 0;
+	stealPositionFromGhosts(np);
 	return static_cast<int>(avatar);
+
 }
 void Fruit::Appear()
 {
 	appearing = true;
-	avatar =   myPrizeandLooks() + IntToChar;
+	setAvatar();
 }
-void Fruit::Disappear()
+void Fruit::Disappear(const Point& np)
 {
 	if (move_counter == 5)
 	{
 		appearing = false;
 		move_counter = 0;
+		clearMe();
+		stealPositionFromGhosts(np);
+		
 	}
 }
 bool Fruit::ExposeMe()
 {
-	return (rand()%3 == 1);
-}
-int  Fruit::myPrizeandLooks()
-{
-	return 5 + (rand() % 5);
+	return (rand()%12 == 1);
 }

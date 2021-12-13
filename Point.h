@@ -2,7 +2,7 @@
 #include <iostream>
 #include <Windows.h>
 #include <vector>
-
+const int IntToChar = 48;
 enum class Color
 {
 	BLACK = 0,

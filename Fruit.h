@@ -1,17 +1,28 @@
 #pragma once
 #include "NPC.h"
+
 class Fruit : public NPC
 {
     bool appearing = false;
     short move_counter = 0;
+  
 public:
-    bool isAppearing() { if (appearing)move_counter++; return appearing; }
-    void setAvatar(char av) { avatar = av; }
+    void stealPositionFromGhosts(const Point& p) { pos = p; }
+    void step() { move_counter++; }
+    bool isAppearing() { return appearing; }
+    void setAvatar() { avatar = 5 + (rand() % 5)+ IntToChar;}
     char getAvatar() { return avatar; }
     void Appear();
-    void Disappear();
-    int  myPrizeandLooks();
+    void updateMove(Direction dic, bool colored)
+    {
+        if (appearing)
+            clearMe(colored, content_underme);
+        pos.updateCoord(dic);
+        if (appearing)
+            printMe(colored);
+    }
+    void Disappear(const Point&);
     bool ExposeMe();
-    int Eaten();
+    short int Eaten(const Point&);
 };
 

@@ -36,13 +36,7 @@ menu:
 	switch (choice)
 	{
 	case 1:
-		if (br.getMapNum() < 0)
-		{
-			cout << "EROR 9345: Please make sure you have a valid map in your working directory before entring!";
-			_getch();
-			system("cls");
-		}
-		else
+		if(maps_available())
 		{
 			Engine();
 			ResetGame();
@@ -90,6 +84,8 @@ void Game::load_specific_Map()
 
 void Game::printlegend(Point pt, short hp)
 {
+	gotoxy(pt.getX(), pt.getY() + 1);
+	cout << "                   ";
 	setTextColor(Color::WHITE);
 	if (br.getLegend_flag()) {
 
@@ -121,18 +117,22 @@ void Game::NewRound(){         // when pac meets ghost  need to make the ghosts 
 	br.get_pac().HitByGhost();// -1 hp
 	
 	if (br.get_pac().getHP() != 0)
-	{
+	{	
 		printlegend(br.getlegend(), br.get_pac().getHP());   // update remaining lives on screen 
 		br.get_pac().clearMe();
 		br.get_pac().resetMe();
 		br.get_pac().printMe(colored);
 
-		for (auto G : br.get_ghosts_vec())
+		for (auto& G : br.get_ghosts_vec())
 		{
 			G.clearMe(colored, br.getPlay_map()[G.getPos().getY()][G.getPos().getX()]);
 			G.resetMe();
 			G.printMe(colored);
 		}
+		auto Fr = br.getFruit();
+		Fr.clearMe();
+		Fr.stealPositionFromGhosts(br.get_ghosts_vec()[rand() % br.get_ghosts_vec().size()].getPos());
+		
 		pause = true;
 	}
 }
@@ -180,7 +180,7 @@ void  Game::setChoice()
 		cout << "Invalid choice!" << endl;
 
 		cout << "Please select one of the following options." << endl;
-		cout << " 1) Start a new game" << endl  << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
+		cout << " 1) Start a new game" << endl <<" 2) Choose a map" << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
 
 		choice = _getch()-48;
 	}
@@ -245,7 +245,9 @@ void Game::level_progress()
 			NewRound();//update necessary info and reset avatars to default positions
 			goto PAUSE;
 		}
-		
+
+		br.pacEatsfruit(fruitscore);
+
 		++moves_made_this_level;
 	} while (!Over());
 }
@@ -270,35 +272,13 @@ void Game::Engine()
 
 void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direction& last_dic)
 {
-	if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
-		cur_dic = Direction::STAY;
-
-	else if (br.isOnBorder(br.get_pac().getPos()))  // this method works partcailly
-	{
-		br.get_pac().updateMove(next_dic, colored);
-		last_dic = cur_dic = next_dic;// remember the new direction
-		next_dic = Direction::DEF; // default the next direction
-	}
-	else if (br.portals(cur_dic, (Point&)br.get_pac().getPos()))
-			br.get_pac().printMe(colored);
-
-	else if (int(Content::WALL) != br.nextCellCont(br.get_pac().getPos(), next_dic))  //advance to next direction if its not a wall
-	{
-		br.movePac(next_dic, colored, score);
-		last_dic = cur_dic = next_dic;// remember the new direction
-		next_dic = Direction::DEF; // default the next direction
-	}
-	else if (int(Content::WALL) != br.nextCellCont(br.get_pac().getPos(), cur_dic)) // advance in current direction if the 
-	{																	       // requested next isnt possible
-			br.movePac(cur_dic, colored, score);
-			last_dic = cur_dic;
-	}	
+		br.move_in_border(next_dic, cur_dic, last_dic, colored, score);	
 }
 
 void Game::NPCMoves_Dispatcher()
 {
 	 //ghost movement manager that makes ghost move everyother move that pacman makes and moves fruit every 3
-		br.NPCmoveGenerator(colored,moves_made_this_level);
+		br.NPCmoveGenerator(colored,moves_made_this_level,fruitscore);
 }
 
 void Game::printScore(Point legend)
@@ -306,13 +286,14 @@ void Game::printScore(Point legend)
 	 gotoxy(legend.getX()+7,legend.getY()+1);//6 is a magic number represents the length of "SCORE:"
 	 if(colored)
 		 setTextColor(Color::LIGHTRED);
-	 cout  << score;
+	 cout  << score + fruitscore;
 }
 
 void Game::ResetGame()
 {
 	br.resetCharacters();
 	score = 0;
+	fruitscore = 0;
 	pause = false;
 	win = false;
 	choice = 0;
@@ -343,7 +324,7 @@ void Game::Loser()
 
 void Game::pauseGAME()
 {
-	gotoxy(br.getlegend().getX(), br.getlegend().getY()+1);
+	gotoxy(br.getlegend().getX(), br.getlegend().getY() + 1);
 	cout << "hit key to continue";
 	_getch();
 	pause = false;
