@@ -19,47 +19,51 @@ const pair<Direction, int> Min4pairs(const pair<Direction, int>& a,const pair<Di
 
 Board::Board()   // loads all game board to maps vector
 {
-	vector<string>  screen_files, tmp_map;
 	string tmp_line,tmp_path;
-	int map_num = 0;
-
+	short cur_map = 0;
 	for (auto const& entry : filesystem::directory_iterator("."))  // goes throu all files in the working directory
 	{
 		tmp_path = entry.path().string();  
 		
-		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 10) == "screen.txt")    // checkes if path ends with "screen.txt"
+		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 6) == "screen")    // checkes if path ends with "screen"
 		{
 			screen_files.push_back(entry.path().string());          // if so it adds the path to the path container
 		}
 	}
 
-	screen_files.shrink_to_fit();
 
-	for (const auto& cur_path : screen_files)    // opens all files and scans them RAW
+	if (screen_files.size() < 1)  // if no map files was found
 	{
-		ifstream myFile(cur_path, ios_base::in);
-		
-		rows = 0;
+		cout << "WARNING 9345: It seems that there are no valid map files in the working directory " << endl << "              [ the file must end with 'screen' ]";
+		_getch();
+		map_num = -1;
+	}
 
-		Org_maps.push_back(vector<string>());
+	else
+	{
+		screen_files.shrink_to_fit();
 
-		while (!myFile.eof()) {
-			getline(myFile, tmp_line);
+		for (const auto& cur_path : screen_files)    // opens all files and scans them RAW
+		{
+			ifstream myFile(cur_path, ios_base::in);
 
-			Org_maps[map_num].push_back(tmp_line);
-			create_map_from_file(map_num);  // initializing visual cells from Original map one row at a time
-			++rows;
+			Org_maps.push_back(vector<string>());
+
+			while (!myFile.eof()) {
+				getline(myFile, tmp_line);
+				Org_maps[cur_map].push_back(tmp_line);
+			}
+			myFile.close();
+
+			++cur_map;
 		}
 
-		myFile.close();
-
-		++map_num;
+		
+		loadNew_map();  // need to get the number of map that the user chose - default map is 0.
 	}
-	
-	loadNew_map(0);
 }
 
-void Board::loadNew_map(int map_num)
+void Board::loadNew_map()
 {
 	Play_map.clear();
 
@@ -67,15 +71,61 @@ void Board::loadNew_map(int map_num)
 	rows = 0;
 
 	for (int i = 0; i < Org_maps[map_num].size(); ++i) {
-		tmp_line = Org_maps[map_num][rows];
-		if (!(tmp_line.length() == 0 || (tmp_line.length() == 1 && tmp_line[0] == '&')))     // ---  we changed the data structur so there is only one play_map at a time!!! need to ajust
-			Play_map.push_back(Org_maps[map_num][rows++]);  // copying from orignal map to the play map. increment of the rows happens here.
+		create_PlayMap_from_Org(i);  // initializing visual cells from Original map one row at a time.
+		tmp_line = Org_maps[map_num][i];
+		Play_map.push_back(tmp_line);     // copying from orignal map to the play map. 
+
+		if (!(tmp_line.length() == 0 || (tmp_line.length() == 1 && tmp_line[0] == '&')))  // if the row is not empty and not only & (legened sign) cout them
+			++rows;  // is it really needed?
+	}
+
+	insert_legend();
+}
+
+void Board::insert_legend()
+{
+	short y = legend.getY(), x = legend.getX();
+
+	for (short i = 0; i < 3; ++i,++y)
+	{
+		insert_legend_row(y, x);
 	}
 }
 
-void Board::create_map_from_file(int map_num)  
+void Board::insert_legend_row(int y, int x)
 {
-	short y = rows;
+	short i;
+	while (Play_map.size() < (short)legend.getY() + 3)   // if the legened is 'below' aloocated rows of map, increment it.
+	{
+		Play_map.push_back(string());
+	}
+	if ((int)Play_map[y].length() - x >= 19)  // the legend row can fit in the memory allocated + change length to signed integer
+	{
+		for (i = x; i < x + 19; ++i)
+		{
+			Play_map[y][i] = '#';
+		}
+	}
+	else
+	{	
+		for (i = x; i < Play_map[y].length(); ++i)   // if there is space allocted in the line switch the characters to '#'
+		{
+			Play_map[y][i] = '#';
+		}
+		while (Play_map[y].length() < x)  // if the row is shorter then the position of the legened adds spaces till that point (extands the row accordinlly)
+		{
+			Play_map[y].push_back(' ');
+		}
+		while (i < x + 19)   
+		{
+			Play_map[y].push_back('#');
+			++i;
+		}
+	}
+}
+
+void Board::create_PlayMap_from_Org(int y)  
+{
 
 	for (int x = 0; x < Org_maps[map_num][y].length(); ++x)
 	{
@@ -107,7 +157,7 @@ void Board::create_map_from_file(int map_num)
 
 void Board::printMap(bool colored)
 {
-	for (int i = 0; i < rows; ++i) { if (colored) setTextColor(Color::BLUE); else setTextColor(Color::WHITE);  cout << Play_map[i] << endl; }
+	for (int i = 0; i < Play_map.size(); ++i) { if (colored) setTextColor(Color::BLUE); else setTextColor(Color::WHITE);  cout << Play_map[i] << endl; }
 }
 
 void Board::nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around)
@@ -147,14 +197,15 @@ char Board::nextCellCont(Point pos , Direction dic)
 		return static_cast<char>(Content::WALL);
 		break;
 	case Direction::DOWN:
+		if (Play_map.size()-1 <= y) return static_cast<char>(Content::PATH); // if the board has no limits the pacman will walk freely on screen.
 		return (Play_map[++y][x]);
 		break;
 	case Direction::LEFT:
 		if(x!=0) return (Play_map[y][--x]);
 		return static_cast<char>(Content::WALL);
-
 		break;
 	case Direction::RIGHT:
+		if (Play_map[y].length()-1 <= x) return static_cast<char>(Content::PATH); // if the board has no limits the pacman will walk freely on screen.
 		return (Play_map[y][++x]);
 		break;
 	default:
@@ -163,6 +214,13 @@ char Board::nextCellCont(Point pos , Direction dic)
 	}
 }
 
+bool Board::out_of_line(const Point& pos, const Direction& dic)
+{
+	unsigned short x = pos.getX(), y = pos.getY();
+		
+	if (x > Play_map[y].length() || y > Play_map.size()) return true;
+	else return false;
+}
 
 void Board::movePac(Direction dic, bool colored, short& score)
 {
@@ -174,7 +232,6 @@ void Board::movePac(Direction dic, bool colored, short& score)
 		changeFood2Path(pac.getPos());
 	}
 }
-
 
 bool Board::isOnBorder(Point pos)
 {
@@ -260,8 +317,6 @@ void Board::moveGhost(bool colored,int movesmade)
 	
 	
 }
-
-
 
 void Board::BestMovement(const vector<Direction>& options, bool colored, Ghost& G,const char& content_underme)
 {
@@ -358,7 +413,6 @@ bool Board::isTopBorder(const unsigned& X, const unsigned& Y)
 	return true;
 
 }
-
 
 bool Board::portals(Direction dic,Point& pos)
 {

@@ -35,6 +35,7 @@ public:
 	void Loser();
 	void Winner();
 	//-----------game-engine-------------------
+
 	void play();
 	void Engine();
 	void level_progress();
@@ -42,11 +43,19 @@ public:
 	void ResetGame();
 	void pauseGAME();
 	void updateDics(Direction& cur);
+
 	//-------------utilities------------
+
+	void load_specific_Map();
+	string getMapName() {
+		string name;
+		cin >> name;
+		return name;
+	}
 	void printlegend(Point pt, short hp);
 	bool Over()//indicator to end game loop
 	{
-		if (br.Pac().getHP() == 0)
+		if (br.get_pac().getHP() == 0)
 		{
 			win = false;
 			return true;
@@ -60,6 +69,5 @@ public:
 			return false;
 	}
 	void printScore(Point);
-
 };
 

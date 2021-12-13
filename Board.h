@@ -18,21 +18,23 @@ class Board
 {
 	vector<vector<string>> Org_maps;       // We creat 2 identical maps; one to keep for new game beginnings (each time we switch map we update the play map)
 	vector<string> Play_map;			  // and one to play and change in real time.
-	Pacman pac;						  
+	vector<string>  screen_files;        //  stores all pathes to maps.
+	Pacman pac;	
+
 	vector<Ghost> ghosts;
 	Point legend;
+
+	int map_num = 0;
 	bool legend_flag = false;
-	short rows;
+	short rows = 0;
 	short breadcrumbs = 0;
 
 private:
 	//-------------------------pacman movement-----------------------------------
-	bool findBorder_Top(const unsigned short& col, unsigned short& line);
 
-	
+	bool findBorder_Top(const unsigned short& col, unsigned short& line);
 	void changeFood2Path(Point pos) { Play_map[pos.getY()][pos.getX()] = ' '; }
 	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
-	bool isOnBorder(Point pos);
 	bool isTopBorder(const unsigned& X, const unsigned& Y);
 	//------------------------ghosts movement------------------------------------
 
@@ -43,30 +45,40 @@ private:
 	pair<Direction, int> BestMovement_Util(vector<vector<bool>>canGo, int path_len, Point dest, Point cur, Direction,set<Point>);
 	vector<vector<bool>> createTrackingMap();
 	//-----------------------------ctor-----------------------------------------
-	void create_map_from_file(int map_num);//choose more adequate name
+
+	void create_PlayMap_from_Org(int y);
+	void insert_legend();
+	void insert_legend_row(int y, int x);
 
 public:
 	Board();
 
-	//---------------------utilities----------------------------------
-	void loadNew_map(int map_num);
+	//---------------------map--------------------------------------
+
+	void loadNew_map();
 	vector<string>& getPlay_map() { return Play_map; }
 	const Point& getlegend() const { return legend; }
-	bool getLegend_flag() const { return legend_flag; }
+	const bool getLegend_flag() const { return legend_flag; }
+	const int getMapNum() { return map_num; }
+	const vector<string>& getScreen_files() { return screen_files; }
+	void setMap_num(int x) { map_num = x; }
+	bool out_of_line(const Point& pos, const Direction& dic);
+	bool isOnBorder(Point pos);
+
+	//----------------------utilities---------------------------------------------
 	void resetCharacters() { pac.resetMe(); for (auto& g : ghosts) g.resetMe(); }
-	void resetMap();
 	short getCrumbs() { return breadcrumbs; }
 	char nextCellCont(Point pos, Direction dic);      // returns map content in a given postion.
 	bool Collision();
 	void printMap(bool colored);
 
 	//-------------------pacman---------------------------
-	Pacman& Pac() { return pac; }
+	Pacman& get_pac() { return pac; }
 	void movePac(Direction dic, bool colored, short& score);
 	bool portals(Direction dic, Point& pos);
 	
 	//----------------------ghosts----------------------
-	const vector<Ghost>& Ghosts() { return ghosts; }
-	Ghost& Ghosts(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
+	vector<Ghost>& get_ghosts_vec() { return ghosts; }
+	Ghost& get_ghost(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
 	void moveGhost(bool colored,int);
 };
