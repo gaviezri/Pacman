@@ -113,8 +113,6 @@ void Game::printlegend(Point pt, short hp)
 		{
 			cout << "C";
 		}
-		gotoxy(pt.getX(), pt.getY()+2);
-		cout << spaces << endl;
 	}
 }
 
@@ -281,33 +279,20 @@ void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direc
 		last_dic = cur_dic = next_dic;// remember the new direction
 		next_dic = Direction::DEF; // default the next direction
 	}
-	else
-	{
-		if (br.portals(cur_dic, (Point&)br.get_pac().getPos()))
+	else if (br.portals(cur_dic, (Point&)br.get_pac().getPos()))
 			br.get_pac().printMe(colored);
 
-		else if (int(Content::WALL) != br.nextCellCont(br.get_pac().getPos(), next_dic))  //advance to next direction if its not a wall
-		{
-			br.movePac(next_dic, colored, score);
-			last_dic = cur_dic = next_dic;// remember the new direction
-			next_dic = Direction::DEF; // default the next direction
-		}
-		else if (int(Content::WALL) != br.nextCellCont(br.get_pac().getPos(), cur_dic)) // advance in current direction if the 
-		{																	       // requested next isnt possible
+	else if (int(Content::WALL) != br.nextCellCont(br.get_pac().getPos(), next_dic))  //advance to next direction if its not a wall
+	{
+		br.movePac(next_dic, colored, score);
+		last_dic = cur_dic = next_dic;// remember the new direction
+		next_dic = Direction::DEF; // default the next direction
+	}
+	else if (int(Content::WALL) != br.nextCellCont(br.get_pac().getPos(), cur_dic)) // advance in current direction if the 
+	{																	       // requested next isnt possible
 			br.movePac(cur_dic, colored, score);
 			last_dic = cur_dic;
-		}
-	}
-}
-
-
-
-
-	else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(), cur_dic)) // advance in current direction if the 
-	{																     	// requested next isnt possible
-		br.movePac(cur_dic, colored, score);
-		last_dic = cur_dic;
-	}
+	}	
 }
 
 void Game::NPCMoves_Dispatcher()
@@ -319,7 +304,6 @@ void Game::NPCMoves_Dispatcher()
 void Game::printScore(Point legend)
 {
 	 gotoxy(legend.getX()+7,legend.getY()+1);//6 is a magic number represents the length of "SCORE:"
-
 	 if(colored)
 		 setTextColor(Color::LIGHTRED);
 	 cout  << score;

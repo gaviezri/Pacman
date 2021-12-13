@@ -167,8 +167,6 @@ void Board::printMap(bool colored)
 }
 
 
-
-
 void Board::movePac(Direction dic, bool colored, short& score)
 {
 	char cell_c = nextCellCont(pac.getPos(), dic);
@@ -295,25 +293,9 @@ bool Board::out_of_line(const Point& pos, const Direction& dic)
 }
 
 
-void Board::movePac(Direction dic, bool colored, short& score)
-{
-	char cell_c = nextCellCont(pac.getPos(), dic);
-	pac.updateMove(dic, colored);
-	if (cell_c == '.')
-	{
-		score++;
-		changeFood2Path(pac.getPos());
-	}
-}
 
-bool Board::isOnBorder(Point pos)
-{
-	unsigned short X = pos.getX(), Y = pos.getY();
-	
-	return (X == 0 || Y == 0 || X == Play_map[Y].length() - 1 || Y == rows - 1 || isTopBorder(pos.getX(),pos.getY()) );
-}
 
-void Board::AnalyzeAround(Ghost g, char* conts, bool* paths)
+
 
 void Board::premoveDatacollection(char& next_cont,char* cont_around, bool* path_around, NPC& G, Direction& opposite_dic,vector<Direction>& options)
 
@@ -374,7 +356,6 @@ void Board::NPCmoveGenerator(bool colored,int movesmade)
 }
 
 
-void Board::BestMovement(const vector<Direction>& options, bool colored, Ghost& G,const char& content_underme)
 
 
 

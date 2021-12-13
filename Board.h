@@ -35,9 +35,6 @@ private:
 	//-------------------------pacman movement-----------------------------------
 	bool findBorder_Top(const unsigned short& col, unsigned short& line);
 	void changeFood2Path(Point pos) { Play_map[pos.getY()][pos.getX()] = ' '; }
-	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
-	bool isTopBorder(const unsigned& X, const unsigned& Y);
-
 	//------------------------ghosts movement------------------------------------
 	void premoveDatacollection(char& next_cont, char* cont_around, bool* path_around, NPC& G, Direction& opposite_dic, vector<Direction>& options);
 	void nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around);
@@ -66,7 +63,8 @@ public:
 	void setMap_num(int x) { map_num = x; }
 	bool out_of_line(const Point& pos, const Direction& dic);
 	bool isOnBorder(Point pos);
-
+	bool isTopBorder(const unsigned& X, const unsigned& Y);
+	bool isInBorder(Point pos);
 	//----------------------utilities---------------------------------------------
 
 	void resetCharacters() { pac.resetMe(); fruit.setPos(pac.getPos()); for (auto& g : ghosts) g.resetMe(); }
@@ -75,9 +73,7 @@ public:
 	bool Collision();
 	void printMap(bool colored);
 	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
-	bool isOnBorder(Point pos);
-	bool isTopBorder(const unsigned& X, const unsigned& Y);
-	bool isInBorder(Point pos);
+	
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
 	void movePac(Direction dic, bool colored, short& score);
@@ -87,7 +83,6 @@ public:
 
 	vector<Ghost>& get_ghosts_vec() { return ghosts; }
 	Ghost& get_ghost(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
-	void moveGhost(bool colored,int);
 	const vector<Ghost>& Ghosts() { return ghosts; }
 	void NPCmoveGenerator(bool colored,int);
 };
