@@ -36,15 +36,19 @@ void Point::updateCoord(Direction dic)
 	switch (dic)
 	{
 	case Direction::UP:
-		coord[1]--;
+		if(coord[1]-1>=0)
+			coord[1]--;
 		break;
 	case Direction::DOWN:
+		if(coord[1]+1<=80)
 		coord[1]++;
 		break;
 	case Direction::LEFT:
+		if(coord[0]-1 >=0)
 		coord[0]--;
 		break;
 	case Direction::RIGHT:
+		if(coord[1]+1<=200)
 		coord[0]++;
 		break;
 	case Direction::STAY:

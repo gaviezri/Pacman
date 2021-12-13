@@ -38,7 +38,7 @@ private:
 	//------------------------ghosts movement------------------------------------
 	void premoveDatacollection(char& next_cont, char* cont_around, bool* path_around, NPC& G, Direction& opposite_dic, vector<Direction>& options);
 	void nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around);
-	void AnalyzeAround(NPC g, char* conts, bool* paths);
+	void AnalyzeAround(NPC& g, char* conts, bool* paths);
 	void NoviceMovement(const vector<Direction>&,const Direction&, const char&, bool, NPC& G);
 	void BestMovement(const vector<Direction>& options, const bool& colored, Ghost& G, const Direction& opposite_dic,const char& next_cont);
 	int BestMovement_Util(Point dest, Point cur);
@@ -66,8 +66,9 @@ public:
 	bool isTopBorder(const unsigned& X, const unsigned& Y);
 	bool isInBorder(Point pos);
 	//----------------------utilities---------------------------------------------
-
-	void resetCharacters() { pac.resetMe(); fruit.setPos(pac.getPos()); for (auto& g : ghosts) g.resetMe(); }
+	void move_in_border(Direction&, Direction&, Direction&, const bool& colored, short& score);
+	void move_out_border(Direction&, Direction&, const bool& colored,short&);
+	void resetCharacters() { pac.resetMe(); fruit.setPos(ghosts[rand()%ghosts.size()].getPos()); for (auto& g : ghosts) g.resetMe(); }
 	short getCrumbs() { return breadcrumbs; }
 	char nextCellCont(Point pos, Direction dic);      // returns map content in a given postion.
 	bool Collision();
@@ -78,11 +79,13 @@ public:
 	Pacman& get_pac() { return pac; }
 	void movePac(Direction dic, bool colored, short& score);
 	bool portals(Direction dic, Point& pos);
+	void pacEatsfruit(short&);
 	
 	//----------------------ghosts----------------------
 
 	vector<Ghost>& get_ghosts_vec() { return ghosts; }
 	Ghost& get_ghost(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
-	const vector<Ghost>& Ghosts() { return ghosts; }
-	void NPCmoveGenerator(bool colored,int);
+	void NPCmoveGenerator(bool colored,int,short&);
+	//-----------------------------fruit---------------------------------------
+	Fruit& getFruit() { return fruit; }
 };
