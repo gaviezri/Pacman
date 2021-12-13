@@ -17,12 +17,12 @@ public:
 
 	void printMe(bool colored) {
 		gotoxy(pos.getX(), pos.getY());
-		if (colored) { if (avatar == 'C')setTextColor(Color::BROWN); else setTextColor(Color::RED); }
+		if (colored) { if (avatar == 'C')setTextColor(Color::BROWN); else if (avatar == 'G') setTextColor(Color::RED); else setTextColor(Color::LIGHTGREEN); }
 		else setTextColor(Color::WHITE); cout << avatar;
 	}
 
 	//--------------------------------------------movements of creatures------
-	void updateMove(Direction dic, bool colored)//pacman
+	void updateMove(Direction dic, const bool& colored)//pacman
 	{
 		clearMe();
 		pos.updateCoord(dic);

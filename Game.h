@@ -11,10 +11,9 @@ class Game
 	short score=0;
 	bool pause;
 	Board br;
-	bool everyothermove = true;
 
 	void pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direction& last_dic);
-	void ghostsMoves_Dispatcher();
+	void NPCMoves_Dispatcher();
 
 public:
 	static int moves_made_this_level;

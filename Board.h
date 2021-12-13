@@ -6,9 +6,10 @@
 #include <fstream>
 #include <sstream>
 #include <utility>    
-#include <set>    
+#include <queue>    
 #include "Pacman.h"
 #include "Ghost.h"
+#include "Fruit.h"
 
 using std::vector;
 
@@ -22,6 +23,7 @@ class Board
 	Pacman pac;	
 
 	vector<Ghost> ghosts;
+	Fruit fruit;
 	Point legend;
 
 	int map_num = 0;
@@ -31,18 +33,18 @@ class Board
 
 private:
 	//-------------------------pacman movement-----------------------------------
-
 	bool findBorder_Top(const unsigned short& col, unsigned short& line);
 	void changeFood2Path(Point pos) { Play_map[pos.getY()][pos.getX()] = ' '; }
 	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
 	bool isTopBorder(const unsigned& X, const unsigned& Y);
-	//------------------------ghosts movement------------------------------------
 
+	//------------------------ghosts movement------------------------------------
+	void premoveDatacollection(char& next_cont, char* cont_around, bool* path_around, NPC& G, Direction& opposite_dic, vector<Direction>& options);
 	void nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around);
-	void AnalyzeAround(Ghost g, char* conts, bool* paths);
-	void NoviceMovement(const vector<Direction>&, Direction&, const char&, bool, Ghost& G,const char&);
-	void BestMovement(const vector<Direction>& options, bool colored, Ghost& G, const char&);
-	pair<Direction, int> BestMovement_Util(vector<vector<bool>>canGo, int path_len, Point dest, Point cur, Direction,set<Point>);
+	void AnalyzeAround(NPC g, char* conts, bool* paths);
+	void NoviceMovement(const vector<Direction>&,const Direction&, const char&, bool, NPC& G);
+	void BestMovement(const vector<Direction>& options, const bool& colored, Ghost& G, const Direction& opposite_dic,const char& next_cont);
+	int BestMovement_Util(Point dest, Point cur);
 	vector<vector<bool>> createTrackingMap();
 	//-----------------------------ctor-----------------------------------------
 
@@ -66,19 +68,26 @@ public:
 	bool isOnBorder(Point pos);
 
 	//----------------------utilities---------------------------------------------
-	void resetCharacters() { pac.resetMe(); for (auto& g : ghosts) g.resetMe(); }
+
+	void resetCharacters() { pac.resetMe(); fruit.setPos(pac.getPos()); for (auto& g : ghosts) g.resetMe(); }
 	short getCrumbs() { return breadcrumbs; }
 	char nextCellCont(Point pos, Direction dic);      // returns map content in a given postion.
 	bool Collision();
 	void printMap(bool colored);
-
+	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
+	bool isOnBorder(Point pos);
+	bool isTopBorder(const unsigned& X, const unsigned& Y);
+	bool isInBorder(Point pos);
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
 	void movePac(Direction dic, bool colored, short& score);
 	bool portals(Direction dic, Point& pos);
 	
 	//----------------------ghosts----------------------
+
 	vector<Ghost>& get_ghosts_vec() { return ghosts; }
 	Ghost& get_ghost(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
 	void moveGhost(bool colored,int);
+	const vector<Ghost>& Ghosts() { return ghosts; }
+	void NPCmoveGenerator(bool colored,int);
 };

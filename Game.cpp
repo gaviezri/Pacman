@@ -113,6 +113,8 @@ void Game::printlegend(Point pt, short hp)
 		{
 			cout << "C";
 		}
+		gotoxy(pt.getX(), pt.getY()+2);
+		cout << spaces << endl;
 	}
 }
 
@@ -144,7 +146,7 @@ void Game::setDif()
 	{
 		system("cls");
 		cout << "Select your difficulty" << endl << "~~~~~~~~~~~~~~~~~~~~~~" << endl;
-		cout << "1 = \"Novice\"" << endl << "2 = \"Good\"" << endl << "3 = \"Best\"" << endl;
+		cout << "1 = \"Easy\"" << endl << "2 = \"Medium\"" << endl << "3 = \"Expert\"" << endl;
 		cout << "selection: ";
 		ch = _getch()-48;
 	}
@@ -210,6 +212,7 @@ void Game::level_progress()
 		for (auto g : br.get_ghosts_vec())
 			g.printMe(colored);
 	}
+	
 
 	updateDics(cur_dic);//game is frozen until first hit1
 	do
@@ -227,6 +230,9 @@ void Game::level_progress()
 		//if outside of board dont go in, just update move
 		pacmanMoves_Dispatcher(next_dic,cur_dic,last_dic);
 		
+		if (br.getLegend_flag())
+			printScore(br.getlegend());
+
 		Sleep(300);
 		if (br.Collision())
 		{
@@ -234,16 +240,14 @@ void Game::level_progress()
 			goto PAUSE;
 		}
 
-		ghostsMoves_Dispatcher();
+		NPCMoves_Dispatcher();
 
 		if (br.Collision())//if one of the ghosts and pacman share the same cell
 		{
 			NewRound();//update necessary info and reset avatars to default positions
 			goto PAUSE;
 		}
-		if (br.getLegend_flag())
-			printScore(br.getlegend());
-
+		
 		++moves_made_this_level;
 	} while (!Over());
 }
@@ -277,7 +281,6 @@ void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direc
 		last_dic = cur_dic = next_dic;// remember the new direction
 		next_dic = Direction::DEF; // default the next direction
 	}
-
 	else
 	{
 		if (br.portals(cur_dic, (Point&)br.get_pac().getPos()))
@@ -298,20 +301,25 @@ void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direc
 }
 
 
-void Game::ghostsMoves_Dispatcher()
-{
-	if (everyothermove)//ghost movement manager that makes ghost move everyother move that pacman makes
-	{
-		br.moveGhost(colored,moves_made_this_level);
-		everyothermove = false;// switch off
+
+
+	else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(), cur_dic)) // advance in current direction if the 
+	{																     	// requested next isnt possible
+		br.movePac(cur_dic, colored, score);
+		last_dic = cur_dic;
 	}
-	else
-		everyothermove = true;// switch on
+}
+
+void Game::NPCMoves_Dispatcher()
+{
+	 //ghost movement manager that makes ghost move everyother move that pacman makes and moves fruit every 3
+		br.NPCmoveGenerator(colored,moves_made_this_level);
 }
 
 void Game::printScore(Point legend)
 {
 	 gotoxy(legend.getX()+7,legend.getY()+1);//6 is a magic number represents the length of "SCORE:"
+
 	 if(colored)
 		 setTextColor(Color::LIGHTRED);
 	 cout  << score;

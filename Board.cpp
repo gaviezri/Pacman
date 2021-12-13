@@ -1,16 +1,20 @@
 #include "Board.h"
+
+const short STUCK = -1;
 bool const to_X = true;
 bool const to_Y = false;
 
 
 const pair<Direction, int> Min2pairs(const pair<Direction, int>& a, const pair<Direction, int>& b)
 {
-	if (a.first == Direction::DEF)
-		return  b;
-	else if (b.first == Direction::DEF)
+	if ((a.first == Direction::DEF && b.first == Direction::DEF))
 		return  a;
+	else if (a.first == Direction::DEF && b.first != Direction::DEF)
+		return  b;
+	else if (a.first != Direction::DEF && b.first == Direction::DEF)
+		return a;
 	else
-		return  a.second <= b.second ? a : b;
+		return a.second < b.second ? a : b;
 }
 const pair<Direction, int> Min4pairs(const pair<Direction, int>& a,const pair<Direction, int>& b,const  pair<Direction, int>& c, const pair<Direction,int>& d)
 {
@@ -25,7 +29,9 @@ Board::Board()   // loads all game board to maps vector
 	{
 		tmp_path = entry.path().string();  
 		
-		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 6) == "screen")    // checkes if path ends with "screen"
+
+		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 7) == ".screen")    // checkes if path ends with ".screen"
+
 		{
 			screen_files.push_back(entry.path().string());          // if so it adds the path to the path container
 		}
@@ -160,6 +166,72 @@ void Board::printMap(bool colored)
 	for (int i = 0; i < Play_map.size(); ++i) { if (colored) setTextColor(Color::BLUE); else setTextColor(Color::WHITE);  cout << Play_map[i] << endl; }
 }
 
+
+
+
+void Board::movePac(Direction dic, bool colored, short& score)
+{
+	char cell_c = nextCellCont(pac.getPos(), dic);
+	pac.updateMove(dic, colored);
+	if (cell_c == '.')
+	{
+		score++;
+		changeFood2Path(pac.getPos());
+	}
+}
+
+bool Board::isInBorder(Point pos)
+{
+	unsigned short X = pos.getX(), Y = pos.getY();
+	if (Y >= rows || Y<0) return false;
+	return ((X >= 0 && X<= Play_map[Y].length() - 1) &&  (Y >= 0 &&  Y <= rows-1 ));
+}
+
+bool Board::isOnBorder(Point pos)
+{
+	unsigned short X = pos.getX(), Y = pos.getY();
+	if (isTopBorder(pos.getX(), pos.getY()))
+		return true;
+	return (X == 0 || Y == 0 || X == Play_map[Y].length() - 1 || Y == rows - 1 );
+}
+
+void Board::AnalyzeAround(NPC g, char* conts, bool* paths)
+{
+	int i = 0;
+	Point gPos = g.getPos();
+	unsigned short Y = gPos.getY(), X = gPos.getX();
+
+	// first round of check makes sure we approach legal indexing
+	if (isInBorder(Point(X, Y - 1))) conts[int(Direction::UP)] = Play_map[Y - 1][X];	//assigning the array of the cells content around current ghost
+	else conts[int(Direction::UP)] = (char)Content::WALL;
+
+	if (isInBorder(Point(X, Y + 1))) conts[int(Direction::DOWN)] = Play_map[Y + 1][X]; // position on the beggining of her move.
+	else 	conts[int(Direction::DOWN)] = (char)Content::WALL;
+	
+	if (isInBorder(Point(X - 1, Y))) conts[(int)Direction::LEFT] = Play_map[Y][X - 1];
+	else conts[(int)Direction::LEFT] =(char)Content::WALL;
+
+	if (isInBorder(Point(X + 1, Y))) conts[(int)Direction::RIGHT] = Play_map[Y][X + 1];
+	else conts[(int)Direction::RIGHT] = (char)Content::WALL;
+
+	for ( i = 0; i < 4; i++)
+	{
+		if (conts[i] == (char)Content::WALL)
+		{
+			paths[i] = false;
+		}
+		else
+			paths[i] = true;
+	}
+}
+
+void getOptions(vector<Direction>& d, bool* paths)
+{
+	d.clear();
+	for (int j = 0; j < 4; ++j)
+		if (paths[j])  d.push_back((Direction)j);
+}
+
 void Board::nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around)
 {
 	switch (dic)
@@ -186,14 +258,14 @@ void Board::nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont,
 	}
 }
 
-char Board::nextCellCont(Point pos , Direction dic)
+char Board::nextCellCont(Point pos, Direction dic)
 {
 	unsigned short x = pos.getX(), y = pos.getY();
 
 	switch (dic)
 	{
 	case Direction::UP:
-		if(y!=0) return (Play_map[--y][x]);
+		if (y != 0) return (Play_map[--y][x]);
 		return static_cast<char>(Content::WALL);
 		break;
 	case Direction::DOWN:
@@ -201,7 +273,7 @@ char Board::nextCellCont(Point pos , Direction dic)
 		return (Play_map[++y][x]);
 		break;
 	case Direction::LEFT:
-		if(x!=0) return (Play_map[y][--x]);
+		if (x != 0) return (Play_map[y][--x]);
 		return static_cast<char>(Content::WALL);
 		break;
 	case Direction::RIGHT:
@@ -222,6 +294,7 @@ bool Board::out_of_line(const Point& pos, const Direction& dic)
 	else return false;
 }
 
+
 void Board::movePac(Direction dic, bool colored, short& score)
 {
 	char cell_c = nextCellCont(pac.getPos(), dic);
@@ -241,90 +314,123 @@ bool Board::isOnBorder(Point pos)
 }
 
 void Board::AnalyzeAround(Ghost g, char* conts, bool* paths)
+
+void Board::premoveDatacollection(char& next_cont,char* cont_around, bool* path_around, NPC& G, Direction& opposite_dic,vector<Direction>& options)
+
 {
-	int i = 0;
-	Point gPos = g.getPos();
-	unsigned short Y = gPos.getY(), X = gPos.getX();
+	G.setCont_under ( Play_map[G.getPos().getY()][G.getPos().getX()]);// gets the content that the ghost 'steps' on prior to new location
 
+	AnalyzeAround(G, cont_around, path_around);
 
-	conts[int(Direction::UP)] = Play_map[Y - 1][X],	//assigning the array of the cells content around current ghost
-		conts[int(Direction::DOWN)] = Play_map[Y + 1][X],	// position on the beggining of her move.
-		conts[(int)Direction::LEFT] = Play_map[Y][X - 1],
-		conts[(int)Direction::RIGHT] = Play_map[Y][X + 1];
+	nextContAndOppDic(G.getcurDic(), opposite_dic, next_cont, cont_around);//checking whats the next cell's content in the current direction im going and 
+																		  // updating my opposite direction
+	path_around[(int)opposite_dic] = false;  // We want the ghost to treat the opposite direction as if it was a wall.
 
-	
-	if (isOnBorder((gPos - Point(1, 0))))
-		conts[int(Direction::LEFT)] = (char)Content::WALL;
-	if (isOnBorder((gPos - Point(0, 1))))
-		conts[int(Direction::UP)] = (char)Content::WALL;
-	if (isOnBorder((gPos + Point(1, 0))))
-		conts[int(Direction::RIGHT)] = (char)Content::WALL;
-	if (isOnBorder((gPos + Point(0, 1))))
-		conts[int(Direction::DOWN)] = (char)Content::WALL;
-
-	for ( i = 0; i < 4; i++)
-	{
-		if (conts[i] == (char)Content::WALL)
-		{
-			paths[i] = false;
-		}
-		else
-			paths[i] = true;
-	}
+	getOptions(options, path_around);
 }
 
-void getOptions(vector<Direction>& d, bool* paths)
+void Board::NPCmoveGenerator(bool colored,int movesmade)
 {
-	d.clear();
-	for (int j = 0; j < 4; ++j)
-		if (paths[j])  d.push_back((Direction)j);
-}
-
-void Board::moveGhost(bool colored,int movesmade)
-{
-	char cont_around[4], next_cont;		//wall counter count actual walls, path around just indicate wether there is a path and we are manipulating the opposite direction to act
+	char cont_around[4], next_cont ;		//wall counter count actual walls, path around just indicate wether there is a path and we are manipulating the opposite direction to act
 	vector<Direction> options;
 	Direction opposite_dic;
 	bool path_around[4];             // bool array that indicate by index using enum if theres a path in a given direction
-
-	for (auto& G : ghosts)
+	if(movesmade%2)
+	for (auto& G : ghosts)//moving ghosts
 	{
-		char content_underme = Play_map[G.getPos().getY()][G.getPos().getX()];// gets the content that the ghost 'steps' on prior to new location
-
-		AnalyzeAround(G, cont_around, path_around);
-
-		nextContAndOppDic(G.getcurDic(), opposite_dic, next_cont, cont_around);//checking whats the next cell's content in the current direction im going and 
-																			  // updating my opposite direction
-		path_around[(int)opposite_dic] = false;  // We want the ghost to treat the opposite direction as if it was a wall.
-
-		getOptions(options, path_around);
-
+		
+		premoveDatacollection(next_cont, cont_around, path_around, G, opposite_dic, options);
 		switch (Ghost::getDif())
 		{
 		case Difficulty::NOVICE:
-			NoviceMovement(options, opposite_dic, next_cont, colored, G,content_underme);
+			NoviceMovement(options, opposite_dic, next_cont, colored, G);
 			break;
 		case Difficulty::GOOD:
-			if (movesmade % 20 > 14) NoviceMovement(options, opposite_dic, next_cont, colored, G,content_underme); 	
-			else BestMovement(options, colored, G,content_underme);
+			if (movesmade % 20 > 14) NoviceMovement(options, opposite_dic, next_cont, colored, G);
+			else BestMovement(options, colored, G,opposite_dic,next_cont);
 			break;
 		case Difficulty::BEST:
-			BestMovement(options, colored, G,content_underme);
+			BestMovement(options, colored, G, opposite_dic, next_cont);
 			break;
 		}
 	
+	}
+	if ((movesmade % 3)==1)
+	{
+		premoveDatacollection(next_cont, cont_around, path_around,fruit, opposite_dic, options);
+		if (!fruit.isAppearing() && fruit.ExposeMe())
+			fruit.Appear();
+		NoviceMovement(options, opposite_dic, next_cont, colored, fruit);
+		
+		
+		 fruit.Disappear();
+		
+		if (fruit.getPos() == pac.getPos());
+			 //score +=fruit.Eaten();
+
 	}
 	
 	
 }
 
+
 void Board::BestMovement(const vector<Direction>& options, bool colored, Ghost& G,const char& content_underme)
+
+
+
+void Board::NoviceMovement(const vector<Direction>& options,const Direction& opposite_dic, const const char& next_cont, bool colored, NPC& G)
 {
-	Point dest = pac.getPos();
-	vector<vector<bool>> canGo = createTrackingMap();
-	set<Point> visited;
-	Direction dic = BestMovement_Util(canGo, 0, pac.getPos(), G.getPos(), Direction::DEF,visited).first;
-	G.updateMove(dic, colored, content_underme);
+	if (next_cont == (int)Content::WALL) //  + Or T Or L Or  or DeadEnd  junction approaching T from side or from front
+		switch (options.size())
+		{
+		case 0:	// Dead-End go opposite direction
+			G.updateMove(G.setcurDic(opposite_dic), colored, G.getCont_under());
+			break;
+		case 1:	//L Junc  - go the only way 
+			G.updateMove(G.setcurDic(options[0]), colored, G.getCont_under());
+			break;
+		default:	//T Junc choose randomly from options
+			G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored, G.getCont_under());
+			break;
+		}
+	else if (options.size() >= 2)// in a 4 way junc - choose randomly
+		G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored, G.getCont_under());
+	else
+		G.updateMove(G.getcurDic(), colored, G.getCont_under());// continue same way
+}
+inline bool stuck4ways(int up, int down, int left, int right)
+{
+	return (up == STUCK) && (down == STUCK) && (left == STUCK) && (right == STUCK);
+}
+inline Direction shortestRoute(int up, int down, int left, int right)
+{
+	if(stuck4ways(up,down,left,right)) return Direction::DEF;//incase pacman is hiding on edges (this is the logic.)
+
+	if (up == STUCK) up = 1 + max(max(down, left), right);// ensuring STUCK assigned values will not be the minimals
+	if (down == STUCK) down = 1 + max(max(up, left), right);
+	if (left == STUCK) left = 1 + max(max(down, up), right);
+	if (right == STUCK) right = 1 + max(max(down, up), left);
+	
+	if (up == (min(min(up, down), min(left, right)))) return Direction::UP; // returning direction of a shortest path (can be 1 or more)
+	if (down == (min(min(up, down), min(left, right)))) return Direction::DOWN;
+	if (left == (min(min(up, down), min(left, right)))) return Direction::LEFT;
+	if (right == (min(min(up, down), min(left, right)))) return Direction::RIGHT;
+}
+
+void Board::BestMovement(const vector<Direction>& options,const bool& colored, Ghost& G,const Direction& opposite_dic,const char& next_cont) // smart ghosts movement maker
+{// getting the length of paths to pacman from all 4 direction and choosing the direction with the shortest 
+//  path.  if pacman is hiding in borders with no portals the ghosts will lose his location and go randomly
+//	giving the sensation they are looking for him
+	Point dest = pac.getPos();  
+	int UP = BestMovement_Util(dest, G.getPos() - Point(0, 1)); 
+	int DOWN = BestMovement_Util(dest, G.getPos() + Point(0, 1));	
+	int LEFT = BestMovement_Util(dest, G.getPos() - Point(1, 0));
+	int RIGHT = BestMovement_Util(dest, G.getPos() + Point(1, 0));
+	Direction tmp = shortestRoute(UP, DOWN, LEFT, RIGHT);
+	if (tmp == Direction::DEF)
+		NoviceMovement(options, opposite_dic, next_cont, colored, G);
+	else
+	G.updateMove(tmp,colored);
 }
 
 vector<vector<bool>> Board::createTrackingMap()
@@ -332,69 +438,85 @@ vector<vector<bool>> Board::createTrackingMap()
 	vector<vector<bool>> canGo;
 
 	canGo.reserve(rows);
-	
+
 	for (int row = 0; row < rows; row++)
 	{
-		vector<bool> tmp;		
+		vector<bool> tmp;
 
 		for (int col = 0; col < Play_map[row].length(); col++) //creation here
-			if (isOnBorder(Point(col, row)) || Play_map[row][col] == (int)Content::WALL)
+		{// wall = false, otherwise = true;
+			if (isInBorder(Point(col, row)))  
+				if (Play_map[row][col] == (int)Content::WALL)
+					tmp.push_back(false);
+				else
+					tmp.push_back(true);
+			else 
 				tmp.push_back(false);
-			else tmp.push_back(true);
 
+		}
 		canGo.push_back(tmp);
 	}
 	return canGo;
 }
 
-pair<Direction, int> Board::BestMovement_Util(vector<vector<bool>>canGo, int path_len, Point dest, Point cur, Direction last_went, set<Point> visited)
+int Board::BestMovement_Util( Point dest, Point cur)
 {
-	
-	unsigned short cX = cur.getX(), cY = cur.getY();
-	if (!canGo[cY][cX]) // if cant go to curr pos from previous
-	{							
-		return { Direction::DEF,UINT16_MAX }; // return default pair
-	}
-	if ((!visited.empty() && visited.end() != visited.find(cur)))	  //  Or not empty and cur already been visited return default values (==NOT FOUND)
-	{
-		visited.erase(cur);
-		return { Direction::DEF,UINT16_MAX }; // return default pair
-	}
-	pair<Direction, int> up, down, left, right;
-	if (cur == dest)
-	{
-		return { last_went,path_len };
-	}
-	visited.insert(cur);
-	down = BestMovement_Util(canGo,  path_len + 1,dest,cur+Point(0,1),Direction::DOWN, visited);
-	up = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(0, 1),Direction::UP, visited);
-	right = BestMovement_Util(canGo, path_len + 1, dest, cur + Point(1, 0), Direction::RIGHT, visited);
-	left = BestMovement_Util(canGo, path_len + 1, dest, cur - Point(1, 0),  Direction::LEFT, visited);
+    vector<vector<bool>> canGo = createTrackingMap(); // create a boolean map the reflects where can go
+	if (!isInBorder(cur) || !canGo[cur.getY()][cur.getX()] || isOnBorder(cur) ) 
+		return STUCK;
 
-	return Min4pairs(down, up, right, left);
-}
-
-void Board::NoviceMovement(const vector<Direction>&options,Direction&opposite_dic,const char& next_cont,bool colored, Ghost& G,const char& content_underme)
-{
-	
-	if (next_cont == (int)Content::WALL) //  + Or T Or L Or  or DeadEnd  junction approaching T from side or from front
-		switch (options.size())
+	queue<pair<Point, int>> steps; //keeping visited cells here to get back to them while exploring the breadth
+																								
+	steps.push({ cur,0 }); 
+	while (!steps.empty())
+	{
+		pair<Point, int> tmp = steps.front();
+		steps.pop();
+		if (isOnBorder(tmp.first))
 		{
-		case 0:	// Dead-End go opposite direction
-			G.updateMove(G.setcurDic(opposite_dic), colored, content_underme);
-			break;
-		case 1:	//L Junc  - go the only way 
-			G.updateMove(G.setcurDic(options[0]), colored, content_underme);
-			break;										   
-		default:	//T Junc choose randomly from options
-			G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored, content_underme);
-			break;
+			continue;
 		}
-	else if (options.size() >= 2)// in a 4 way junc - choose randomly
-	G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored, content_underme);
-	else
-		G.updateMove(G.getcurDic(), colored, content_underme);// continue same way
+		// falsify my position preventing circles while tracking (like hensel and gretel leaving bread crumbs behind)
+		canGo[cur.getY()][cur.getX()] = false;
+		if (tmp.first == dest)
+			return tmp.second;
+		
+
+		if (isInBorder(tmp.first - Point(0, 1))) // GOING UP
+			if (canGo[tmp.first.getY() - 1][tmp.first.getX()])
+			{
+				canGo[tmp.first.getY() - 1][tmp.first.getX()] = false;
+				steps.push({ tmp.first - Point(0, 1),tmp.second + 1 });
+			}
+			
+		if (isInBorder(tmp.first + Point(0, 1))) // DOWN
+			if (canGo[tmp.first.getY() + 1][tmp.first.getX()])
+			{
+				canGo[tmp.first.getY() + 1][tmp.first.getX()] = false;
+				steps.push({ tmp.first + Point(0, 1),tmp.second + 1 });
+			}
+
+		if (isInBorder(tmp.first - Point(1, 0))) // LEFT
+			if (canGo[tmp.first.getY()][tmp.first.getX() - 1])
+			{
+				canGo[tmp.first.getY()][tmp.first.getX() - 1] = false;
+				steps.push({ tmp.first - Point(1, 0),tmp.second + 1 });
+			}
+
+		if (isInBorder(tmp.first + Point(1, 0)))
+			if (canGo[tmp.first.getY()][tmp.first.getX() + 1])// RIGHT
+			{
+				canGo[tmp.first.getY()][tmp.first.getX() + 1] = false;
+				steps.push({ tmp.first + Point(1, 0),tmp.second + 1 });
+			}
+	}
+	return STUCK;	
 }
+
+
+
+
+
 
 bool Board::Collision()
 {
@@ -407,10 +529,12 @@ bool Board::Collision()
 }
 
 bool Board::isTopBorder(const unsigned& X, const unsigned& Y)
-{
-	if (Y > 0)
+{//checking if a give cell is a top border (relatively)
+	if (Y == 0)
+		return true;
+	if (Y > 0 && Play_map[Y - 1].length() >= Play_map[Y].length())
 		return (X > Play_map[Y - 1].length());
-	return true;
+	return false;
 
 }
 
@@ -450,8 +574,8 @@ bool Board::portals(Direction dic,Point& pos)
 
  bool Board::findBorder_Top(const unsigned short& col,unsigned short & line)
 {
-	 for (int i = 0; i < Play_map.size(); ++i)
-		 if (Play_map[i].size() >= col)// if the current from top is potentially a portal 
+	 for (int i = 0; i < Play_map.size(); ++i)//looking for the row which is the top border relative to the coloumn im in.
+		 if (Play_map[i].size() >= col)			// if the current from top is potentially a portal 
 		 {
 			 if (isBlank(Play_map[i][col]))
 			 {
@@ -459,7 +583,6 @@ bool Board::portals(Direction dic,Point& pos)
 				 return true;
 			 }
 			 return false;
-
 		 }
 	 return false;
 }
