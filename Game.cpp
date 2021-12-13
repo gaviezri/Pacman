@@ -36,8 +36,22 @@ menu:
 	switch (choice)
 	{
 	case 1:
-		Engine();
-		ResetGame();
+		if (br.getMapNum() < 0)
+		{
+			cout << "EROR 9345: Please make sure you have a valid map in your working directory before entring!";
+			_getch();
+			system("cls");
+		}
+		else
+		{
+			Engine();
+			ResetGame();
+		}
+		break;
+	case 2:
+		system("cls");
+		cout << " enter map name: " << endl;
+		load_specific_Map();
 		break;
 	case 8:
 		printInstructions();
@@ -53,65 +67,80 @@ menu:
 	goto menu;
 }
 
+void Game::load_specific_Map()
+{
+	string name = getMapName();
+	vector<string> screen_files = br.getScreen_files();
+	bool found = false;
+	for (int i = 0; i < screen_files.size(); ++i)
+	{
+		if (screen_files[i].substr(2, screen_files[i].length() - 9) == name)
+		{
+			found = true;
+			br.setMap_num(i);
+			br.get_ghosts_vec().clear();
+			br.loadNew_map();
+			Engine();
+			ResetGame();
+		}
+	}
+
+	if(!found) cout << "Map named '" << name << "' was not found.";
+}
+
 void Game::printlegend(Point pt, short hp)
 {
 	setTextColor(Color::WHITE);
 	if (br.getLegend_flag()) {
-		gotoxy(pt.getX(), pt.getY());
 
-		string spaces = "                    ";
-		cout << spaces << endl;
-		gotoxy(pt.getX(), pt.getY()+1);
-			if (colored)
+		gotoxy(pt.getX(), pt.getY() + 1);
+
+		if (colored)
 			setTextColor(Color::LIGHTBLUE);
-		cout << "SCORE:";
+		cout << "SCORE: ";
+
 		if (colored)
 			setTextColor(Color::LIGHTRED);
-		cout << score << "\t  \t";
+		cout << score;
+
 		if (colored)
 			setTextColor(Color::LIGHTBLUE);
-		cout << "LIVES:";
+		cout << "  LIVES:";
+
 		if (colored)
 			setTextColor(Color::YELLOW);
 		for (int i = 0; i < hp; i++)
-			cout << " C";
+		{
+			cout << "C";
+		}
 		gotoxy(pt.getX(), pt.getY()+2);
 		cout << spaces << endl;
-
-
 	}
 }
 
-
 void Game::NewRound(){         // when pac meets ghost  need to make the ghosts print the previus char in the location of collision
 	cout << "\a"; // SOUND FOR COLLISON!
-	br.Pac().HitByGhost();// -1 hp
+	br.get_pac().HitByGhost();// -1 hp
 	
-	if (br.Pac().getHP() != 0)
+	if (br.get_pac().getHP() != 0)
 	{
-		printlegend(br.getlegend(), br.Pac().getHP());   // update remaining lives on screen 
+		printlegend(br.getlegend(), br.get_pac().getHP());   // update remaining lives on screen 
+		br.get_pac().clearMe();
+		br.get_pac().resetMe();
+		br.get_pac().printMe(colored);
 
-
-		
-		br.Pac().clearMe();
-		br.Pac().resetMe();
-		br.Pac().printMe(colored);
-
-		for (int i = 0; i < br.Ghosts().size(); i++) {
-			Ghost& G = br.Ghosts(i);
-			G.clearMe(colored,br.getPlay_map()[G.getPos().getY()][G.getPos().getX()]);
-
-			br.Ghosts(i).resetMe();//reset ghosts 
-			br.Ghosts(i).printMe(colored);
+		for (auto G : br.get_ghosts_vec())
+		{
+			G.clearMe(colored, br.getPlay_map()[G.getPos().getY()][G.getPos().getX()]);
+			G.resetMe();
+			G.printMe(colored);
 		}
 		pause = true;
 	}
 }
 
 void Game::setDif()
-{
-	
-	    	
+{ 	
 	char ch=-1;
 	while (ch != 1 && ch != 2 && ch != 3)
 	{
@@ -138,7 +167,7 @@ void Game::printMenu()
 	cout << "#############################################" << endl << endl;
 	cout << " Welcome to Gal & Omri's version of PACMAN !" << endl;
 	cout << " Please select one of the following options :" << endl;
-	cout << " 1) Start a new game" << endl<< " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
+	cout << " 1) Start a new game" << endl << " 2) Choose a map" << endl << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
 	cout << "#############################################" << endl;
 }
 
@@ -147,7 +176,7 @@ void  Game::setChoice()
 	choice = _getch() - 48;
 	
 
-	while(choice != 1 && choice != 8 && choice != 9 )    //  makes sure that the player chose one of the given options
+	while(choice != 1 && choice != 2 && choice != 8 && choice != 9 )    //  makes sure that the player chose one of the given options
 	{
 		system("cls");
 		cout << "Invalid choice!" << endl;
@@ -175,12 +204,12 @@ void Game::level_progress()
 {
 	Direction cur_dic = Direction::DEF, next_dic = Direction::DEF, last_dic = Direction::DEF; // initialzing for the switch 
 	br.printMap(colored);
-	printlegend(br.getlegend(), br.Pac().getHP());
+	printlegend(br.getlegend(), br.get_pac().getHP());
 
-	br.Pac().printMe(colored);   // PRINTING
+	br.get_pac().printMe(colored);   // PRINTING
 
-	if (!(br.Ghosts().empty())) {
-		for (auto g : br.Ghosts())
+	if (!(br.get_ghosts_vec().empty())) {
+		for (auto g : br.get_ghosts_vec())
 			g.printMe(colored);
 	}
 	
@@ -198,7 +227,7 @@ void Game::level_progress()
 		if (next_dic == Direction::QUIT)
 			return;
 	
-		
+		//if outside of board dont go in, just update move
 		pacmanMoves_Dispatcher(next_dic,cur_dic,last_dic);
 		
 		if (br.getLegend_flag())
@@ -246,15 +275,34 @@ void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direc
 	if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
 		cur_dic = Direction::STAY;
 
-	else if (br.portals(cur_dic, (Point&)br.Pac().getPos()))
-		br.Pac().printMe(colored);
-
-	else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(), next_dic))  //advance to next direction if its not a wall
+	else if (br.isOnBorder(br.get_pac().getPos()))  // this method works partcailly
 	{
-		br.movePac(next_dic, colored, score);
-		last_dic = cur_dic = next_dic;// remember the new directio
+		br.get_pac().updateMove(next_dic, colored);
+		last_dic = cur_dic = next_dic;// remember the new direction
 		next_dic = Direction::DEF; // default the next direction
 	}
+	else
+	{
+		if (br.portals(cur_dic, (Point&)br.get_pac().getPos()))
+			br.get_pac().printMe(colored);
+
+		else if (int(Content::WALL) != br.nextCellCont(br.get_pac().getPos(), next_dic))  //advance to next direction if its not a wall
+		{
+			br.movePac(next_dic, colored, score);
+			last_dic = cur_dic = next_dic;// remember the new direction
+			next_dic = Direction::DEF; // default the next direction
+		}
+		else if (int(Content::WALL) != br.nextCellCont(br.get_pac().getPos(), cur_dic)) // advance in current direction if the 
+		{																	       // requested next isnt possible
+			br.movePac(cur_dic, colored, score);
+			last_dic = cur_dic;
+		}
+	}
+}
+
+
+
+
 	else if (int(Content::WALL) != br.nextCellCont(br.Pac().getPos(), cur_dic)) // advance in current direction if the 
 	{																     	// requested next isnt possible
 		br.movePac(cur_dic, colored, score);
@@ -270,7 +318,8 @@ void Game::NPCMoves_Dispatcher()
 
 void Game::printScore(Point legend)
 {
-	 gotoxy(legend.getX()+6,legend.getY()+1);//6 is a magic number represents the length of "SCORE:"
+	 gotoxy(legend.getX()+7,legend.getY()+1);//6 is a magic number represents the length of "SCORE:"
+
 	 if(colored)
 		 setTextColor(Color::LIGHTRED);
 	 cout  << score;
@@ -310,13 +359,12 @@ void Game::Loser()
 
 void Game::pauseGAME()
 {
-	gotoxy(br.getlegend().getX(), br.getlegend().getY());
-	system("pause");
+	gotoxy(br.getlegend().getX(), br.getlegend().getY()+1);
+	cout << "hit key to continue";
+	_getch();
 	pause = false;
 	gotoxy(br.getlegend().getX(), br.getlegend().getY());
-	cout << "                                             ";
-	gotoxy(br.getlegend().getX(), br.getlegend().getY());
-	printlegend(br.getlegend(), br.Pac().getHP());
+	printlegend(br.getlegend(), br.get_pac().getHP());
 }
 
 void Game::updateDics( Direction& nxt)
