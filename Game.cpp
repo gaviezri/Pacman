@@ -24,6 +24,7 @@ void PacmanLogo()
 
 void Game::play()  //  this is where the magic happens (!)
 {
+	srand(0x11A);
 	ShowConsoleCursor(false);
 	setTextColor(Color::WHITE);
 	system("cls");
@@ -44,8 +45,8 @@ menu:
 		break;
 	case 2:
 		system("cls");
-		cout << " enter map name: " << endl;
 		load_specific_Map();
+		br.setActive_map(0);
 		break;
 	case 8:
 		printInstructions();
@@ -63,23 +64,32 @@ menu:
 
 void Game::load_specific_Map()
 {
+	
+	int i = 0;
 	string name = getMapName();
 	vector<string> screen_files = br.getScreen_files();
 	bool found = false;
-	for (int i = 0; i < screen_files.size(); ++i)
+	for (; i < screen_files.size(); ++i)
 	{
 		if (screen_files[i].substr(2, screen_files[i].length() - 9) == name)
 		{
 			found = true;
-			br.setMap_num(i);
-			br.get_ghosts_vec().clear();
-			br.loadNew_map();
-			Engine();
-			ResetGame();
+			break;
 		}
 	}
-
-	if(!found) cout << "Map named '" << name << "' was not found.";
+	if (found)
+	{
+		br.setActive_map(i);
+		br.get_ghosts_vec().clear();
+		br.loadNew_map();
+		if (Validmap())
+		{
+			setDif(); // sets the difficulty of the ghosts
+			br.resetCharacters();
+			level_progress();
+		}
+	}
+	else cout << "Map named '" << name << "' was not found.";
 }
 
 void Game::printlegend(Point pt, short hp)
@@ -88,7 +98,10 @@ void Game::printlegend(Point pt, short hp)
 	cout << "                   ";
 	setTextColor(Color::WHITE);
 	if (br.getLegend_flag()) {
-
+		gotoxy(pt.getX(), pt.getY());
+		if (colored)
+			setTextColor(Color::LIGHTBLUE);
+		cout << "####################";
 		gotoxy(pt.getX(), pt.getY() + 1);
 
 		if (colored)
@@ -101,7 +114,7 @@ void Game::printlegend(Point pt, short hp)
 
 		if (colored)
 			setTextColor(Color::LIGHTBLUE);
-		cout << "  LIVES:";
+		cout << "   LIVES:";
 
 		if (colored)
 			setTextColor(Color::YELLOW);
@@ -109,6 +122,10 @@ void Game::printlegend(Point pt, short hp)
 		{
 			cout << "C";
 		}
+		if (colored)
+			setTextColor(Color::LIGHTBLUE);
+		gotoxy(pt.getX(), pt.getY() + 2);
+		cout << "####################";
 	}
 }
 
@@ -131,9 +148,14 @@ void Game::NewRound(){         // when pac meets ghost  need to make the ghosts 
 		}
 		auto Fr = br.getFruit();
 		Fr.clearMe();
+		
 		Fr.stealPositionFromGhosts(br.get_ghosts_vec()[rand() % br.get_ghosts_vec().size()].getPos());
 		
 		pause = true;
+	}
+	else
+	{
+		
 	}
 }
 
@@ -180,7 +202,7 @@ void  Game::setChoice()
 		cout << "Invalid choice!" << endl;
 
 		cout << "Please select one of the following options." << endl;
-		cout << " 1) Start a new game" << endl <<" 2) Choose a map" << " 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
+		cout << " 1) Start a new game" << endl <<" 2) Choose a map" << endl<<" 8) Present instructions and keys" << endl << " 9) EXIT" << endl << endl;
 
 		choice = _getch()-48;
 	}
@@ -198,14 +220,24 @@ void  Game::printInstructions()
 	_getch(); //  "removes" the key used from screen	
 }
 
+void Game::level_completed()
+{
+	system("cls");
+	if (colored)
+		setTextColor(Color::BROWN);
+	cout << "level Completed! good job.";
+	Sleep(3000);
+}
+
 void Game::level_progress()
 {
+	system("cls");
 	Direction cur_dic = Direction::DEF, next_dic = Direction::DEF, last_dic = Direction::DEF; // initialzing for the switch 
 	br.printMap(colored);
 	printlegend(br.getlegend(), br.get_pac().getHP());
 
 	br.get_pac().printMe(colored);   // PRINTING
-
+	
 	if (!(br.get_ghosts_vec().empty())) {
 		for (auto g : br.get_ghosts_vec())
 			g.printMe(colored);
@@ -223,7 +255,11 @@ void Game::level_progress()
 		if (_kbhit())
 			updateDics(next_dic);// in case user ended PAUSE with the new move
 		if (next_dic == Direction::QUIT)
+		{
+			
 			return;
+		}
+			
 	
 		//if outside of board dont go in, just update move
 		pacmanMoves_Dispatcher(next_dic,cur_dic,last_dic);
@@ -250,26 +286,35 @@ void Game::level_progress()
 
 		++moves_made_this_level;
 	} while (!Over());
+	if(win)
+	level_completed();
 }
 
 void Game::Engine()
 {
-	short level = 0;
+	short level = 0, totmaps = Board::getTotal_maps();
+	br.setActive_map(level);
 	setDif(); // sets the difficulty of the ghosts
 	
-	// while(level<br.levels() && !Over())
+	while (level < totmaps && !Over()&& Validmap())
 	{
 		br.resetCharacters();
 		moves_made_this_level = 0;
 		level_progress();
 		level++;
+		br.setActive_map(level);
+		br.loadNew_map();
 	}
-	if (win == true)
+	if (win)
 		Winner();// cout message
 	else
 		Loser();// kanal
 }
 
+bool Game::Validmap()
+{
+	return !br.getundefinedchars_flag() && br.getPacman_flag();
+}
 void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direction& last_dic)
 {
 		br.move_in_border(next_dic, cur_dic, last_dic, colored, score);	
@@ -294,6 +339,8 @@ void Game::ResetGame()
 	br.resetCharacters();
 	score = 0;
 	fruitscore = 0;
+	round_lost = false;
+	quit = false;
 	pause = false;
 	win = false;
 	choice = 0;
@@ -307,8 +354,7 @@ void Game::Winner()
 	if (colored)
 		setTextColor(Color::LIGHTCYAN);
 	cout <<"CONGRATULATIONS! You've beaten all the stages (Rewards will be sent upon request)." << endl;
-	gotoxy(16, 2);
-	cout << "press any key to continue, champ...";
+	Sleep(5000);
 }
 
 void Game::Loser()

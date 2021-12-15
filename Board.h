@@ -10,9 +10,12 @@
 #include "Pacman.h"
 #include "Ghost.h"
 #include "Fruit.h"
+#include <algorithm>
 
 using std::vector;
 
+constexpr unsigned short MAXBOARD_WIDTH = 80;
+constexpr unsigned short MAXBOARD_HEIGHT = 25;
 
 
 class Board
@@ -26,9 +29,14 @@ class Board
 	Fruit fruit;
 	Point legend;
 
-	int map_num = 0;
+	unsigned short active_map = 0;
+	static unsigned short total_maps;
+
 	bool legend_flag = false;
-	short rows = 0;
+	bool pacman_flag = false;
+	bool undefined_characters = false;
+	short rows = 25;
+	short cur_rows_len = 0;
 	short breadcrumbs = 0;
 
 private:
@@ -44,48 +52,57 @@ private:
 	int BestMovement_Util(Point dest, Point cur);
 	vector<vector<bool>> createTrackingMap();
 	//-----------------------------ctor-----------------------------------------
-
-	void create_PlayMap_from_Org(int y);
+	void create_PlayMap_from_Org(int y,int);
 	void insert_legend();
-	void insert_legend_row(int y, int x);
-
+	void insert_legend_row(const unsigned y, const unsigned x);
+	void getScreen_names();
+	void CreateOrg_maps();
+	void setCur_row_len();
 public:
 	Board();
-
 	//---------------------map--------------------------------------
-
+	static short getTotal_maps() { return total_maps; }
 	void loadNew_map();
 	vector<string>& getPlay_map() { return Play_map; }
 	const Point& getlegend() const { return legend; }
-	const bool getLegend_flag() const { return legend_flag; }
-	const int getMapNum() { return map_num; }
+	const bool& getLegend_flag() const { return legend_flag; }
+	const bool& getPacman_flag() const { return pacman_flag; }
+	const bool& getundefinedchars_flag() const { return undefined_characters; }
+	const int getMapNum() { return active_map; }
 	const vector<string>& getScreen_files() { return screen_files; }
-	void setMap_num(int x) { map_num = x; }
-	bool out_of_line(const Point& pos, const Direction& dic);
+	void setActive_map(int x) { active_map = x; }
 	bool isOnBorder(Point pos);
 	bool isTopBorder(const unsigned& X, const unsigned& Y);
 	bool isInBorder(Point pos);
 	//----------------------utilities---------------------------------------------
 	void move_in_border(Direction&, Direction&, Direction&, const bool& colored, short& score);
-	void move_out_border(Direction&, Direction&, const bool& colored,short&);
-	void resetCharacters() { pac.resetMe(); fruit.setPos(ghosts[rand()%ghosts.size()].getPos()); for (auto& g : ghosts) g.resetMe(); }
+	void resetCharacters()
+	{
+		if (ghosts.empty()) 
+			fruit.setPos(pac.getPos()); 
+		else fruit.setPos(ghosts[rand() % ghosts.size()].getPos());
+		pac.resetMe();
+		for (auto& g : ghosts) g.resetMe();
+	}
 	short getCrumbs() { return breadcrumbs; }
 	char nextCellCont(Point pos, Direction dic);      // returns map content in a given postion.
 	bool Collision();
 	void printMap(bool colored);
 	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
-	
+	bool isportal(const unsigned short& X, const unsigned short& Y);
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
 	void movePac(Direction dic, bool colored, short& score);
-	bool portals(Direction dic, Point& pos);
-	void pacEatsfruit(short&);
-	
+	bool portals( Direction&, Direction&,Point& pos);
+	void pacEatsfruit(unsigned short&);
 	//----------------------ghosts----------------------
-
 	vector<Ghost>& get_ghosts_vec() { return ghosts; }
 	Ghost& get_ghost(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
-	void NPCmoveGenerator(bool colored,int,short&);
+	void NPCmoveGenerator(bool colored,int,unsigned short&);
 	//-----------------------------fruit---------------------------------------
 	Fruit& getFruit() { return fruit; }
+	Point getvalidPos(){
+		if (ghosts.size()) return ghosts[rand() % ghosts.size()].getPos();
+		else return pac.getPos();
+	}
 };
