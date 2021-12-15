@@ -6,10 +6,19 @@
  1) easy - ghosts move randomly
  2) medium - ghosts chase pacman and once in every 15 moves they will do 5 random moves
  3) expert - ghosts chase pacman all theway 
- ** if pacman is hiding inside a wall crack(edges with no walls which arent teleports) the ghosts will try to look for him
-    as if he dissappeared.
  
  a fruit which appears randomly in a random spot once in a while and will grant bonus points
  
  an option on menu to load a specific level from working directory
  
+ ***any map that follows the game format can be loaded and be played***
+ 
+ format: 
+
+create a file of type ".screen" and use each of the following character:
+'@' -  pacman default position (only the first is addressed)
+'$' - a ghost default position (can be many)
+' ' - (a space) where food will be printed
+'%' - a tile to be left blank
+'&' - a space for the legend (score + lives) [the legend spans 3 rows with 20 characters each]
+
