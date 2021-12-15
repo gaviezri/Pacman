@@ -2,9 +2,9 @@
 
 int Game::moves_made_this_level=0;
 
-void PacmanLogo()
+void Game::PacmanLogo()
 {
-	setTextColor(Color::LIGHTMAGENTA);
+	if(colored) setTextColor(Color::LIGHTMAGENTA);
 	gotoxy(0, 8);
 	cout << "     ___        ___           ___           ___           ___           ___" << endl
 		<< "    /  /\\      /  /\\         /  /\\         /__/\\         /  /\\         /__/\\" << endl
@@ -26,11 +26,11 @@ void Game::play()  //  this is where the magic happens (!)
 {
 	srand(0xAFFF);
 	ShowConsoleCursor(false);
-	setTextColor(Color::WHITE);
-	system("cls");
-	PacmanLogo();
+	
 menu:
 	
+	system("cls");
+	PacmanLogo();
 	system("cls");
 	printMenu();
 	setChoice();
@@ -97,7 +97,6 @@ void Game::printlegend(Point pt, short hp)
 {
 	gotoxy(pt.getX(), pt.getY() + 1);
 	cout << "                   ";
-	setTextColor(Color::WHITE);
 	if (br.getLegend_flag()) {
 		gotoxy(pt.getX(), pt.getY());
 		if (colored)
@@ -182,8 +181,6 @@ void Game::printMenu()
 {
 	if (colored)
 		setTextColor(Color::BROWN);
-	else
-		setTextColor(Color::WHITE);
 	system("cls");
 	cout << "#############################################" << endl << endl;
 	cout << " Welcome to Gal & Omri's version of PACMAN !" << endl;
@@ -224,6 +221,7 @@ void  Game::printInstructions()
 void Game::level_completed()
 {
 	system("cls");
+	score = 0;
 	if (colored)
 		setTextColor(Color::BROWN);
 	cout << "level Completed! good job.";
@@ -257,6 +255,8 @@ void Game::level_progress()
 			updateDics(next_dic);// in case user ended PAUSE with the new move
 		if (next_dic == Direction::QUIT)
 		{
+			quit = true;
+			win = false;
 			
 			return;
 		}
@@ -284,14 +284,14 @@ void Game::level_progress()
 
 		++moves_made_this_level;
 	} while (!Over());
-	if(win)
-	level_completed();
+	if(win) level_completed();  // prints semi-winner massage
 }
 
 void Game::Engine()
 {
 	short level = 0, totmaps = Board::getTotal_maps();
 	br.setActive_map(level);
+	br.loadNew_map();
 	setDif(); // sets the difficulty of the ghosts
 	
 	while (level < totmaps && !Over()&& Validmap())
@@ -300,19 +300,28 @@ void Game::Engine()
 		moves_made_this_level = 0;
 		level_progress();
 		level++;
-		br.setActive_map(level);
 		br.loadNew_map();
+		br.setActive_map(level);
+		
 	}
+	
 	if (win)
+	{
+		win = false;
 		Winner();// cout message
-	else
+	}
+	else if (!quit)
+	{
+		quit = false;
 		Loser();// kanal
+	}
 }
 
 bool Game::Validmap()
 {
 	return !br.getundefinedchars_flag() && br.getPacman_flag();
 }
+
 void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direction& last_dic)
 {
 		br.move_in_border(next_dic, cur_dic, last_dic, colored, score);	

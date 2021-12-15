@@ -44,8 +44,8 @@ void Board::CreateOrg_maps()
 		myFile.close();
 		++cur_map;
 	}
-	loadNew_map();  //loads the first map
 }
+
 Board::Board()   // loads all game board to maps vector
 {
 	
@@ -95,7 +95,8 @@ void Board::loadNew_map()
 		create_PlayMap_from_Org(i, Org_maps[active_map][i].length());  // initializing visual cells from Original map one row at a time.
 
 	}
-	insert_legend();
+	if(legend_flag) insert_legend();
+
 	if (!pacman_flag)
 	{
 		system("cls");
@@ -205,7 +206,7 @@ void Board::create_PlayMap_from_Org(int y, int actual_len)
 
 void Board::printMap(bool colored)
 {
-	for (int i = 0; i < Play_map.size(); ++i) { if (colored) setTextColor(Color::BLUE); else setTextColor(Color::WHITE);  cout << Play_map[i] << endl; }
+	for (int i = 0; i < Play_map.size(); ++i) { if (colored) setTextColor(Color::BLUE);  cout << Play_map[i] << endl; }
 }
 
 void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& last_dic,const bool & colored, short& score)
