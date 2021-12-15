@@ -13,7 +13,7 @@ void Fruit::Appear()
 	appearing = true;
 	setAvatar();
 }
-void Fruit::Disappear(const Point& np)
+void Fruit::Toggle(const Point& np)
 {
 	if (move_counter == 5)
 	{
@@ -24,7 +24,8 @@ void Fruit::Disappear(const Point& np)
 		
 	}
 }
-bool Fruit::ExposeMe()
+bool Fruit::ExposeMe(const Point& pacpos)
 {
+	if (pacpos == pos) return false;
 	return (rand()%12 == 1);
 }

@@ -30,7 +30,7 @@ void Game::play()  //  this is where the magic happens (!)
 	system("cls");
 	PacmanLogo();
 menu:
-	Color();
+	
 	system("cls");
 	printMenu();
 	setChoice();
@@ -107,11 +107,11 @@ void Game::printlegend(Point pt, short hp)
 
 		if (colored)
 			setTextColor(Color::LIGHTBLUE);
-		cout << "SCORE: ";
+		cout << "SCORE:";
 
 		if (colored)
 			setTextColor(Color::LIGHTRED);
-		cout << score;
+		cout <<score;
 
 		if (colored)
 			setTextColor(Color::LIGHTBLUE);
@@ -260,9 +260,6 @@ void Game::level_progress()
 			
 			return;
 		}
-			
-	
-		//if outside of board dont go in, just update move
 		pacmanMoves_Dispatcher(next_dic,cur_dic,last_dic);
 		
 		if (br.getLegend_flag())
@@ -329,7 +326,7 @@ void Game::NPCMoves_Dispatcher()
 
 void Game::printScore(Point legend)
 {
-	 gotoxy(legend.getX()+7,legend.getY()+1);//6 is a magic number represents the length of "SCORE:"
+	 gotoxy(legend.getX()+6,legend.getY()+1);//6 is a magic number represents the length of "SCORE:"
 	 if(colored)
 		 setTextColor(Color::LIGHTRED);
 	 cout  << score + fruitscore;

@@ -21,8 +21,9 @@ public:
         if (appearing)
             printMe(colored);
     }
-    void Disappear(const Point&);
-    bool ExposeMe();
+    void Toggle(const Point&);
+    bool ExposeMe(const Point&);
     short int Eaten(const Point&);
+    void Dissappear() { appearing = false; }
 };
 
