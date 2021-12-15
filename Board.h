@@ -75,7 +75,7 @@ public:
 	bool isTopBorder(const unsigned& X, const unsigned& Y);
 	bool isInBorder(Point pos);
 	//----------------------utilities---------------------------------------------
-	void move_in_border(Direction&, Direction&, Direction&, const bool& colored, short& score);
+	void move_in_border(Direction&, Direction&, Direction&, const bool& colored, unsigned short& score);
 	void resetCharacters()
 	{
 		if (ghosts.empty()) 
@@ -91,9 +91,10 @@ public:
 	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
 	bool isportal(const unsigned short& X, const unsigned short& Y);
 	bool in_legend_area(const int& x, const int& y);
+	void MapErrors();
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
-	void movePac(Direction dic, bool colored, short& score);
+	void movePac(Direction dic, bool colored,unsigned short& score);
 	bool portals( Direction&, Direction&,Point& pos);
 	void pacEatsfruit(unsigned short&, unsigned short&);
 	//----------------------ghosts----------------------

@@ -6,6 +6,28 @@ bool const to_Y = false;
 
 unsigned short Board::total_maps = 0;
 
+void Board::MapErrors()
+{
+	system("cls");
+	if (!pacman_flag)
+	{
+		system("cls");
+		cout << "the map: " << screen_files[active_map] << " does not contain a pacman default position and therefore cannot be loaded.";
+		Sleep(3500);
+	}
+	else if (undefined_characters)
+	{
+		cout << "the map: " << screen_files[active_map] << " contains a undefined symbols and therefore cannot be loaded.";
+		Sleep(3500);
+	}
+	if (in_legend_area(pac.getPos().getX(), pac.getPos().getY()))
+	{
+		undefined_characters = true;
+		cout << "the map: " << screen_files[active_map] << " isn't well defined and therefore cannot be loaded.";
+		Sleep(3500);
+
+	}
+}
 
 void Board::getScreen_names()
 {
@@ -61,12 +83,13 @@ Board::Board()   // loads all game board to maps vector
 
 void Board::setCur_row_len()
 {// incase a '&' is the on top , set the legend's dimensions as map's default
-	if (Org_maps[active_map][0][0] == '&' && Org_maps[active_map][0].length() == 1)
+	if (Org_maps[active_map][0][0] == '&' && Org_maps[active_map][0].length() <= 1)
 		cur_rows_len = 20;
 // otherwise, the first row sets the tone
 	else
 		cur_rows_len = Org_maps[active_map][0].length();
 }
+
 void Board::loadNew_map()
 {
 	breadcrumbs = 0;
@@ -96,25 +119,9 @@ void Board::loadNew_map()
 
 	}
 	if(legend_flag) insert_legend();
-
-	if (!pacman_flag)
-	{
-		system("cls");
-		cout << "the map: " << screen_files[active_map] << " does not contain a pacman default position and therefore cannot be loaded.";
-		Sleep(3500);
-	}
-	else if (undefined_characters)
-	{
-		cout << "the map: " << screen_files[active_map] << " contains a undefined symbols and therefore cannot be loaded.";
-		Sleep(3500);
-	}
-	else if (in_legend_area(pac.getPos().getY(), pac.getPos().getX()))
-	{
-		undefined_characters = true;
-		cout << "the map: " << screen_files[active_map] << " isn't well defined and therefore cannot be loaded.";
-		Sleep(3500);
-
-	}
+	
+	MapErrors();
+	
 }
 
 void Board::insert_legend_row(const unsigned& y, const unsigned& x)
@@ -144,13 +151,12 @@ void Board::insert_legend()
 		}
 }
 	
-
 bool Board::in_legend_area(const int& x, const int& y)
 {
 	if (legend_flag)
 	{
 		const int lg_x = legend.getX(), lg_y = legend.getY();
-		return  (x <= lg_x + 19 && x >= lg_y && y >= lg_y && y <= lg_y + 2);
+		return  (x <= lg_x + 19 && x >= lg_x && y >= lg_y && y <= lg_y + 2);
 	}
 	return false;
 }
@@ -179,10 +185,12 @@ void Board::create_PlayMap_from_Org(int y, int actual_len)
 			case '@':
 				if (!pacman_flag)
 				{
-					pac = Pacman(Point(x, y));    //sets def pos
+					pac.setDef_pos(Point(x, y));//sets def pos
+					pac.resetHP();
+					pac.resetMe();
 					pacman_flag = true;
 				}
-				else Play_map[y][x] = ' ';
+				Play_map[y][x] = ' ';
 				break;
 			case '&':
 				if (!legend_flag)
@@ -209,7 +217,7 @@ void Board::printMap(bool colored)
 	for (int i = 0; i < Play_map.size(); ++i) { if (colored) setTextColor(Color::BLUE);  cout << Play_map[i] << endl; }
 }
 
-void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& last_dic,const bool & colored, short& score)
+void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& last_dic,const bool & colored,unsigned short& score)
 {
 	if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
 		cur_dic = Direction::STAY;
@@ -231,7 +239,7 @@ void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& l
 	}
 }
 
-void Board::movePac(Direction dic, bool colored, short& score)
+void Board::movePac(Direction dic, bool colored,unsigned short& score)
 {
 	char cell_c = nextCellCont(pac.getPos(), dic);
 	pac.updateMove(dic, colored);
@@ -393,17 +401,16 @@ void Board::NPCmoveGenerator(bool colored,int movesmade,unsigned short& fruitbon
 	
 	}
 	premoveDatacollection(next_cont, cont_around, path_around, fruit, opposite_dic, options);
-	fruit.Toggle(getvalidPos());
 	if (fruit.isAppearing())
 	{
 		
 		if ((movesmade % 4) == 1)
 		{
+
 			NoviceMovement(options, opposite_dic, next_cont, colored, fruit);
 			fruit.step();
-			pacEatsfruit(fruitbonus,score);
 		}
-		
+		pacEatsfruit(fruitbonus, score);
 	}	
 	else
 	{
@@ -411,6 +418,7 @@ void Board::NPCmoveGenerator(bool colored,int movesmade,unsigned short& fruitbon
 			fruit.Appear();
 		NoviceMovement(options, opposite_dic, next_cont, colored, fruit);
 	}
+	fruit.Toggle(getvalidPos());
 }
 
 void Board::pacEatsfruit(unsigned short& fruitscore, unsigned short& score)
@@ -611,28 +619,24 @@ bool Board::portals(Direction& dic,Direction& next_dic,Point& pos)
 	{// print ' ' over pac's last position and update his coord to other side
 		pac.clearMe();
 		pac.setX(Play_map[Y].length() - 1);
-		next_dic = dic;
 		return true;
 	}
 	else if (X == cur_rows_len-1 && (dic == Direction::RIGHT || next_dic == Direction::RIGHT) && isBlank(Play_map[Y][0])) //Right -> Left
 	{
 		pac.clearMe();
 		pac.setX(0);
-		next_dic = dic;
 		return true;
 	}
 	else if (Y==0 && (dic == Direction::UP || next_dic == Direction::UP) && isBlank(Play_map[rows - 1][X]))// TOP -> BOTTOM
 	{
 		pac.clearMe();
 		pac.setY(rows-1);
-		next_dic = dic;
 		return true;
 	}
 	else if (Y == rows-1 && (dic == Direction::DOWN || next_dic == Direction::DOWN) && isBlank(Play_map[0][X])) // BOTTOM -> UP
 	{
 		pac.clearMe();
 		pac.setY(0);
-		next_dic = dic;
 		return true;
 	}
 	return false;
