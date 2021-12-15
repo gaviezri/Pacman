@@ -10,7 +10,7 @@ class Game
 	bool win=false;
 	bool round_lost = false;
 	bool quit = false;
-	short score=0;
+	unsigned short score=0;
 	unsigned short fruitscore = 0;
 	bool pause;
 	Board br;

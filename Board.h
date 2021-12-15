@@ -54,7 +54,7 @@ private:
 	//-----------------------------ctor-----------------------------------------
 	void create_PlayMap_from_Org(int y,int);
 	void insert_legend();
-	void insert_legend_row(const unsigned y, const unsigned x);
+	void insert_legend_row(const unsigned& y, const unsigned& x);
 	void getScreen_names();
 	void CreateOrg_maps();
 	void setCur_row_len();
@@ -90,15 +90,16 @@ public:
 	void printMap(bool colored);
 	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
 	bool isportal(const unsigned short& X, const unsigned short& Y);
+	bool in_legend_area(const int& x, const int& y);
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
 	void movePac(Direction dic, bool colored, short& score);
 	bool portals( Direction&, Direction&,Point& pos);
-	void pacEatsfruit(unsigned short&);
+	void pacEatsfruit(unsigned short&, unsigned short&);
 	//----------------------ghosts----------------------
 	vector<Ghost>& get_ghosts_vec() { return ghosts; }
 	Ghost& get_ghost(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
-	void NPCmoveGenerator(bool colored,int,unsigned short&);
+	void NPCmoveGenerator(bool colored,int,unsigned short&, unsigned short&);
 	//-----------------------------fruit---------------------------------------
 	Fruit& getFruit() { return fruit; }
 	Point getvalidPos(){

@@ -76,26 +76,24 @@ void Board::loadNew_map()
 
 	if (active_map >= total_maps) return;
 
-	int i = 0,j=0;
+	int i = 0, j = 0;
 	Play_map.clear();
 	ghosts.clear();
 	rows = Org_maps[active_map].size() > 25 ? 25 : Org_maps[active_map].size();
 	Play_map.reserve(rows);
-	pacman_flag = false;
-	legend_flag = false;
-	for (; i < Org_maps[active_map].size() && i<MAXBOARD_HEIGHT ; ++i)
-	{	
+	for (; i < Org_maps[active_map].size() && i < MAXBOARD_HEIGHT; ++i)
+	{
 		if (!i)
 			setCur_row_len();
 		else
 		{
 			short originalsize = Org_maps[active_map][i].size();
 			Org_maps[active_map][i].resize(cur_rows_len);
-			for (int j = originalsize ; j < cur_rows_len; ++j) 
+			for (int j = originalsize; j < cur_rows_len; ++j)
 				Org_maps[active_map][i][j] = ' ';
 		}
-		create_PlayMap_from_Org(i,Org_maps[active_map][i].length());  // initializing visual cells from Original map one row at a time.
-		 
+		create_PlayMap_from_Org(i, Org_maps[active_map][i].length());  // initializing visual cells from Original map one row at a time.
+
 	}
 	if(legend_flag) insert_legend();
 
@@ -110,17 +108,21 @@ void Board::loadNew_map()
 		cout << "the map: " << screen_files[active_map] << " contains a undefined symbols and therefore cannot be loaded.";
 		Sleep(3500);
 	}
+	else if (in_legend_area(pac.getPos().getY(), pac.getPos().getX()))
+	{
+		undefined_characters = true;
+		cout << "the map: " << screen_files[active_map] << " isn't well defined and therefore cannot be loaded.";
+		Sleep(3500);
 
+	}
 }
 
-void Board::insert_legend_row(const unsigned y, const unsigned x)
+void Board::insert_legend_row(const unsigned& y, const unsigned& x)
 {
-	for (int i = x; i < x+20 ; i++)
+	for (int i = x; i < x+20 && i < Play_map[y].size(); i++)
 	{
-		if (i < Play_map[y].size())
-			Play_map[y][i] = static_cast<char>(Content::WALL);
-		else
-			Play_map[y].push_back('#');
+		if (Play_map[y][i] == '.') breadcrumbs--;
+		Play_map[y][i] = static_cast<char>(Content::WALL);
 	}
 }
 
@@ -143,48 +145,59 @@ void Board::insert_legend()
 }
 	
 
+bool Board::in_legend_area(const int& x, const int& y)
+{
+	if (legend_flag)
+	{
+		const int lg_x = legend.getX(), lg_y = legend.getY();
+		return  (x <= lg_x + 19 && x >= lg_y && y >= lg_y && y <= lg_y + 2);
+	}
+	return false;
+}
+
 void Board::create_PlayMap_from_Org(int y, int actual_len)
 {
 	short tmp = 0;
 	Play_map.push_back(Org_maps[active_map][y]);
 	for (int x = 0; x < cur_rows_len ; ++x)
 	{	//this condition is to double check resize was successful and if not the 'else' part takes care of the compelment needed
-		if(x<actual_len)
-		switch ((char)Org_maps[active_map][y][x])
+		if (x < actual_len)
 		{
-		case ' ':
-			Play_map[y][x] = '.';
-			breadcrumbs++;
-			break;
-		case '%':
-			Play_map[y][x] = ' ';
-			break;
-		case '$':
-			Play_map[y][x] = ' ';
-			ghosts.push_back(Ghost(Point(x,y)));  //sets def pos
-			break;
-		case '@':
-			if (!pacman_flag)
+			switch ((char)Org_maps[active_map][y][x])
 			{
+			case ' ':
+				Play_map[y][x] = '.';
+				breadcrumbs++;
+				break;
+			case '%':
 				Play_map[y][x] = ' ';
-				pac = Pacman(Point(x, y));    //sets def pos
-				pacman_flag = true;
-			}
-			else Play_map[y][x] = '.';
-			break;
-		case '&':
-			if (!legend_flag)
-			{
+				break;
+			case '$':
 				Play_map[y][x] = ' ';
-				legend = Point(x, y);
-				legend_flag = true;
+				ghosts.push_back(Ghost(Point(x, y)));  //sets def pos
+				break;
+			case '@':
+				if (!pacman_flag)
+				{
+					pac = Pacman(Point(x, y));    //sets def pos
+					pacman_flag = true;
+				}
+				else Play_map[y][x] = ' ';
+				break;
+			case '&':
+				if (!legend_flag)
+				{
+					legend = Point(x, y);
+					legend_flag = true;
+				}
+				Play_map[y][x] = '#';
+				break;
+			case '#':
+				continue;
+			default:
+				undefined_characters = true;
+				break;
 			}
-			break;
-		case '#':
-			continue;
-		default:
-			undefined_characters = true;
-			break;
 		}
 		else
 			Play_map[y].push_back(' ');
@@ -353,7 +366,7 @@ void Board::premoveDatacollection(char& next_cont,char* cont_around, bool* path_
 	getOptions(options, path_around);
 }
 
-void Board::NPCmoveGenerator(bool colored,int movesmade,unsigned short& fruitbonus)
+void Board::NPCmoveGenerator(bool colored,int movesmade,unsigned short& fruitbonus,unsigned short& score)
 {
 	char cont_around[4], next_cont ;		//wall counter count actual walls, path around just indicate wether there is a path and we are manipulating the opposite direction to act
 	vector<Direction> options;
@@ -380,29 +393,38 @@ void Board::NPCmoveGenerator(bool colored,int movesmade,unsigned short& fruitbon
 	
 	}
 	premoveDatacollection(next_cont, cont_around, path_around, fruit, opposite_dic, options);
+	fruit.Toggle(getvalidPos());
 	if (fruit.isAppearing())
 	{
+		
 		if ((movesmade % 4) == 1)
 		{
 			NoviceMovement(options, opposite_dic, next_cont, colored, fruit);
 			fruit.step();
-			pacEatsfruit(fruitbonus);
+			pacEatsfruit(fruitbonus,score);
 		}
-		fruit.Disappear(getvalidPos());
+		
 	}	
 	else
 	{
-		if(fruit.ExposeMe())
+		if(fruit.ExposeMe(pac.getPos()))
 			fruit.Appear();
 		NoviceMovement(options, opposite_dic, next_cont, colored, fruit);
-		fruit.Disappear(getvalidPos());
 	}
 }
 
-void Board::pacEatsfruit(unsigned short& fruitscore)
+void Board::pacEatsfruit(unsigned short& fruitscore, unsigned short& score)
 {
 	if (fruit.getPos() == pac.getPos())
+	{
 		fruitscore += (fruit.Eaten(getvalidPos()) - IntToChar);
+		fruit.Dissappear();
+		if (Play_map[fruit.getPos().getY()][fruit.getPos().getX()] == '.')
+		{
+			score += 1;
+			changeFood2Path(fruit.getPos());
+		} 		
+	}
 }
 
 
