@@ -24,9 +24,9 @@ void Game::PacmanLogo()
 
 void Game::play()  //  this is where the magic happens (!)
 {
+	Color();
 	srand(0xAFFF);
 	ShowConsoleCursor(false);
-	
 menu:
 	
 	system("cls");
@@ -90,7 +90,11 @@ void Game::load_specific_Map()
 			ResetGame();
 		}
 	}
-	else cout << "Map named '" << name << "' was not found.";
+	else 
+	{
+		cout << "Map named '" << name << "' was not found.";
+		Sleep(3500);
+	}
 }
 
 void Game::printlegend(Point pt, short hp)
@@ -152,10 +156,6 @@ void Game::NewRound(){         // when pac meets ghost  need to make the ghosts 
 		Fr.stealPositionFromGhosts(br.get_ghosts_vec()[rand() % br.get_ghosts_vec().size()].getPos());
 		
 		pause = true;
-	}
-	else
-	{
-		
 	}
 }
 
@@ -280,7 +280,7 @@ void Game::level_progress()
 			goto PAUSE;
 		}
 
-		br.pacEatsfruit(fruitscore);
+		br.pacEatsfruit(fruitscore,score);
 
 		++moves_made_this_level;
 	} while (!Over());
@@ -294,15 +294,14 @@ void Game::Engine()
 	br.loadNew_map();
 	setDif(); // sets the difficulty of the ghosts
 	
-	while (level < totmaps && !Over()&& Validmap())
+	while (level < totmaps && !Over() && Validmap())
 	{
 		br.resetCharacters();
 		moves_made_this_level = 0;
 		level_progress();
 		level++;
-		br.loadNew_map();
 		br.setActive_map(level);
-		
+		br.loadNew_map();
 	}
 	
 	if (win)
@@ -319,7 +318,7 @@ void Game::Engine()
 
 bool Game::Validmap()
 {
-	return !br.getundefinedchars_flag() && br.getPacman_flag();
+	return (!br.getundefinedchars_flag() && br.getPacman_flag());
 }
 
 void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direction& last_dic)
@@ -330,7 +329,7 @@ void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direc
 void Game::NPCMoves_Dispatcher()
 {
 	 //ghost movement manager that makes ghost move everyother move that pacman makes and moves fruit every 3
-		br.NPCmoveGenerator(colored,moves_made_this_level,fruitscore);
+		br.NPCmoveGenerator(colored,moves_made_this_level,fruitscore,score);
 }
 
 void Game::printScore(Point legend)
@@ -351,7 +350,6 @@ void Game::ResetGame()
 	pause = false;
 	win = false;
 	choice = 0;
-	colored = false;
 }
 
 void Game::Winner()
