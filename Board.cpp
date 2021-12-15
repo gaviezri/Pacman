@@ -80,22 +80,22 @@ void Board::loadNew_map()
 	Play_map.clear();
 	ghosts.clear();
 	rows = Org_maps[active_map].size() > 25 ? 25 : Org_maps[active_map].size();
+	Play_map.reserve(rows);
 	pacman_flag = false;
 	legend_flag = false;
-	string tmp_line;
 	for (; i < Org_maps[active_map].size() && i<MAXBOARD_HEIGHT ; ++i)
 	{	
-		if (!i) setCur_row_len();
+		if (!i)
+			setCur_row_len();
 		else
 		{
 			short originalsize = Org_maps[active_map][i].size();
 			Org_maps[active_map][i].resize(cur_rows_len);
-			for (int j = originalsize == 0 ? 0 : originalsize - 1; j < cur_rows_len; ++j) 
+			for (int j = originalsize ; j < cur_rows_len; ++j) 
 				Org_maps[active_map][i][j] = ' ';
 		}
 		create_PlayMap_from_Org(i,Org_maps[active_map][i].length());  // initializing visual cells from Original map one row at a time.
-		tmp_line = Org_maps[active_map][i];
-		Play_map.push_back(tmp_line);     // copying from orignal map to the play map. 
+		 
 	}
 	insert_legend();
 	if (!pacman_flag)
@@ -145,7 +145,7 @@ void Board::insert_legend()
 void Board::create_PlayMap_from_Org(int y, int actual_len)
 {
 	short tmp = 0;
-	Play_map[y].reserve(cur_rows_len);
+	Play_map.push_back(Org_maps[active_map][y]);
 	for (int x = 0; x < cur_rows_len ; ++x)
 	{	//this condition is to double check resize was successful and if not the 'else' part takes care of the compelment needed
 		if(x<actual_len)

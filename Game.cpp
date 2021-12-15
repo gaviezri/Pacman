@@ -24,7 +24,7 @@ void PacmanLogo()
 
 void Game::play()  //  this is where the magic happens (!)
 {
-	srand(0x11A);
+	srand(0xAFFF);
 	ShowConsoleCursor(false);
 	setTextColor(Color::WHITE);
 	system("cls");
@@ -87,6 +87,7 @@ void Game::load_specific_Map()
 			setDif(); // sets the difficulty of the ghosts
 			br.resetCharacters();
 			level_progress();
+			ResetGame();
 		}
 	}
 	else cout << "Map named '" << name << "' was not found.";
