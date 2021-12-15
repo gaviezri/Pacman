@@ -8,8 +8,10 @@ class Game
 	bool colored;
 	char choice=0;
 	bool win=false;
+	bool round_lost = false;
+	bool quit = false;
 	short score=0;
-	short fruitscore = 0;
+	unsigned short fruitscore = 0;
 	bool pause;
 	Board br;
 
@@ -35,6 +37,7 @@ public:
 	void Loser();
 	void Winner();
 	//-----------game-engine-------------------
+	bool Validmap();
 	bool maps_available() {
 		if (br.getScreen_files().size() == 0)
 		{
@@ -55,9 +58,10 @@ public:
 	void updateDics(Direction& cur);
 
 	//-------------utilities------------
-
+	void level_completed();
 	void load_specific_Map();
 	string getMapName() {
+		cout << " enter map name(case sensitive, without extension):  ";
 		string name;
 		cin >> name;
 		return name;
@@ -68,6 +72,7 @@ public:
 		if (br.get_pac().getHP() == 0)
 		{
 			win = false;
+			round_lost = true;
 			return true;
 		}
 		if (score == br.getCrumbs())
@@ -76,7 +81,7 @@ public:
 			return true;
 		}
 		else
-			return false;
+			return quit;
 	}
 	void printScore(Point);
 };
