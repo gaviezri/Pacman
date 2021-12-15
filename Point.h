@@ -20,7 +20,6 @@ enum class Color
 	LIGHTRED = 12,
 	LIGHTMAGENTA = 13,
 	YELLOW = 14,
-	WHITE = 15
 };
 using namespace std;
 
