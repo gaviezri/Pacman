@@ -9,6 +9,7 @@ protected:
 	Point def_pos;
 
 public:
+	//--------------------------------------------movements of creatures------
 	const Point& getPos() { return pos; }
 	void setPos(const Point& p) { pos = p; }
 	void setX(unsigned int x) { pos.setX(x); }
@@ -16,15 +17,13 @@ public:
 	void resetMe() { pos = def_pos; }
 	void printMe(bool colored) {
 		gotoxy(pos.getX(), pos.getY());
-		if (colored) { if (avatar == 'C')setTextColor(Color::BROWN); 
-		else if (avatar == 'G') setTextColor(Color::RED); 
-		else setTextColor(Color::LIGHTGREEN); }
+		if (colored) {
+			if (avatar == 'C')setTextColor(Color::BROWN);
+			else if (avatar == 'G') setTextColor(Color::RED);
+			else setTextColor(Color::LIGHTGREEN);
+		}
 		cout << avatar;
 	}
-
-	//--------------------------------------------movements of creatures------
-
-
 	
 	void clearMe(bool colored,char cont)
 	{

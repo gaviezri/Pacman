@@ -14,19 +14,17 @@ class Ghost:public NPC {
 	static Difficulty diffic;
 
 public:
-	//-----------positioning&movement---------------------------
 	
-	//----------------behavior relative to difficulty
-	static void setDif(int );
-	static Difficulty getDif();
 	//----------------ctor--------------------------
 	Ghost(Point _pos) { pos = def_pos = _pos; avatar = 'G'; }
+	//----------------movement
 	void updateMove(Direction dic, bool colored)//ghosts
 	{
 		clearMe(colored, content_underme);
 		pos.updateCoord(dic);
 		printMe(colored);
 	}
-
+	static void setDif(int);
+	static Difficulty getDif();
 };
 

@@ -5,22 +5,23 @@
 
 class Game
 {
+	Board br;
+
 	bool colored;
 	char choice=0;
+
 	bool win=false;
 	bool round_lost = false;
 	bool quit = false;
+	bool pause;
+
 	unsigned short score=0;
 	unsigned short fruitscore = 0;
-	bool pause;
-	Board br;
-
+	
 	void pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direction& last_dic);
 	void NPCMoves_Dispatcher();
-
 public:
-	void PacmanLogo();
-	static int moves_made_this_level;
+	
 	//-----------------UI (settings)----------------
 	void setDif();
 	void Color() {
@@ -34,9 +35,12 @@ public:
 	void setChoice();
 	void printInstructions();
 	//-----------------UI (announcements)----------------
+	void PacmanLogo();
 	void Loser();
 	void Winner();
+	void level_completed();
 	//-----------game-engine-------------------
+	static int moves_made_this_level;
 	bool Validmap();
 	bool maps_available() {
 		if (br.getScreen_files().size() == 0)
@@ -56,9 +60,7 @@ public:
 	void ResetGame();
 	void pauseGAME();
 	void updateDics(Direction& cur);
-
 	//-------------utilities------------
-	void level_completed();
 	void load_specific_Map();
 	string getMapName() {
 		cout << " enter map name(case sensitive, without extension):  ";

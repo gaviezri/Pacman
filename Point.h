@@ -43,8 +43,6 @@ public:
 	//-------------setters---------------------
 	void setX(unsigned short x) { coord[0] = x; }
 	void setY(unsigned short y) { coord[1] = y; }
-	static bool U_above_D(const Point& U, const Point& D) { return U.coord[1] + 1 == D.coord[1]; }
-	static bool L_left_R(const Point& L, const Point& R) { return R.coord[0]  == L.coord[0] + 1; }
 	void setCoord(int _x, int _y);
 	//------------------operators-----------------------
 	bool operator==(const Point&)const;

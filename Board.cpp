@@ -7,7 +7,7 @@ bool const to_Y = false;
 unsigned short Board::total_maps = 0;
 
 void Board::MapErrors()
-{
+{// printing relevant error incase a flag is risen
 	system("cls");
 	if (!pacman_flag)
 	{
@@ -25,7 +25,6 @@ void Board::MapErrors()
 		undefined_characters = true;
 		cout << "the map: " << screen_files[active_map] << " isn't well defined and therefore cannot be loaded.";
 		Sleep(3500);
-
 	}
 }
 
@@ -96,18 +95,18 @@ void Board::loadNew_map()
 	pacman_flag = false;
 	legend_flag = false;
 	undefined_characters = false;
-
+	//in Game::engine this prevent running out of vectors range and end the gameloop peacefuly
 	if (active_map >= total_maps) return;
 
 	int i = 0, j = 0;
-	Play_map.clear();
-	ghosts.clear();
-	rows = Org_maps[active_map].size() > 25 ? 25 : Org_maps[active_map].size();
+	Play_map.clear();//clean previous map from the active map container
+	ghosts.clear();// same for ghosts
+	rows = Org_maps[active_map].size() > 25 ? 25 : Org_maps[active_map].size(); //set rows
 	Play_map.reserve(rows);
 	for (; i < Org_maps[active_map].size() && i < MAXBOARD_HEIGHT; ++i)
 	{
 		if (!i)
-			setCur_row_len();
+			setCur_row_len();// first row determines length of the gameboard
 		else
 		{
 			short originalsize = Org_maps[active_map][i].size();
@@ -118,9 +117,9 @@ void Board::loadNew_map()
 		create_PlayMap_from_Org(i, Org_maps[active_map][i].length());  // initializing visual cells from Original map one row at a time.
 
 	}
-	if(legend_flag) insert_legend();
+	if(legend_flag) insert_legend();//sets the legend + its 3X20 borders
 	
-	MapErrors();
+	MapErrors(); //errors to user if any
 	
 }
 
@@ -134,7 +133,7 @@ void Board::insert_legend_row(const unsigned& y, const unsigned& x)
 }
 
 void Board::insert_legend()
-{
+{// inserting walls where needed inside the playmap to prevent creatures overriding the legend
 	unsigned short y = legend.getY(), x = legend.getX();
 
 		if (y < Play_map.size() && x < Play_map[y].size())
@@ -213,12 +212,12 @@ void Board::create_PlayMap_from_Org(int y, int actual_len)
 }
 
 void Board::printMap(bool colored)
-{
+{//self explanatory
 	for (int i = 0; i < Play_map.size(); ++i) { if (colored) setTextColor(Color::BLUE);  cout << Play_map[i] << endl; }
 }
 
 void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& last_dic,const bool & colored,unsigned short& score)
-{
+{//pacmans movement dispatcher
 	if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
 		cur_dic = Direction::STAY;
 
@@ -240,7 +239,7 @@ void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& l
 }
 
 void Board::movePac(Direction dic, bool colored,unsigned short& score)
-{
+{//removes pac from previous cell, printing him on new cell and updating playmap and score if needed
 	char cell_c = nextCellCont(pac.getPos(), dic);
 	pac.updateMove(dic, colored);
 	if (cell_c == '.')
@@ -249,8 +248,6 @@ void Board::movePac(Direction dic, bool colored,unsigned short& score)
 		changeFood2Path(pac.getPos());
 	}
 }
-
-
 
 bool Board::isInBorder(Point pos)
 {
@@ -266,8 +263,6 @@ bool Board::isOnBorder(Point pos)
 		return true;
 	return (X == 0 || Y == 0 || X == cur_rows_len - 1 || Y == rows - 1 );
 }
-
-
 
 void Board::AnalyzeAround(NPC& g, char* conts, bool* paths)
 {
@@ -360,7 +355,6 @@ char Board::nextCellCont(Point pos, Direction dic)
 	}
 }
 
-
 void Board::premoveDatacollection(char& next_cont,char* cont_around, bool* path_around, NPC& G, Direction& opposite_dic,vector<Direction>& options)
 {
 	G.setCont_under ( Play_map[G.getPos().getY()][G.getPos().getX()]);// gets the content that the ghost 'steps' on prior to new location
@@ -435,8 +429,6 @@ void Board::pacEatsfruit(unsigned short& fruitscore, unsigned short& score)
 	}
 }
 
-
-
 void Board::NoviceMovement(const vector<Direction>& options,const Direction& opposite_dic, const const char& next_cont, bool colored, NPC& G)
 {
 	if (next_cont == (int)Content::WALL) //  + Or T Or L Or  or DeadEnd  junction approaching T from side or from front
@@ -457,10 +449,12 @@ void Board::NoviceMovement(const vector<Direction>& options,const Direction& opp
 	else
 		G.updateMove(G.getcurDic(), colored);// continue same way
 }
+
 inline bool stuck4ways(int up, int down, int left, int right)
 {
 	return (up == STUCK) && (down == STUCK) && (left == STUCK) && (right == STUCK);
 }
+
 inline Direction shortestRoute(int up, int down, int left, int right)
 {
 	if(stuck4ways(up,down,left,right)) return Direction::DEF;//incase pacman is hiding on edges (this is the logic.)
@@ -570,11 +564,6 @@ int Board::BestMovement_Util( Point dest, Point cur)
 	return STUCK;	
 }
 
-
-
-
-
-
 bool Board::Collision()
 {
 	for (auto g : ghosts)
@@ -602,6 +591,7 @@ bool Board::isTopBorder(const unsigned& X, const unsigned& Y)
 	return false;
 
 }
+
 bool Board::isportal(const unsigned short& X, const unsigned short& Y)
 {
 	if (Y > 0)
@@ -609,6 +599,7 @@ bool Board::isportal(const unsigned short& X, const unsigned short& Y)
 			&& isBlank(Play_map[Y][X]));
 			return false;
 }
+
 bool Board::portals(Direction& dic,Direction& next_dic,Point& pos)
 {
 	unsigned short X = pos.getX();
@@ -662,4 +653,3 @@ bool Board::portals(Direction& dic,Direction& next_dic,Point& pos)
 		 }
 	 return false;
 }
-
