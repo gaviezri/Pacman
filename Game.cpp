@@ -4,7 +4,7 @@ int Game::moves_made_this_level=0;
 
 void Game::PacmanLogo()
 {
-	if(colored) setTextColor(Color::LIGHTMAGENTA);
+	if (colored) setTextColor(Color::LIGHTMAGENTA);
 	gotoxy(0, 8);
 	cout << "     ___        ___           ___           ___           ___           ___" << endl
 		<< "    /  /\\      /  /\\         /  /\\         /__/\\         /  /\\         /__/\\" << endl

@@ -23,8 +23,8 @@ class Board
 	vector<vector<string>> Org_maps;       // We creat 2 identical maps; one to keep for new game beginnings (each time we switch map we update the play map)
 	vector<string> Play_map;			  // and one to play and change in real time.
 	vector<string>  screen_files;        //  stores all pathes to maps.
-	Pacman pac;	
 
+	Pacman pac;	
 	vector<Ghost> ghosts;
 	Fruit fruit;
 	Point legend;
@@ -43,7 +43,7 @@ private:
 	//-------------------------pacman movement-----------------------------------
 	bool findBorder_Top(const unsigned short& col, unsigned short& line);
 	void changeFood2Path(Point pos) { Play_map[pos.getY()][pos.getX()] = ' '; }
-	//------------------------ghosts movement------------------------------------
+	//------------------------NPC movement------------------------------------
 	void premoveDatacollection(char& next_cont, char* cont_around, bool* path_around, NPC& G, Direction& opposite_dic, vector<Direction>& options);
 	void nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around);
 	void AnalyzeAround(NPC& g, char* conts, bool* paths);
@@ -64,6 +64,7 @@ public:
 	static short getTotal_maps() { return total_maps; }
 	void loadNew_map();
 	vector<string>& getPlay_map() { return Play_map; }
+	//----------------------utilities---------------------------------------------
 	const Point& getlegend() const { return legend; }
 	const bool& getLegend_flag() const { return legend_flag; }
 	const bool& getPacman_flag() const { return pacman_flag; }
@@ -74,8 +75,6 @@ public:
 	bool isOnBorder(Point pos);
 	bool isTopBorder(const unsigned& X, const unsigned& Y);
 	bool isInBorder(Point pos);
-	//----------------------utilities---------------------------------------------
-	void move_in_border(Direction&, Direction&, Direction&, const bool& colored, unsigned short& score);
 	void resetCharacters()
 	{
 		if (ghosts.empty()) 
@@ -97,6 +96,7 @@ public:
 	void movePac(Direction dic, bool colored,unsigned short& score);
 	bool portals( Direction&, Direction&,Point& pos);
 	void pacEatsfruit(unsigned short&, unsigned short&);
+	void move_in_border(Direction&, Direction&, Direction&, const bool& colored, unsigned short& score);
 	//----------------------ghosts----------------------
 	vector<Ghost>& get_ghosts_vec() { return ghosts; }
 	Ghost& get_ghost(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
