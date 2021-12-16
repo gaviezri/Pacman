@@ -284,7 +284,8 @@ void Game::level_progress()
 
 		++moves_made_this_level;
 	} while (!Over());
-	if(win) level_completed();  // prints semi-winner massage
+	if (win) level_completed();  // prints semi-winner massage
+	else Loser();
 }
 
 void Game::Engine()
@@ -308,11 +309,6 @@ void Game::Engine()
 	{
 		win = false;
 		Winner();// cout message
-	}
-	else if (!quit)
-	{
-		quit = false;
-		Loser();// kanal
 	}
 }
 
@@ -369,8 +365,9 @@ void Game::Loser()
 	if(colored) 
 		setTextColor(Color::LIGHTRED);
 	cout <<  "Yikes! better luck next time..." << endl;
-	gotoxy(17, 5);
+	gotoxy(17,7);
 	cout << "press any key to continue, loser...";
+	_getch();
 }
 
 void Game::pauseGAME()

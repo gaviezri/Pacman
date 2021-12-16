@@ -71,6 +71,7 @@ public:
 	void printlegend(Point pt, short hp);
 	bool Over()//indicator to end game loop
 	{
+		if (round_lost)	return true;
 		if (br.get_pac().getHP() == 0)
 		{
 			win = false;
@@ -80,6 +81,7 @@ public:
 		if (score == br.getCrumbs())
 		{
 			win = true;
+			round_lost = false;
 			return true;
 		}
 		else

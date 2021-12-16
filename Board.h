@@ -94,7 +94,7 @@ public:
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
 	void movePac(Direction dic, bool colored,unsigned short& score);
-	bool portals( Direction&, Direction&,Point& pos);
+	bool portals( Direction&, Direction&,Point& pos,unsigned short&);
 	void pacEatsfruit(unsigned short&, unsigned short&);
 	void move_in_border(Direction&, Direction&, Direction&, const bool& colored, unsigned short& score);
 	//----------------------ghosts----------------------

@@ -227,7 +227,7 @@ void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& l
 		last_dic = cur_dic = next_dic;// remember the new direction
 		next_dic = Direction::DEF; // default the next direction
 	}
-	else if (portals(cur_dic, next_dic, (Point&)pac.getPos()))
+	else if (portals(cur_dic, next_dic, (Point&)pac.getPos(),score))
 	{
 		pac.printMe(colored);
 	}
@@ -600,7 +600,7 @@ bool Board::isportal(const unsigned short& X, const unsigned short& Y)
 			return false;
 }
 
-bool Board::portals(Direction& dic,Direction& next_dic,Point& pos)
+bool Board::portals(Direction& dic,Direction& next_dic,Point& pos,unsigned short& score)
 {
 	unsigned short X = pos.getX();
 	unsigned short Y = pos.getY();
@@ -609,25 +609,29 @@ bool Board::portals(Direction& dic,Direction& next_dic,Point& pos)
 	if (X == 0 && (dic == Direction::LEFT || next_dic == Direction::LEFT) && isBlank(Play_map[Y][cur_rows_len-1] ))// Left -> Right
 	{// print ' ' over pac's last position and update his coord to other side
 		pac.clearMe();
-		pac.setX(Play_map[Y].length() - 1);
+		pac.setX(cur_rows_len-1);
+		if (Play_map[Y][cur_rows_len - 1] == '.') {changeFood2Path(Point(cur_rows_len - 1, Y)), score++;}
 		return true;
 	}
 	else if (X == cur_rows_len-1 && (dic == Direction::RIGHT || next_dic == Direction::RIGHT) && isBlank(Play_map[Y][0])) //Right -> Left
 	{
 		pac.clearMe();
 		pac.setX(0);
+		if (Play_map[Y][0] == '.') { changeFood2Path(Point(0, Y)), score++; }
 		return true;
 	}
 	else if (Y==0 && (dic == Direction::UP || next_dic == Direction::UP) && isBlank(Play_map[rows - 1][X]))// TOP -> BOTTOM
 	{
 		pac.clearMe();
 		pac.setY(rows-1);
+		if (Play_map[rows-1][X] == '.') { changeFood2Path(Point(X,rows-1)), score++; }
 		return true;
 	}
 	else if (Y == rows-1 && (dic == Direction::DOWN || next_dic == Direction::DOWN) && isBlank(Play_map[0][X])) // BOTTOM -> UP
 	{
 		pac.clearMe();
 		pac.setY(0);
+		if (Play_map[0][X] == '.') { changeFood2Path(Point(X,0)), score++; }
 		return true;
 	}
 	return false;
