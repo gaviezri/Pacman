@@ -13,12 +13,12 @@
  
  ***any map that follows the game format can be loaded and be played***
  
- format: 
-
+format: 
 create a file of type ".screen" and use each of the following character:
 '@' -  pacman default position (only the first is addressed)
 '$' - a ghost default position (can be many)
 ' ' - (a space) where food will be printed
 '%' - a tile to be left blank
-'&' - a space for the legend (score + lives) [the legend spans 3 rows with 20 characters each]
+'&' - a space for the legend (score + lives) [the legend spans 3 rows with 20 characters each and is treated as wall block by creatures in the game.] 
+
 
