@@ -49,6 +49,7 @@ menu:
 		br.setActive_map(0);
 		break;
 	case 8:
+		system("cls");
 		printInstructions();
 		break;
 	case 9:
@@ -211,6 +212,7 @@ void  Game::printInstructions()
 	cout << "The Pacman must eat all the breadcrumbs shown on screen." << endl << "The Pacman can walk freely as long as no wall is hit" << endl << " every breadcrumb is worth one point" << endl;
 	cout << "Each round the Pacman starts with 3 lifes." << endl << "The Pacman must avoid contact with the ghost at all cost! if not one life will be removed." << endl;
 	cout << "The player will win the game if all breadcrumbs on board are eaten and lose if all lifes are lost." << endl;
+	cout << "When one map ends a new one will be loaded and a new round will start, the score and HP will be restarted." << endl << "Every once in a while a 'fruit' will appear on screen in shape of a number (5-9) which will represent" << endl << "the number of points given if the pacman eats the fruit." << endl;
 	cout << " To move UP = 'W'" << endl << " To move DOWN = 'X'" << endl << " To move LEFT = 'A'" << endl << " To move RIGHT = 'D'" << endl << "To stay in your place = S" << endl << "To exit game and go to main menu = TAB" << endl<<"To Pause game = P or Esc"<<endl;
 	cout << endl<<" Press any key for main menu" << endl;
 
@@ -372,12 +374,22 @@ void Game::Loser()
 
 void Game::pauseGAME()
 {
-	gotoxy(br.getlegend().getX(), br.getlegend().getY() + 1);
+	br.getLegend_flag() ? gotoxy(br.getlegend().getX(), br.getlegend().getY() + 1) : gotoxy(0, br.getRows() + 1);
+
 	cout << "hit key to continue";
 	_getch();
 	pause = false;
-	gotoxy(br.getlegend().getX(), br.getlegend().getY());
-	printlegend(br.getlegend(), br.get_pac().getHP());
+
+	if (br.getLegend_flag())
+	{
+		gotoxy(br.getlegend().getX(), br.getlegend().getY());
+		printlegend(br.getlegend(), br.get_pac().getHP());
+	}
+	else
+	{
+		gotoxy(0, br.getRows() + 1);
+		cout << "                   ";
+	}
 }
 
 void Game::updateDics( Direction& nxt)
