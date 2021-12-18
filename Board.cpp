@@ -114,7 +114,7 @@ void Board::loadNew_map()
 			for (int j = originalsize; j < cur_rows_len; ++j)
 				Org_maps[active_map][i][j] = ' ';
 		}
-		create_PlayMap_from_Org(i, Org_maps[active_map][i].length());  // initializing visual cells from Original map one row at a time.
+		create_PlayMap_from_Org(i,Org_maps[active_map][i].length());  // initializing visual cells from Original map one row at a time.
 
 	}
 	if(legend_flag) insert_legend();//sets the legend + its 3X20 borders
@@ -160,11 +160,12 @@ bool Board::in_legend_area(const int& x, const int& y)
 	return false;
 }
 
-void Board::create_PlayMap_from_Org(int y, int actual_len)
+void Board::create_PlayMap_from_Org(int y,const short& actual_len)
 {
+	int x = 0;
 	short tmp = 0;
 	Play_map.push_back(Org_maps[active_map][y]);
-	for (int x = 0; x < cur_rows_len ; ++x)
+	for (; x < cur_rows_len ; ++x)
 	{	//this condition is to double check resize was successful and if not the 'else' part takes care of the compelment needed
 		if (x < actual_len)
 		{

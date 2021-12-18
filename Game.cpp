@@ -301,8 +301,11 @@ void Game::Engine()
 		moves_made_this_level = 0;
 		level_progress();
 		level++;
-		br.setActive_map(level);
-		br.loadNew_map();
+		if (!quit)
+		{
+			br.setActive_map(level);
+			br.loadNew_map();
+		}
 	}
 	
 	if (win)

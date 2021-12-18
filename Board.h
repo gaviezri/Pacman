@@ -52,7 +52,7 @@ private:
 	int BestMovement_Util(Point dest, Point cur);
 	vector<vector<bool>> createTrackingMap();
 	//-----------------------------ctor-----------------------------------------
-	void create_PlayMap_from_Org(int y,int);
+	void create_PlayMap_from_Org(int y,const short&);
 	void insert_legend();
 	void insert_legend_row(const unsigned& y, const unsigned& x);
 	void getScreen_names();
