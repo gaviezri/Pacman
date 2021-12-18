@@ -47,8 +47,8 @@ private:
 	void premoveDatacollection(char& next_cont, char* cont_around, bool* path_around, NPC& G, Direction& opposite_dic, vector<Direction>& options);
 	void nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around);
 	void AnalyzeAround(NPC& g, char* conts, bool* paths);
-	void NoviceMovement(const vector<Direction>&,const Direction&, const char&, bool, NPC& G);
-	void BestMovement(const vector<Direction>& options, const bool& colored, Ghost& G, const Direction& opposite_dic,const char& next_cont);
+	void NoviceMovement(const vector<Direction>&,const Direction&, const char&,  NPC& G);
+	void BestMovement(const vector<Direction>& options,  Ghost& G, const Direction& opposite_dic,const char& next_cont);
 	int BestMovement_Util(Point dest, Point cur);
 	vector<vector<bool>> createTrackingMap();
 	//-----------------------------ctor-----------------------------------------
@@ -86,7 +86,7 @@ public:
 	short getCrumbs() { return breadcrumbs; }
 	char nextCellCont(Point pos, Direction dic);      // returns map content in a given postion.
 	bool Collision();
-	void printMap(bool colored);
+	void printMap();
 	static bool isBlank(char a) { return a == ' ' || a == '%' || a == '.'; }
 	bool isportal(const unsigned short& X, const unsigned short& Y);
 	bool in_legend_area(const int& x, const int& y);
@@ -94,14 +94,14 @@ public:
 	const short getRows() { return rows; }
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
-	void movePac(Direction dic, bool colored,unsigned short& score);
+	void movePac(Direction dic,unsigned short& score);
 	bool portals( Direction&, Direction&,Point& pos,unsigned short&);
 	void pacEatsfruit(unsigned short&, unsigned short&);
-	void move_in_border(Direction&, Direction&, Direction&, const bool& colored, unsigned short& score);
+	void move_in_border(Direction&, Direction&, Direction&, unsigned short& score);
 	//----------------------ghosts----------------------
 	vector<Ghost>& get_ghosts_vec() { return ghosts; }
 	Ghost& get_ghost(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
-	void NPCmoveGenerator(bool colored,int,unsigned short&, unsigned short&);
+	void NPCmoveGenerator(int,unsigned short&, unsigned short&);
 	//-----------------------------fruit---------------------------------------
 	Fruit& getFruit() { return fruit; }
 	Point getvalidPos(){

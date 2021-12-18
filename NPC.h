@@ -7,7 +7,7 @@ protected:
     Direction cur_move = Direction::UP;
     char content_underme;
 public:
-    virtual void updateMove(Direction dic, bool colored) = 0; // ghosts + fruit
+    virtual void updateMove(Direction dic) = 0; // ghosts + fruit
 
     void setCont_under(char ch) { content_underme = ch; }
     char getCont_under() { return content_underme; }

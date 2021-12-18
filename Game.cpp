@@ -4,7 +4,6 @@ int Game::moves_made_this_level=0;
 
 void Game::PacmanLogo()
 {
-	if (colored) setTextColor(Color::LIGHTMAGENTA);
 	gotoxy(0, 8);
 	cout << "     ___        ___           ___           ___           ___           ___" << endl
 		<< "    /  /\\      /  /\\         /  /\\         /__/\\         /  /\\         /__/\\" << endl
@@ -24,7 +23,6 @@ void Game::PacmanLogo()
 
 void Game::play()  //  this is where the magic happens (!)
 {
-	Color();
 	srand(0xAFFF);
 	ShowConsoleCursor(false);
 menu:
@@ -104,31 +102,23 @@ void Game::printlegend(Point pt, short hp)
 	cout << "                   ";
 	if (br.getLegend_flag()) {
 		gotoxy(pt.getX(), pt.getY());
-		if (colored)
-			setTextColor(Color::LIGHTBLUE);
 		cout << "####################";
 		gotoxy(pt.getX(), pt.getY() + 1);
 
-		if (colored)
-			setTextColor(Color::LIGHTBLUE);
+		
 		cout << "SCORE:";
 
-		if (colored)
-			setTextColor(Color::LIGHTRED);
+		
 		cout <<score;
 
-		if (colored)
-			setTextColor(Color::LIGHTBLUE);
+		
 		cout << "   LIVES:";
 
-		if (colored)
-			setTextColor(Color::YELLOW);
+	
 		for (int i = 0; i < hp; i++)
 		{
 			cout << "C";
 		}
-		if (colored)
-			setTextColor(Color::LIGHTBLUE);
 		gotoxy(pt.getX(), pt.getY() + 2);
 		cout << "####################";
 	}
@@ -143,13 +133,13 @@ void Game::NewRound(){         // when pac meets ghost  need to make the ghosts 
 		printlegend(br.getlegend(), br.get_pac().getHP());   // update remaining lives on screen 
 		br.get_pac().clearMe();
 		br.get_pac().resetMe();
-		br.get_pac().printMe(colored);
+		br.get_pac().printMe();
 
 		for (auto& G : br.get_ghosts_vec())
 		{
-			G.clearMe(colored, br.getPlay_map()[G.getPos().getY()][G.getPos().getX()]);
+			G.clearMe( br.getPlay_map()[G.getPos().getY()][G.getPos().getX()]);
 			G.resetMe();
-			G.printMe(colored);
+			G.printMe();
 		}
 		auto Fr = br.getFruit();
 		Fr.clearMe();
@@ -180,8 +170,7 @@ void Game::setDif()
 
 void Game::printMenu()
 {
-	if (colored)
-		setTextColor(Color::BROWN);
+	
 	system("cls");
 	cout << "#############################################" << endl << endl;
 	cout << " Welcome to Gal & Omri's version of PACMAN !" << endl;
@@ -224,8 +213,6 @@ void Game::level_completed()
 {
 	system("cls");
 	score = 0;
-	if (colored)
-		setTextColor(Color::BROWN);
 	cout << "level Completed! good job.";
 	Sleep(3000);
 }
@@ -234,14 +221,14 @@ void Game::level_progress()
 {
 	system("cls");
 	Direction cur_dic = Direction::DEF, next_dic = Direction::DEF, last_dic = Direction::DEF; // initialzing for the switch 
-	br.printMap(colored);
+	br.printMap();
 	printlegend(br.getlegend(), br.get_pac().getHP());
 
-	br.get_pac().printMe(colored);   // PRINTING
+	br.get_pac().printMe();   // PRINTING
 	
 	if (!(br.get_ghosts_vec().empty())) {
 		for (auto g : br.get_ghosts_vec())
-			g.printMe(colored);
+			g.printMe();
 	}
 	
 
@@ -324,20 +311,18 @@ bool Game::Validmap()
 
 void Game::pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direction& last_dic)
 {
-		br.move_in_border(next_dic, cur_dic, last_dic, colored, score);	
+		br.move_in_border(next_dic, cur_dic, last_dic, score);	
 }
 
 void Game::NPCMoves_Dispatcher()
 {
 	 //ghost movement manager that makes ghost move everyother move that pacman makes and moves fruit every 3
-		br.NPCmoveGenerator(colored,moves_made_this_level,fruitscore,score);
+		br.NPCmoveGenerator(moves_made_this_level,fruitscore,score);
 }
 
 void Game::printScore(Point legend)
 {
 	 gotoxy(legend.getX()+6,legend.getY()+1);//6 is a magic number represents the length of "SCORE:"
-	 if(colored)
-		 setTextColor(Color::LIGHTRED);
 	 cout  << score + fruitscore;
 }
 
@@ -357,8 +342,6 @@ void Game::Winner()
 {
 	system("cls");
 	gotoxy(11, 2);
-	if (colored)
-		setTextColor(Color::LIGHTCYAN);
 	cout <<"CONGRATULATIONS! You've beaten all the stages (Rewards will be sent upon request)." << endl;
 	Sleep(5000);
 }
@@ -367,8 +350,6 @@ void Game::Loser()
 {
 	system("cls");
 	gotoxy(11, 5);
-	if(colored) 
-		setTextColor(Color::LIGHTRED);
 	cout <<  "Yikes! better luck next time..." << endl;
 	gotoxy(17,7);
 	cout << "press any key to continue, loser...";

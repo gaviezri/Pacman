@@ -18,11 +18,11 @@ public:
 	//----------------ctor--------------------------
 	Ghost(Point _pos) { pos = def_pos = _pos; avatar = 'G'; }
 	//----------------movement
-	void updateMove(Direction dic, bool colored)//ghosts
+	void updateMove(Direction dic)//ghosts
 	{
-		clearMe(colored, content_underme);
+		clearMe( content_underme);
 		pos.updateCoord(dic);
-		printMe(colored);
+		printMe();
 	}
 	static void setDif(int);
 	static Difficulty getDif();

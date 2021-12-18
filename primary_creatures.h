@@ -15,21 +15,14 @@ public:
 	void setX(unsigned int x) { pos.setX(x); }
 	void setY(unsigned int y) { pos.setY(y); }
 	void resetMe() { pos = def_pos; }
-	void printMe(bool colored) {
+	void printMe() {
 		gotoxy(pos.getX(), pos.getY());
-		if (colored) {
-			if (avatar == 'C')setTextColor(Color::BROWN);
-			else if (avatar == 'G') setTextColor(Color::RED);
-			else setTextColor(Color::LIGHTGREEN);
-		}
 		cout << avatar;
 	}
 	
-	void clearMe(bool colored,char cont)
+	void clearMe(char cont)
 	{
 		gotoxy(pos.getX(), pos.getY()); // putting cursor on character's place and run it over with the cell content
-		if (colored)
-			setTextColor(Color::BLUE);
 		cout << (cont == (int)Content::PATH ? " " : "."); // checks cells content and print it.
 	}
 	void clearMe()

@@ -7,7 +7,7 @@ class Game
 {
 	Board br;
 
-	bool colored;
+	
 	char choice=0;
 
 	bool win=false;
@@ -24,13 +24,6 @@ public:
 	
 	//-----------------UI (settings)----------------
 	void setDif();
-	void Color() {
-		system("cls");
-		short cho;
-		cout << "for color mode enter 1, for B&W enter anything else : ";
-		cin >> cho;
-		cho == 1 ? colored = true : colored = false;
-	}
 	void printMenu();
 	void setChoice();
 	void printInstructions();

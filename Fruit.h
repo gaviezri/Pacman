@@ -12,13 +12,13 @@ public:
     bool isAppearing() { return appearing; }
     void setAvatar() { avatar = 5 + (rand() % 5)+ IntToChar;}
     void Appear();
-    void updateMove(Direction dic, bool colored)
+    void updateMove(Direction dic )
     {
         if (appearing)
-            clearMe(colored, content_underme);
+            clearMe( content_underme);
         pos.updateCoord(dic);
         if (appearing)
-            printMe(colored);
+            printMe();
     }
     void Toggle(const Point&);
     bool ExposeMe(const Point&);

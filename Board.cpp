@@ -212,37 +212,37 @@ void Board::create_PlayMap_from_Org(int y,const short& actual_len)
 	}
 }
 
-void Board::printMap(bool colored)
+void Board::printMap()
 {//self explanatory
-	for (int i = 0; i < Play_map.size(); ++i) { if (colored) setTextColor(Color::BLUE);  cout << Play_map[i] << endl; }
+	for (int i = 0; i < Play_map.size(); ++i)   cout << Play_map[i] << endl; 
 }
 
-void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& last_dic,const bool & colored,unsigned short& score)
+void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& last_dic,unsigned short& score)
 {//pacmans movement dispatcher
 	if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
 		cur_dic = Direction::STAY;
 
 	else if (int(Content::WALL) != nextCellCont(pac.getPos(), next_dic))  //advance to next direction if its not a wall
 	{
-		movePac(next_dic, colored, score);
+		movePac(next_dic, score);
 		last_dic = cur_dic = next_dic;// remember the new direction
 		next_dic = Direction::DEF; // default the next direction
 	}
 	else if (portals(cur_dic, next_dic, (Point&)pac.getPos(),score))
 	{
-		pac.printMe(colored);
+		pac.printMe();
 	}
 	else if (int(Content::WALL) != nextCellCont(pac.getPos(), cur_dic)) // advance in current direction if the 
 	{																	       // requested next isnt possible
-		movePac(cur_dic, colored, score);
+		movePac(cur_dic, score);
 		last_dic = cur_dic;
 	}
 }
 
-void Board::movePac(Direction dic, bool colored,unsigned short& score)
+void Board::movePac(Direction dic,unsigned short& score)
 {//removes pac from previous cell, printing him on new cell and updating playmap and score if needed
 	char cell_c = nextCellCont(pac.getPos(), dic);
-	pac.updateMove(dic, colored);
+	pac.updateMove(dic);
 	if (cell_c == '.')
 	{
 		score++;
@@ -369,7 +369,7 @@ void Board::premoveDatacollection(char& next_cont,char* cont_around, bool* path_
 	getOptions(options, path_around);
 }
 
-void Board::NPCmoveGenerator(bool colored,int movesmade,unsigned short& fruitbonus,unsigned short& score)
+void Board::NPCmoveGenerator(int movesmade,unsigned short& fruitbonus,unsigned short& score)
 {
 	char cont_around[4], next_cont ;		//wall counter count actual walls, path around just indicate wether there is a path and we are manipulating the opposite direction to act
 	vector<Direction> options;
@@ -383,14 +383,14 @@ void Board::NPCmoveGenerator(bool colored,int movesmade,unsigned short& fruitbon
 		switch (Ghost::getDif())
 		{
 		case Difficulty::NOVICE:
-			NoviceMovement(options, opposite_dic, next_cont, colored, G);
+			NoviceMovement(options, opposite_dic, next_cont, G);
 			break;
 		case Difficulty::GOOD:
-			if (movesmade % 20 > 14) NoviceMovement(options, opposite_dic, next_cont, colored, G);
-			else BestMovement(options, colored, G,opposite_dic,next_cont);
+			if (movesmade % 20 > 14) NoviceMovement(options, opposite_dic, next_cont, G);
+			else BestMovement(options, G,opposite_dic,next_cont);
 			break;
 		case Difficulty::BEST:
-			BestMovement(options, colored, G, opposite_dic, next_cont);
+			BestMovement(options,  G, opposite_dic, next_cont);
 			break;
 		}
 	
@@ -402,7 +402,7 @@ void Board::NPCmoveGenerator(bool colored,int movesmade,unsigned short& fruitbon
 		if ((movesmade % 4) == 1)
 		{
 
-			NoviceMovement(options, opposite_dic, next_cont, colored, fruit);
+			NoviceMovement(options, opposite_dic, next_cont,  fruit);
 			fruit.step();
 		}
 		pacEatsfruit(fruitbonus, score);
@@ -411,7 +411,7 @@ void Board::NPCmoveGenerator(bool colored,int movesmade,unsigned short& fruitbon
 	{
 		if(fruit.ExposeMe(pac.getPos()))
 			fruit.Appear();
-		NoviceMovement(options, opposite_dic, next_cont, colored, fruit);
+		NoviceMovement(options, opposite_dic, next_cont,  fruit);
 	}
 	fruit.Toggle(getvalidPos());
 }
@@ -430,25 +430,25 @@ void Board::pacEatsfruit(unsigned short& fruitscore, unsigned short& score)
 	}
 }
 
-void Board::NoviceMovement(const vector<Direction>& options,const Direction& opposite_dic, const const char& next_cont, bool colored, NPC& G)
+void Board::NoviceMovement(const vector<Direction>& options,const Direction& opposite_dic, const const char& next_cont, NPC& G)
 {
 	if (next_cont == (int)Content::WALL) //  + Or T Or L Or  or DeadEnd  junction approaching T from side or from front
 		switch (options.size())
 		{
 		case 0:	// Dead-End go opposite direction
-			G.updateMove(G.setcurDic(opposite_dic), colored);
+			G.updateMove(G.setcurDic(opposite_dic));
 			break;
 		case 1:	//L Junc  - go the only way 
-			G.updateMove(G.setcurDic(options[0]), colored);
+			G.updateMove(G.setcurDic(options[0]));
 			break;
 		default:	//T Junc choose randomly from options
-			G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored);
+			G.updateMove(G.setcurDic(options[rand() % (options.size())]));
 			break;
 		}
 	else if (options.size() >= 2)// in a 4 way junc - choose randomly
-		G.updateMove(G.setcurDic(options[rand() % (options.size())]), colored);
+		G.updateMove(G.setcurDic(options[rand() % (options.size())]));
 	else
-		G.updateMove(G.getcurDic(), colored);// continue same way
+		G.updateMove(G.getcurDic());// continue same way
 }
 
 inline bool stuck4ways(int up, int down, int left, int right)
@@ -471,7 +471,7 @@ inline Direction shortestRoute(int up, int down, int left, int right)
 	if (right == (min(min(up, down), min(left, right)))) return Direction::RIGHT;
 }
 
-void Board::BestMovement(const vector<Direction>& options,const bool& colored, Ghost& G,const Direction& opposite_dic,const char& next_cont) // smart ghosts movement maker
+void Board::BestMovement(const vector<Direction>& options, Ghost& G,const Direction& opposite_dic,const char& next_cont) // smart ghosts movement maker
 {// getting the length of paths to pacman from all 4 direction and choosing the direction with the shortest 
 //  path.  if pacman is hiding in borders with no portals the ghosts will lose his location and go randomly
 //	giving the sensation they are looking for him
@@ -482,9 +482,9 @@ void Board::BestMovement(const vector<Direction>& options,const bool& colored, G
 	int RIGHT = BestMovement_Util(dest, G.getPos() + Point(1, 0));
 	Direction tmp = shortestRoute(UP, DOWN, LEFT, RIGHT);
 	if (tmp == Direction::DEF)
-		NoviceMovement(options, opposite_dic, next_cont, colored, G);
+		NoviceMovement(options, opposite_dic, next_cont,  G);
 	else
-	G.updateMove(tmp,colored);
+	G.updateMove(tmp);
 }
 
 vector<vector<bool>> Board::createTrackingMap()

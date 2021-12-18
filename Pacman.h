@@ -11,11 +11,11 @@ public:
 	short getHP() { return HP; }
 	void resetHP() { HP = 3; }
 	void HitByGhost() { --HP; gotoxy(2 * pos.getX(), pos.getY()); cout << " ";  pos = def_pos; }
-	void updateMove(const Direction& dic, const bool& colored)//pacman
+	void updateMove(const Direction& dic)//pacman
 	{
 		clearMe();
 		pos.updateCoord(dic);
-		printMe(colored);
+		printMe();
 
 	}
 	void setDef_pos(Point&& x) { def_pos = x; }
