@@ -91,6 +91,7 @@ public:
 	bool isportal(const unsigned short& X, const unsigned short& Y);
 	bool in_legend_area(const int& x, const int& y);
 	void MapErrors();
+	const short getRows() { return rows; }
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
 	void movePac(Direction dic, bool colored,unsigned short& score);

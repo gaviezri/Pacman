@@ -198,7 +198,7 @@ void Board::create_PlayMap_from_Org(int y,const short& actual_len)
 					legend = Point(x, y);
 					legend_flag = true;
 				}
-				Play_map[y][x] = '#';
+				Play_map[y][x] = ' ';
 				break;
 			case '#':
 				continue;
