@@ -94,8 +94,8 @@ public:
 	const short getRows() { return rows; }
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
-	void movePac(Direction dic,unsigned short& score);
-	bool portals( Direction&, Direction&,Point& pos,unsigned short&);
+	void movePac(Direction dic,unsigned short& score,bool);
+	bool portals(const  Direction&, const Direction&,Point& pos,unsigned short&);
 	void pacEatsfruit(unsigned short&, unsigned short&);
 	void move_in_border(Direction&, Direction&, Direction&, unsigned short& score);
 	//----------------------ghosts----------------------
@@ -108,4 +108,6 @@ public:
 		if (ghosts.size()) return ghosts[rand() % ghosts.size()].getPos();
 		else return pac.getPos();
 	}
+
+	void moveNPC(std::string::iterator& stepsptr,bool);
 };

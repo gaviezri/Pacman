@@ -224,7 +224,7 @@ void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& l
 
 	else if (int(Content::WALL) != nextCellCont(pac.getPos(), next_dic))  //advance to next direction if its not a wall
 	{
-		movePac(next_dic, score);
+		movePac(next_dic, score,false);
 		last_dic = cur_dic = next_dic;// remember the new direction
 		next_dic = Direction::DEF; // default the next direction
 	}
@@ -234,15 +234,15 @@ void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& l
 	}
 	else if (int(Content::WALL) != nextCellCont(pac.getPos(), cur_dic)) // advance in current direction if the 
 	{																	       // requested next isnt possible
-		movePac(cur_dic, score);
+		movePac(cur_dic, score,false);
 		last_dic = cur_dic;
 	}
 }
 
-void Board::movePac(Direction dic,unsigned short& score)
+void Board::movePac(Direction dic,unsigned short& score,bool silent)
 {//removes pac from previous cell, printing him on new cell and updating playmap and score if needed
 	char cell_c = nextCellCont(pac.getPos(), dic);
-	pac.updateMove(dic);
+	pac.updateMove(dic,silent);
 	if (cell_c == '.')
 	{
 		score++;
@@ -601,7 +601,7 @@ bool Board::isportal(const unsigned short& X, const unsigned short& Y)
 			return false;
 }
 
-bool Board::portals(Direction& dic,Direction& next_dic,Point& pos,unsigned short& score)
+bool Board::portals(const Direction& dic,const Direction& next_dic,Point& pos,unsigned short& score)
 {
 	unsigned short X = pos.getX();
 	unsigned short Y = pos.getY();
@@ -658,3 +658,14 @@ bool Board::portals(Direction& dic,Direction& next_dic,Point& pos,unsigned short
 		 }
 	 return false;
 }
+
+ void Board::moveNPC(std::string::iterator& stepsptr,bool silent)
+ {
+	 for (auto& g : ghosts)
+	 {
+		 g.setCont_under(Play_map[g.getPos().getY()][g.getPos().getX()]);
+		 g.updateMove(charToDic(*(stepsptr++)),silent);
+	 }
+	 fruit.setCont_under(Play_map[fruit.getPos().getY()][fruit.getPos().getX()]);
+	 fruit.updateMove(charToDic(*(stepsptr++)),silent);
+ }

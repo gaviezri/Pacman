@@ -24,6 +24,12 @@ public:
 		pos.updateCoord(dic);
 		printMe();
 	}
+	void updateMove(Direction dic,bool silent)//ghosts
+	{
+		if(!silent)clearMe(content_underme);
+		pos.updateCoord(dic);
+		if(!silent)printMe();
+	}
 	static void setDif(int);
 	static Difficulty getDif();
 };

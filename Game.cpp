@@ -84,6 +84,7 @@ void Game::readResult()
 			}
 		}
 	}
+	std::sort(results.begin(), results.end());
 }
 
 void Game::readSteps()
@@ -103,6 +104,7 @@ void Game::readSteps()
 			}
 		}
 	}
+	std::sort(steps.begin(), steps.end());
 }
 
 
@@ -112,12 +114,11 @@ void Game::LoadMode()
 	short level = 0, totmaps = Board::getTotal_maps();
 	br.setActive_map(level);
 	br.loadNew_map();
-	Ghost::setDif(int(Difficulty::NOVICE));
 	while (level < totmaps && !Over() && Validmap())
 	{
 		br.resetCharacters();
 		moves_made_this_level = 0;
-		//level_progress();
+		LOADED_level_progress(level);
 		level++;
 		br.setActive_map(level);
 	    br.loadNew_map();
@@ -311,7 +312,11 @@ void Game::level_completed()
 	cout << "level Completed! good job.";
 	Sleep(3000);
 }
-
+void Game::LOADED_pacmanMoves_Dispatcher(Direction dic)
+{
+	br.portals(dic, Direction::DEF, const_cast<Point&>(br.get_pac().getPos()), score);
+	br.movePac(dic,score,silent);
+}
 void Game::LOADED_level_progress(short level)
 {
 	system("cls");
@@ -324,14 +329,22 @@ void Game::LOADED_level_progress(short level)
 	std::string::iterator stepscursor = steps[level].begin();
 	while (stepscursor != steps[level].end() && !Over())
 	{
-		br.movePac(charToDic(*stepscursor), score);
-		if (br.Collision());// LOADED_NewRound()
-		if (silent) Sleep(150);
-		br.moveNPC()
-		if (br.Collision());// LOADED_NewRound()
-		//if silent then no sleep no printing
-		//if collision, reset everyone.
-		//fruit, appear and dissapear
+START:
+		LOADED_pacmanMoves_Dispatcher(charToDic(*(stepscursor++)));
+		if (br.Collision())
+		{
+			// comapre to result
+			// LOADED_NewRound() //if collision, reset everyone.
+			goto START;
+		}
+		if (!silent) Sleep(150);
+		br.moveNPC(stepscursor,silent); // fruit appear and dissappear
+		if (br.Collision())
+		{
+			// conmpare to result
+			// LOADED_NewRound() //if collision, reset everyone.
+			goto START;
+		}
 		//compare to results when - collision, when winning
 		++moves_made_this_level;
 	}
