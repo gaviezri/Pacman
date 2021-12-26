@@ -62,6 +62,7 @@ public:
 	void getStepsAndResult();
 	void readSteps();
 	void readResult();
+	void LOADED_pacmanMoves_Dispatcher(Direction);
 	//-------------utilities------------
 	void load_specific_Map();
 	string getMapName() {

@@ -12,14 +12,15 @@ public:
     bool isAppearing() { return appearing; }
     void setAvatar() { avatar = 5 + (rand() % 5)+ IntToChar;}
     void Appear();
-    void updateMove(Direction dic )
+    void updateMove(Direction dic,bool silent )
     {
-        if (appearing)
+        if (appearing && !silent)
             clearMe( content_underme);
         pos.updateCoord(dic);
-        if (appearing)
+        if (appearing && !silent)
             printMe();
     }
+    void updateMove(Direction dic) {}
     void Toggle(const Point&);
     bool ExposeMe(const Point&);
     short int Eaten(const Point&);
