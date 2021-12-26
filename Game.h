@@ -9,11 +9,13 @@ class Game
 
 	
 	char choice=0;
-
 	bool win=false;
 	bool round_lost = false;
 	bool quit = false;
 	bool pause;
+	bool silent;
+
+	vector<string> results, steps;
 
 	unsigned short score=0;
 	unsigned short fruitscore = 0;
@@ -46,13 +48,20 @@ public:
 		}
 		return true;
 	}
-	void play();
+	void play(int,char*[]);
 	void Engine();
 	void level_progress();
 	void NewRound();
 	void ResetGame();
 	void pauseGAME();
 	void updateDics(Direction& cur);
+	//-------------Exercise 3 ----------
+	void LOADED_level_progress(short level);
+	void LoadMode();
+	void RegularMode();
+	void getStepsAndResult();
+	void readSteps();
+	void readResult();
 	//-------------utilities------------
 	void load_specific_Map();
 	string getMapName() {

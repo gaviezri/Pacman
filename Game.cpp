@@ -21,12 +21,12 @@ void Game::PacmanLogo()
 	system("cls");
 }
 
-void Game::play()  //  this is where the magic happens (!)
+void Game::RegularMode()
 {
-	srand(0xAFFF);
+	srand(time(NULL));
 	ShowConsoleCursor(false);
 menu:
-	
+
 	system("cls");
 	PacmanLogo();
 	system("cls");
@@ -35,7 +35,7 @@ menu:
 	switch (choice)
 	{
 	case 1:
-		if(maps_available())
+		if (maps_available())
 		{
 			Engine();
 			ResetGame();
@@ -59,6 +59,101 @@ menu:
 		break;
 	}
 	goto menu;
+}
+
+void Game::getStepsAndResult()
+{
+	readSteps();
+	readResult();
+}
+
+void Game::readResult()
+{
+	string tmp_path;
+	ifstream tmp_fptr;
+	for (auto const& entry : filesystem::directory_iterator("."))  // goes through all files in the working directory
+	{
+		tmp_path = entry.path().string();
+		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 6) == "result")    // checkes if path ends with ".result
+		{
+			tmp_fptr.open(tmp_path, std::ifstream::in);
+			if (tmp_fptr) {
+				std::stringstream buffer;
+				buffer << tmp_fptr.rdbuf();
+				results.push_back(buffer.str());
+			}
+		}
+	}
+}
+
+void Game::readSteps()
+{
+	string tmp_path;
+	ifstream tmp_fptr;
+	for (auto const& entry : filesystem::directory_iterator("."))  // goes through all files in the working directory
+	{
+		tmp_path = entry.path().string();
+		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 5) == "steps")    // checkes if path ends with ".steps
+		{
+			tmp_fptr.open(tmp_path, std::ifstream::in);
+			if (tmp_fptr) {
+				std::stringstream buffer;
+				buffer << tmp_fptr.rdbuf();
+				steps.push_back(buffer.str());
+			}
+		}
+	}
+}
+
+
+void Game::LoadMode()
+{
+	getStepsAndResult();
+	short level = 0, totmaps = Board::getTotal_maps();
+	br.setActive_map(level);
+	br.loadNew_map();
+	Ghost::setDif(int(Difficulty::NOVICE));
+	while (level < totmaps && !Over() && Validmap())
+	{
+		br.resetCharacters();
+		moves_made_this_level = 0;
+		//level_progress();
+		level++;
+		br.setActive_map(level);
+	    br.loadNew_map();
+		
+	}
+}
+
+
+
+
+void Game::play(int argc, char* argv[])  //  this is where the magic happens (!)
+{
+	string* actions = new  string[argc];
+	for (int i = 0; i < argc; i++) actions[i] = argv[i];
+	switch (argc)
+	{
+	case 0:
+		RegularMode();
+		break;
+	case 1:
+		if (actions[0] == "-load") { silent = false; LoadMode(); }
+		
+		else if (actions[0] == "-save"); // <=== note semi-colon!
+			//SaveMode();
+		else
+			RegularMode();//? <- 
+		break;
+	case 2:
+		if (actions[0] == "-load" && actions[1] == "-silent") { silent = true; LoadMode(); }
+		//else?
+		break;
+	default:
+		RegularMode();
+		break;
+	}
+	delete[] actions;
 }
 
 void Game::load_specific_Map()
@@ -217,6 +312,34 @@ void Game::level_completed()
 	Sleep(3000);
 }
 
+void Game::LOADED_level_progress(short level)
+{
+	system("cls");
+	br.printMap();
+	printlegend(br.getlegend(), br.get_pac().getHP());
+	if (!(br.get_ghosts_vec().empty())) {
+		for (auto g : br.get_ghosts_vec())
+			g.printMe();
+	}
+	std::string::iterator stepscursor = steps[level].begin();
+	while (stepscursor != steps[level].end() && !Over())
+	{
+		br.movePac(charToDic(*stepscursor), score);
+		if (br.Collision());// LOADED_NewRound()
+		if (silent) Sleep(150);
+		br.moveNPC()
+		if (br.Collision());// LOADED_NewRound()
+		//if silent then no sleep no printing
+		//if collision, reset everyone.
+		//fruit, appear and dissapear
+		//compare to results when - collision, when winning
+		++moves_made_this_level;
+	}
+	//if there are still steps left. ouch we have a bug.
+}
+
+
+
 void Game::level_progress()
 {
 	system("cls");
@@ -230,7 +353,6 @@ void Game::level_progress()
 		for (auto g : br.get_ghosts_vec())
 			g.printMe();
 	}
-	
 
 	updateDics(cur_dic);//game is frozen until first hit1
 	do

@@ -2,9 +2,8 @@
 
 
 
-int main() {
-
-	Game().play();
+int main(int argc, char* argv[]) {
+	Game().play(argc,argv);
 	//for some reason using colors the way instructed
 	//carries the last loaded color to the next program
 	//and if the next program is chosen to be B&W

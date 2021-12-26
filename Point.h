@@ -6,10 +6,21 @@ const int IntToChar = 48;
 
 using namespace std;
 
-enum class Direction { UP, DOWN, LEFT, RIGHT,PAUSE=11,STAY=12,DEF,QUIT};
+enum class Direction {
+	UP, DOWN, LEFT, RIGHT, PAUSE = 11, STAY = 12, DEF, QUIT
+};
+
+
 enum class Content {WALL = (int)'#', PATH = (int)' ', FOOD = (int)'.' };
 
-
+inline Direction charToDic(char ch) 
+{
+	if (ch == 'w' || ch == 'W') return Direction::UP;
+	if (ch == 'x' || ch == 'X' ) return Direction::DOWN;
+	if (ch == 'a' || ch == 'A') return  Direction::LEFT;
+	if (ch == 'd' || ch == 'D') return Direction::RIGHT;
+	if (ch == 's' || ch == 'S') return Direction::STAY;
+}
 
 class Point {
 	unsigned short coord[2];
