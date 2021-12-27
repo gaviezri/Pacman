@@ -11,6 +11,8 @@ public:
     void step() { move_counter++; }
     bool isAppearing() { return appearing; }
     void setAvatar() { avatar = 5 + (rand() % 5)+ IntToChar;}
+    void setAvatar(char ch) { avatar = ch; }
+    void LOADED_Appear(char ch) { ch == '+' ? appearing = true : appearing = false;}
     void Appear();
     void updateMove(Direction dic,bool silent )
     {
@@ -25,4 +27,5 @@ public:
     bool ExposeMe(const Point&);
     short int Eaten(const Point&);
     void Dissappear() { appearing = false; }
+   void setPos(const Point& p );
 };

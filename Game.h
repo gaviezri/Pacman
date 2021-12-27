@@ -58,11 +58,13 @@ public:
 	//-------------Exercise 3 ----------
 	void LOADED_level_progress(short level);
 	void LoadMode();
-	void RegularMode();
+	void RegularMode(); 
 	void getStepsAndResult();
 	void readSteps();
 	void readResult();
 	void LOADED_pacmanMoves_Dispatcher(Direction);
+	void LOADED_NewRound(short, std::string::iterator&);
+	void ValidityCheckCollision(std::string::iterator& res, short level);
 	//-------------utilities------------
 	void load_specific_Map();
 	string getMapName() {

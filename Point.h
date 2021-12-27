@@ -1,10 +1,12 @@
 #pragma once
 #include <iostream>
+#include <string>// problematic?
 #include <Windows.h>
 #include <vector>
 const int IntToChar = 48;
 
 using namespace std;
+
 
 enum class Direction {
 	UP, DOWN, LEFT, RIGHT, PAUSE = 11, STAY = 12, DEF, QUIT
@@ -52,4 +54,4 @@ public:
 
 void ShowConsoleCursor(bool showFlag = false);
 void gotoxy(int x=0, int y=0);
-
+Point extractPointFromStr(std::string::iterator&);
