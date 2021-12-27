@@ -667,5 +667,7 @@ bool Board::portals(const Direction& dic,const Direction& next_dic,Point& pos,un
 		 g.updateMove(charToDic(*(stepsptr++)),silent);
 	 }
 	 fruit.setCont_under(Play_map[fruit.getPos().getY()][fruit.getPos().getX()]);
+	 fruit.LOADED_Appear(*(stepsptr++));
+	 fruit.setAvatar(*(stepsptr++));
 	 fruit.updateMove(charToDic(*(stepsptr++)),silent);
  }
