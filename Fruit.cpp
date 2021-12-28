@@ -27,7 +27,7 @@ void Fruit::Toggle(const Point& np)
 bool Fruit::ExposeMe(const Point& pacpos)
 {
 	if (pacpos == pos) return false;
-	return (rand()%12 == 1);
+	return (rand() % 12 == 1);
 }
 
 void Fruit::setPos(const Point& p) { pos = p; }

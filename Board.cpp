@@ -186,7 +186,6 @@ void Board::create_PlayMap_from_Org(int y,const short& actual_len)
 				if (!pacman_flag)
 				{
 					pac.setDef_pos(Point(x, y));//sets def pos
-					pac.resetHP();
 					pac.resetMe();
 					pacman_flag = true;
 				}
@@ -222,24 +221,26 @@ void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& l
 	if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
 	{
 		cur_dic = Direction::STAY;
-		steps_record.push_back('S');    // inserts S(tay) for the fruit in the steps record.
+	STAY:
+		if (save_mode)steps_record.push_back('S');    // inserts S(tay) for the fruit in the steps record.
 	}
 
 	else if (int(Content::WALL) != nextCellCont(pac.getPos(), next_dic))  //advance to next direction if its not a wall
 	{
-		movePac(next_dic, score,false);
+		movePac(next_dic, score, false);
 		last_dic = cur_dic = next_dic;// remember the new direction
 		next_dic = Direction::DEF; // default the next direction
 	}
-	else if (portals(cur_dic, next_dic, (Point&)pac.getPos(),score))
+	else if (portals(cur_dic, next_dic, (Point&)pac.getPos(), score))
 	{
 		pac.printMe();
 	}
 	else if (int(Content::WALL) != nextCellCont(pac.getPos(), cur_dic)) // advance in current direction if the 
 	{																	       // requested next isnt possible
-		movePac(cur_dic, score,false);
+		movePac(cur_dic, score, false);
 		last_dic = cur_dic;
 	}
+	else if (save_mode) goto STAY;
 }
 
 void Board::movePac(Direction dic,unsigned short& score,bool silent)
@@ -422,9 +423,6 @@ void Board::NPCmoveGenerator(int movesmade,unsigned short& fruitbonus,unsigned s
 		steps_record.push_back(fruit.getAvatar());
 		steps_record.push_back('S');    // inserts S(tay) for the fruit in the steps record.
 		}
-
-		fruit.printMe();    /* ADDED THIS BUT THE FRUIT WONT MOVE NOW!*/
-
 		pacEatsfruit(fruitbonus, score);
 	}	
 	else
@@ -696,7 +694,8 @@ bool Board::portals(const Direction& dic,const Direction& next_dic,Point& pos,un
 }
 
  void Board::moveNPC(std::string::iterator& stepsptr,bool silent)
- {
+ {//for loaded mode
+	 
 	 for (auto& g : ghosts)
 	 {
 		 g.setCont_under(Play_map[g.getPos().getY()][g.getPos().getX()]);
@@ -706,4 +705,6 @@ bool Board::portals(const Direction& dic,const Direction& next_dic,Point& pos,un
 	 fruit.LOADED_Appear(*(stepsptr++));
 	 fruit.setAvatar(*(stepsptr++));
 	 fruit.updateMove(charToDic(*(stepsptr++)),silent);
+	 //update fruit's new pos when necessary. 
  }
+ 

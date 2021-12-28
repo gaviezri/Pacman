@@ -23,7 +23,14 @@ public:
         if (appearing && !silent)
             printMe();
     }
-    void updateMove(Direction dic) {}
+    void updateMove(Direction dic)
+    {
+        if (appearing)
+            clearMe(content_underme);
+        pos.updateCoord(dic);
+        if (appearing)
+            printMe();
+    }
     void Toggle(const Point&);
     bool ExposeMe(const Point&);
     short int Eaten(const Point&);

@@ -83,24 +83,19 @@ Point extractPointFromStr(std::string::iterator& pstr)
 {	
 	int i = 0;
 	string Xval, Yval;
-	if (*pstr != '(') 
-	{
-		cout << "Error: Line 87 in Point.cpp - the pointer of result is unsynchronized" << endl << endl << endl;
-		exit(200);
-	}
-	else
-	{
-		while (*pstr != ',')
+	if (*pstr != '(') throw Error("Error: Line 87 in Point.cpp - the pointer of result is unsynchronized");
+
+	
+		while (*(++pstr) != ',')
 		{
-			Xval[i++] = *pstr++;
+			Xval[i++] = *pstr;
 		}
 		i = 0;
-		pstr++; //skip  ',' in "(xx,yy)"
-		while (*pstr != ')')
+		while (*(++pstr) != ')')
 		{
-			Yval[i++] = *pstr++;
+			Yval[i++] = *pstr;
 		}
-	}
+		++pstr;
 	return Point(unsigned short(std::stoul(Xval)), unsigned short(std::stoul(Yval)));
 }
 

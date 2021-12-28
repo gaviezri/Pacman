@@ -15,3 +15,4 @@ public:
     Direction setcurDic(Direction dic) { cur_move = dic; return cur_move; }
 };
 
+

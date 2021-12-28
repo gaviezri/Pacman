@@ -3,6 +3,7 @@
 
 
 
+
 class Game
 {
 	Board br;
@@ -63,9 +64,9 @@ public:
 	void readSteps();
 	void readResult();
 	void LOADED_pacmanMoves_Dispatcher(Direction);
-	void result_temp(const string& x, const string& y, string& result)   // creates a custom template for writing data to result file
+	void result_template(const string& x, const string& y, string& result)   // creates a custom template for writing data to result file
 	{
-		result.push_back(',');
+		if(result.length()!=0) result.push_back(',');
 		result.push_back('(');
 		result += x;
 		result.push_back(',');
@@ -76,6 +77,7 @@ public:
 	void report_result_file(const int& time, const Point& pac, const Point& fruit, string& res);
 	void LOADED_NewRound(short, std::string::iterator&);
 	void ValidityCheckCollision(std::string::iterator& res, short level);
+	void ValidityCheckEndGame(std::string::iterator& res, short level,char ch);
 	//-------------utilities------------
 	void load_specific_Map();
 	string getMapName() {
@@ -105,7 +107,7 @@ public:
 	}
 	void printScore(Point);
 
-	void loadTo_steps_file();
+	void saveTo_steps_file();
 
 };
 
