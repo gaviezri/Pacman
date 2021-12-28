@@ -6,24 +6,24 @@
 class Game
 {
 	Board br;
+	string result;
 
-	
-	char choice=0;
-	bool win=false;
+	char choice = 0;
+	bool win = false;
 	bool round_lost = false;
 	bool quit = false;
 	bool pause;
 	bool silent;
 
-	vector<string> results, steps;
+	vector<string> steps, results;
 
-	unsigned short score=0;
+	unsigned short score = 0;
 	unsigned short fruitscore = 0;
-	
+
 	void pacmanMoves_Dispatcher(Direction& next_dic, Direction& cur_dic, Direction& last_dic);
 	void NPCMoves_Dispatcher();
 public:
-	
+
 	//-----------------UI (settings)----------------
 	void setDif();
 	void printMenu();
@@ -48,7 +48,7 @@ public:
 		}
 		return true;
 	}
-	void play(int,char*[]);
+	void play(int, char* []);
 	void Engine();
 	void level_progress();
 	void NewRound();
@@ -63,6 +63,17 @@ public:
 	void readSteps();
 	void readResult();
 	void LOADED_pacmanMoves_Dispatcher(Direction);
+	void result_temp(const string& x, const string& y, string& result)   // creates a custom template for writing data to result file
+	{
+		result.push_back(',');
+		result.push_back('(');
+		result += x;
+		result.push_back(',');
+		result += y;
+		result.push_back(')');
+	}
+	const string& getResult() { return result; }
+	void report_result_file(const int& time, const Point& pac, const Point& fruit, string& res);
 	void LOADED_NewRound(short, std::string::iterator&);
 	void ValidityCheckCollision(std::string::iterator& res, short level);
 	//-------------utilities------------
@@ -93,5 +104,8 @@ public:
 			return quit;
 	}
 	void printScore(Point);
+
+	void loadTo_steps_file();
+
 };
 
