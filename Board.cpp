@@ -220,7 +220,10 @@ void Board::printMap()
 void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& last_dic,unsigned short& score)
 {//pacmans movement dispatcher
 	if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
+	{
 		cur_dic = Direction::STAY;
+		steps_record.push_back('S');    // inserts S(tay) for the fruit in the steps record.
+	}
 
 	else if (int(Content::WALL) != nextCellCont(pac.getPos(), next_dic))  //advance to next direction if its not a wall
 	{
@@ -243,6 +246,9 @@ void Board::movePac(Direction dic,unsigned short& score,bool silent)
 {//removes pac from previous cell, printing him on new cell and updating playmap and score if needed
 	char cell_c = nextCellCont(pac.getPos(), dic);
 	pac.updateMove(dic,silent);
+
+	if(save_mode) steps_record.push_back(dicToChar(dic));
+
 	if (cell_c == '.')
 	{
 		score++;
@@ -375,36 +381,50 @@ void Board::NPCmoveGenerator(int movesmade,unsigned short& fruitbonus,unsigned s
 	vector<Direction> options;
 	Direction opposite_dic;
 	bool path_around[4];             // bool array that indicate by index using enum if theres a path in a given direction
-	if(movesmade%2 && ghosts.size())
-	for (auto& G : ghosts)//moving ghosts
+	if (movesmade % 2 && ghosts.size())
 	{
-		
-		premoveDatacollection(next_cont, cont_around, path_around, G, opposite_dic, options);
-		switch (Ghost::getDif())
+		for (auto& G : ghosts)//moving ghosts
 		{
-		case Difficulty::NOVICE:
-			NoviceMovement(options, opposite_dic, next_cont, G);
-			break;
-		case Difficulty::GOOD:
-			if (movesmade % 20 > 14) NoviceMovement(options, opposite_dic, next_cont, G);
-			else BestMovement(options, G,opposite_dic,next_cont);
-			break;
-		case Difficulty::BEST:
-			BestMovement(options,  G, opposite_dic, next_cont);
-			break;
+			premoveDatacollection(next_cont, cont_around, path_around, G, opposite_dic, options);
+			switch (Ghost::getDif())
+			{
+			case Difficulty::NOVICE:
+				NoviceMovement(options, opposite_dic, next_cont, G);
+				break;
+			case Difficulty::GOOD:
+				if (movesmade % 20 > 14) NoviceMovement(options, opposite_dic, next_cont, G);
+				else BestMovement(options, G, opposite_dic, next_cont);
+				break;
+			case Difficulty::BEST:
+				BestMovement(options, G, opposite_dic, next_cont);
+				break;
+			}
 		}
-	
+	}
+	else 
+	{
+		for (auto& G : ghosts) {
+			if (save_mode) steps_record.push_back('S');
+		}
 	}
 	premoveDatacollection(next_cont, cont_around, path_around, fruit, opposite_dic, options);
+
 	if (fruit.isAppearing())
 	{
-		
-		if ((movesmade % 4) == 1)
+		if ((movesmade % 3) == 1)
 		{
-
-			NoviceMovement(options, opposite_dic, next_cont,  fruit);
+			NoviceMovement(options, opposite_dic, next_cont, fruit);
 			fruit.step();
 		}
+		else
+		{
+		steps_record.push_back('+');    
+		steps_record.push_back(fruit.getAvatar());
+		steps_record.push_back('S');    // inserts S(tay) for the fruit in the steps record.
+		}
+
+		fruit.printMe();    /* ADDED THIS BUT THE FRUIT WONT MOVE NOW!*/
+
 		pacEatsfruit(fruitbonus, score);
 	}	
 	else
@@ -430,7 +450,7 @@ void Board::pacEatsfruit(unsigned short& fruitscore, unsigned short& score)
 	}
 }
 
-void Board::NoviceMovement(const vector<Direction>& options,const Direction& opposite_dic, const const char& next_cont, NPC& G)
+void Board::NoviceMovement(const vector<Direction>& options, const Direction& opposite_dic, const const char& next_cont, NPC& G)
 {
 	if (next_cont == (int)Content::WALL) //  + Or T Or L Or  or DeadEnd  junction approaching T from side or from front
 		switch (options.size())
@@ -449,6 +469,18 @@ void Board::NoviceMovement(const vector<Direction>& options,const Direction& opp
 		G.updateMove(G.setcurDic(options[rand() % (options.size())]));
 	else
 		G.updateMove(G.getcurDic());// continue same way
+
+	if (save_mode)
+	{
+		if (typeid(G) == typeid(Fruit))  //  if the current NPC is a fruit
+		{
+			Fruit* g = static_cast<Fruit*>(&G);
+			g->isAppearing() ? steps_record.push_back('+') : steps_record.push_back('-');
+
+			steps_record.push_back(g->getAvatar());
+		}
+		steps_record.push_back(dicToChar(G.getcurDic()));                // both fruit and ghost uses this movement function there for it will recorde them all.
+	}
 }
 
 inline bool stuck4ways(int up, int down, int left, int right)
@@ -484,7 +516,11 @@ void Board::BestMovement(const vector<Direction>& options, Ghost& G,const Direct
 	if (tmp == Direction::DEF)
 		NoviceMovement(options, opposite_dic, next_cont,  G);
 	else
-	G.updateMove(tmp);
+	{
+		G.updateMove(tmp);
+
+		if (save_mode) steps_record.push_back(dicToChar(tmp));
+	}
 }
 
 vector<vector<bool>> Board::createTrackingMap()

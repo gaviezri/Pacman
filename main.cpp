@@ -10,6 +10,7 @@ int main(int argc, char* argv[]) {
 	//the entire program is printed in the last color.
 	// a naive solution is to set the last color in the console to be white.
 	SetTextColor(HDC(), RGB(255, 255, 255));
+	
 	return 0;
 }
 

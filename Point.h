@@ -22,6 +22,28 @@ inline Direction charToDic(char ch)
 	if (ch == 's' || ch == 'S') return Direction::STAY;
 }
 
+inline char dicToChar(Direction dic)
+	{
+	switch (dic)
+	{
+	case Direction::UP:
+		return 'W';
+		break;
+	case Direction::DOWN:
+		return 'X';
+		break;
+	case Direction::LEFT:
+		return 'A';
+		break;
+	case Direction::RIGHT:
+		return 'D';
+		break;
+	case Direction::STAY:
+		return 'S';
+		break;
+	}
+	}
+
 class Point {
 	unsigned short coord[2];
 

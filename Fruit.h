@@ -3,10 +3,11 @@
 
 class Fruit : public NPC
 {
-    bool appearing = false;
-    short move_counter = 0;
+    bool appearing ;
+    short move_counter ;
   
 public:
+    Fruit() { avatar = '5'; appearing = false; move_counter = 0; }
     void stealPositionFromGhosts(const Point& p) { pos = p; }
     void step() { move_counter++; }
     bool isAppearing() { return appearing; }

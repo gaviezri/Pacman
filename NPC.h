@@ -1,7 +1,6 @@
 #pragma once
 #include "primary_creatures.h"
-class NPC :// Non-player-characters
-    public primary_creatures
+class NPC : public primary_creatures // Non-player-characters 
 {
 protected:
     Direction cur_move = Direction::UP;

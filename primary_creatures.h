@@ -9,7 +9,7 @@ protected:
 	Point def_pos;
 
 public:
-	//--------------------------------------------movements of creatures------
+	//-------------movements of creatures-------------
 	const Point& getPos() { return pos; }
 	void setPos(const Point& p) { pos = p; }
 	void setX(unsigned int x) { pos.setX(x); }
@@ -19,7 +19,7 @@ public:
 		gotoxy(pos.getX(), pos.getY());
 		cout << avatar;
 	}
-	
+	char getAvatar() { return avatar; }
 	void clearMe(char cont)
 	{
 		gotoxy(pos.getX(), pos.getY()); // putting cursor on character's place and run it over with the cell content

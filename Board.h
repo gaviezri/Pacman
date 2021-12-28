@@ -20,11 +20,14 @@ constexpr unsigned short MAXBOARD_HEIGHT = 25;
 
 class Board
 {
+	string steps_record;
+	bool save_mode = false;
+
 	vector<vector<string>> Org_maps;       // We creat 2 identical maps; one to keep for new game beginnings (each time we switch map we update the play map)
 	vector<string> Play_map;			  // and one to play and change in real time.
 	vector<string>  screen_files;        //  stores all pathes to maps.
 
-	Pacman pac;	
+	Pacman pac;
 	vector<Ghost> ghosts;
 	Fruit fruit;
 	Point legend;
@@ -47,12 +50,12 @@ private:
 	void premoveDatacollection(char& next_cont, char* cont_around, bool* path_around, NPC& G, Direction& opposite_dic, vector<Direction>& options);
 	void nextContAndOppDic(Direction dic, Direction& op_dic, char& next_cont, char* cont_around);
 	void AnalyzeAround(NPC& g, char* conts, bool* paths);
-	void NoviceMovement(const vector<Direction>&,const Direction&, const char&,  NPC& G);
-	void BestMovement(const vector<Direction>& options,  Ghost& G, const Direction& opposite_dic,const char& next_cont);
+	void NoviceMovement(const vector<Direction>&, const Direction&, const char&, NPC& G);
+	void BestMovement(const vector<Direction>& options, Ghost& G, const Direction& opposite_dic, const char& next_cont);
 	int BestMovement_Util(Point dest, Point cur);
 	vector<vector<bool>> createTrackingMap();
 	//-----------------------------ctor-----------------------------------------
-	void create_PlayMap_from_Org(int y,const short&);
+	void create_PlayMap_from_Org(int y, const short&);
 	void insert_legend();
 	void insert_legend_row(const unsigned& y, const unsigned& x);
 	void getScreen_names();
@@ -77,8 +80,8 @@ public:
 	bool isInBorder(Point pos);
 	void resetCharacters()
 	{
-		if (ghosts.empty()) 
-			fruit.setPos(pac.getPos()); 
+		if (ghosts.empty())
+			fruit.setPos(pac.getPos());
 		else fruit.setPos(ghosts[rand() % ghosts.size()].getPos());
 		pac.resetMe();
 		for (auto& g : ghosts) g.resetMe();
@@ -94,20 +97,25 @@ public:
 	const short getRows() { return rows; }
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
-	void movePac(Direction dic,unsigned short& score,bool);
-	bool portals(const  Direction&, const Direction&,Point& pos,unsigned short&);
+	void movePac(Direction dic, unsigned short& score, bool);
+	bool portals(const  Direction&, const Direction&, Point& pos, unsigned short&);
 	void pacEatsfruit(unsigned short&, unsigned short&);
 	void move_in_border(Direction&, Direction&, Direction&, unsigned short& score);
 	//----------------------ghosts----------------------
 	vector<Ghost>& get_ghosts_vec() { return ghosts; }
 	Ghost& get_ghost(int i) { return ghosts[i]; } // needs to be changed in Game.cpp and therefor not const.
-	void NPCmoveGenerator(int,unsigned short&, unsigned short&);
+	void NPCmoveGenerator(int, unsigned short&, unsigned short&);
 	//-----------------------------fruit---------------------------------------
 	Fruit& getFruit() { return fruit; }
-	Point getvalidPos(){
+	Point getvalidPos() {
 		if (ghosts.size()) return ghosts[rand() % ghosts.size()].getPos();
 		else return pac.getPos();
 	}
-
-	void moveNPC(std::string::iterator& stepsptr,bool);
+	void moveNPC(std::string::iterator& stepsptr, bool);
+	//-----------------------------save mode----------------------------------
+	const bool& record_game() { return save_mode; }  // if save mode is TRUE we need to record the game.
+	void setSave_mode(bool mode) { save_mode = mode; }
+	const string& getSteps_record() { return steps_record; }
+	void clearSteps_record() { steps_record.clear(); }
+	string getCur_map_name() { string tmp = screen_files[active_map - 1]; int len = tmp.substr(tmp.find_last_of('\\') + 1).length() - 6; return tmp.substr((tmp.find_last_of('\\') + 1), len); }  // extracts the current map name from full path
 };

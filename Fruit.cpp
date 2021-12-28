@@ -13,6 +13,7 @@ void Fruit::Appear()
 	appearing = true;
 	setAvatar();
 }
+
 void Fruit::Toggle(const Point& np)
 {
 	if (move_counter == 5)
@@ -21,7 +22,6 @@ void Fruit::Toggle(const Point& np)
 		move_counter = 0;
 		clearMe();
 		stealPositionFromGhosts(np);
-		
 	}
 }
 bool Fruit::ExposeMe(const Point& pacpos)

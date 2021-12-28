@@ -1,5 +1,6 @@
 ﻿#include "Game.h"
 
+
 int Game::moves_made_this_level=0;
 
 void Game::PacmanLogo()
@@ -107,7 +108,6 @@ void Game::readSteps()
 	std::sort(steps.begin(), steps.end());
 }
 
-
 void Game::LoadMode()
 {
 	getStepsAndResult();
@@ -126,28 +126,28 @@ void Game::LoadMode()
 	}
 }
 
-
-
-
 void Game::play(int argc, char* argv[])  //  this is where the magic happens (!)
 {
 	string* actions = new  string[argc];
-	for (int i = 0; i < argc; i++) actions[i] = argv[i];
+	for (int i = 1; i < argc; i++) actions[i] = argv[i];
 	switch (argc)
 	{
-	case 0:
+	case 1:
 		RegularMode();
 		break;
-	case 1:
-		if (actions[0] == "-load") { silent = false; LoadMode(); }
+	case 2:
+		if (actions[1] == "-load") { silent = false; LoadMode(); }
 		
-		else if (actions[0] == "-save"); // <=== note semi-colon!
-			//SaveMode();
+		else if (actions[1] == "-save") {
+			br.setSave_mode(true);
+			RegularMode();
+		}
+
 		else
 			RegularMode();//? <- 
 		break;
-	case 2:
-		if (actions[0] == "-load" && actions[1] == "-silent") { silent = true; LoadMode(); }
+	case 3:
+		if (actions[1] == "-load" && actions[2] == "-silent") { silent = true; LoadMode(); }
 		//else?
 		break;
 	default:
@@ -312,11 +312,13 @@ void Game::level_completed()
 	cout << "level Completed! good job.";
 	Sleep(3000);
 }
+
 void Game::LOADED_pacmanMoves_Dispatcher(Direction dic)
 {
 	br.portals(dic, Direction::DEF, const_cast<Point&>(br.get_pac().getPos()), score);
-	br.movePac(dic,score,silent);
+	br.movePac(dic,score, silent);
 }
+
 void Game::LOADED_level_progress(short level)
 {
 	system("cls");
@@ -326,7 +328,7 @@ void Game::LOADED_level_progress(short level)
 		for (auto g : br.get_ghosts_vec())
 			g.printMe();
 	}
-	std::string::iterator stepscursor = steps[level].begin();
+	string::iterator stepscursor = steps[level].begin();
 	while (stepscursor != steps[level].end() && !Over())
 	{
 START:
@@ -351,7 +353,15 @@ START:
 	//if there are still steps left. ouch we have a bug.
 }
 
+void Game::report_result_file(const int& time, const Point& pac, const Point& fruit, string& res)
+{
+	string pac_X = to_string(pac.getX()), pac_Y = to_string(pac.getY()), fruit_X = to_string(fruit.getX()), fruit_Y = to_string(fruit.getY());
 
+	result += to_string(time);
+	result += 'C';
+	result_temp(pac_X, pac_Y, res);
+	result_temp(fruit_X, fruit_Y, res);
+}
 
 void Game::level_progress()
 {
@@ -392,6 +402,7 @@ void Game::level_progress()
 		Sleep(300);
 		if (br.Collision())
 		{
+			report_result_file(moves_made_this_level, br.get_pac().getPos(), br.getFruit().getPos(), result);
 			NewRound();
 			goto PAUSE;
 		}
@@ -400,16 +411,23 @@ void Game::level_progress()
 
 		if (br.Collision())//if one of the ghosts and pacman share the same cell
 		{
+			report_result_file(moves_made_this_level, br.get_pac().getPos(), br.getFruit().getPos(), result);
 			NewRound();//update necessary info and reset avatars to default positions
 			goto PAUSE;
 		}
 
 		br.pacEatsfruit(fruitscore,score);
-
+		
 		++moves_made_this_level;
 	} while (!Over());
 	if (win) level_completed();  // prints semi-winner massage
-	else Loser();
+
+	else
+	{
+		result += moves_made_this_level;
+		result += 'L';
+		Loser();
+	}
 }
 
 void Game::Engine()
@@ -418,9 +436,10 @@ void Game::Engine()
 	br.setActive_map(level);
 	br.loadNew_map();
 	setDif(); // sets the difficulty of the ghosts
-	
+
 	while (level < totmaps && !Over() && Validmap())
 	{
+
 		br.resetCharacters();
 		moves_made_this_level = 0;
 		level_progress();
@@ -429,14 +448,35 @@ void Game::Engine()
 		{
 			br.setActive_map(level);
 			br.loadNew_map();
+			if (br.record_game())
+			{
+				loadTo_steps_file();
+
+				br.clearSteps_record();
+				result.clear();
+			}
+		}
+		if (win)
+		{
+			win = false;
+			Winner();// cout message
 		}
 	}
-	
-	if (win)
-	{
-		win = false;
-		Winner();// cout message
-	}
+}
+
+
+
+void Game::loadTo_steps_file()
+{
+	string cur_map_name = br.getCur_map_name();
+
+	ofstream steps(cur_map_name + "steps");
+	steps << br.getSteps_record();
+	steps.close();
+
+	ofstream results(cur_map_name + "result");
+	results << result;
+	results.close();
 }
 
 bool Game::Validmap()
