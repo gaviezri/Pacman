@@ -7,6 +7,12 @@ const int IntToChar = 48;
 
 using namespace std;
 
+struct Error
+{
+	string msg;
+
+	Error(string _msg) : msg(_msg) {}
+};
 
 enum class Direction {
 	UP, DOWN, LEFT, RIGHT, PAUSE = 11, STAY = 12, DEF, QUIT

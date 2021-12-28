@@ -33,7 +33,6 @@ menu:
 
 	system("cls");
 	PacmanLogo();
-	system("cls");
 	printMenu();
 	setChoice();
 	switch (choice)
@@ -122,9 +121,11 @@ void Game::LoadMode()
 			br.resetCharacters();
 			moves_made_this_level = 0;
 			try { LOADED_level_progress(level); }
-			catch(...)
+			catch(Error& er)
 			{
-				if(!silent){cout << "TEST FAILED! Level:"<<level<<"- moving to next screen..."; Sleep(3000};
+				system("cls");
+				cout << er.msg;
+				Sleep(3000);
 			}
 			level++;
 			br.setActive_map(level);
@@ -224,21 +225,12 @@ void Game::printlegend(Point pt, short hp)
 		gotoxy(pt.getX(), pt.getY());
 		cout << "####################";
 		gotoxy(pt.getX(), pt.getY() + 1);
-
-		
+		cout << "                    ";
+		gotoxy(pt.getX(), pt.getY() + 1);
 		cout << "SCORE:";
-
-		
 		cout <<score;
-
-		
 		cout << "   LIVES:";
-
-	
-		for (int i = 0; i < hp; i++)
-		{
-			cout << "C";
-		}
+		for (int i = 0; i < hp; i++) cout << "C";
 		gotoxy(pt.getX(), pt.getY() + 2);
 		cout << "####################";
 	}
@@ -256,18 +248,19 @@ void Game::LOADED_NewRound(short level,std::string::iterator& current_results)
 			br.get_pac().clearMe();
 		}
 		br.get_pac().resetMe();
-		if(!silent) br.get_pac().printMe();
+		if (!silent) br.get_pac().printMe();
 
 		for (auto& G : br.get_ghosts_vec())
 		{
-			if(!silent)G.clearMe(br.getPlay_map()[G.getPos().getY()][G.getPos().getX()]);
+			if (!silent)G.clearMe(br.getPlay_map()[G.getPos().getY()][G.getPos().getX()]);
 			G.resetMe();
-			if(!silent)G.printMe();
+			if (!silent)G.printMe();
 		}
-		auto Fr = br.getFruit(); 
-		if(!silent)Fr.clearMe();
+		auto Fr = br.getFruit();
+		if (!silent)Fr.clearMe();
 		Fr.setPos(extractPointFromStr(current_results));
 	}
+	else win = false;
 }
 
 void Game::NewRound(){         // when pac meets ghost  need to make the ghosts print the previus char in the location of collision
@@ -368,10 +361,17 @@ int stated_point_of_time(std::string::iterator& res)
 void Game::ValidityCheckCollision(std::string::iterator& res, short level)
 {//correctness check during collision
 	if (moves_made_this_level != stated_point_of_time(res) || *(res++) != 'C')
-			throw "incoherency between steps & results";
+			throw Error("incoherency between steps & results");
 	
 	if (br.get_pac().getPos() != extractPointFromStr(res))
-		   throw "incoherency between steps & results";
+		   throw Error("incoherency between steps & results");
+}
+
+void Game::ValidityCheckEndGame(std::string::iterator& res, short level,char ch)
+{
+	if (moves_made_this_level != stated_point_of_time(res) || *(res++) != ch)
+		throw Error("incoherency between steps & results");
+	else { system("cls"); cout << "TEST SUCCEEDED!" << " level: " << level + 1; Sleep(3000); }
 }
 
 void Game::level_completed()
@@ -390,6 +390,10 @@ void Game::LOADED_pacmanMoves_Dispatcher(Direction dic)
 
 void Game::LOADED_level_progress(short level)
 {
+	if (level >= steps.size() || level >= results.size())
+	{
+		throw Error("can't find steps or results file for map: " + br.getCur_map_name());
+	}
 	system("cls");
 	br.printMap();
 	printlegend(br.getlegend(), br.get_pac().getHP());
@@ -397,8 +401,10 @@ void Game::LOADED_level_progress(short level)
 		for (auto g : br.get_ghosts_vec())
 			g.printMe();
 	}
-
+	br.get_pac().printMe();
 	std::string::iterator stepscursor = steps[level].begin(), resultscursor = results[level].begin();
+	//set pos of fruit before start pf game
+
 	while (stepscursor != steps[level].end() && !Over())
 	{
 START:
@@ -409,7 +415,7 @@ START:
 			LOADED_NewRound(level, resultscursor);
 			goto START;
 		}
-		if (!silent) Sleep(150);
+		if (!silent) Sleep(100);
 		br.moveNPC(stepscursor,silent); // fruit appear and dissappear
 		if (br.Collision())
 		{
@@ -417,13 +423,11 @@ START:
 			LOADED_NewRound(level, resultscursor);
 			goto START;
 		}
-		//compare to results when - collision, when winning
 		++moves_made_this_level;
 	}
-	//if there are still steps left. ouch we have a bug.
-	//ValidityCheck(resultscursor,stepscursor);// comapre to result//if results doesnt match terminate program with a message to the user
+	if (stepscursor == steps[level].end())ValidityCheckEndGame(resultscursor, level, 'W');
+	else ValidityCheckEndGame(resultscursor, level, 'L');
 }
-
 
 void Game::report_result_file(const int& time, const Point& pac, const Point& fruit, string& res)
 {
@@ -431,12 +435,13 @@ void Game::report_result_file(const int& time, const Point& pac, const Point& fr
 
 	result += to_string(time);
 	result += 'C';
-	result_temp(pac_X, pac_Y, res);
-	result_temp(fruit_X, fruit_Y, res);
+	result_template(pac_X, pac_Y, res);
+	result_template(fruit_X, fruit_Y, res);
 }
 
 void Game::level_progress()
 {
+	bool toSave = br.record_game();
 	system("cls");
 	Direction cur_dic = Direction::DEF, next_dic = Direction::DEF, last_dic = Direction::DEF; // initialzing for the switch 
 	br.printMap();
@@ -450,6 +455,7 @@ void Game::level_progress()
 	}
 
 	updateDics(cur_dic);//game is frozen until first hit1
+	if (toSave)result_template(to_string(br.getFruit().getPos().getX()), to_string(br.getFruit().getPos().getY()), result);//save fruit's initial spot
 	do
 	{
 		if (_kbhit())
@@ -471,10 +477,10 @@ void Game::level_progress()
 		if (br.getLegend_flag())
 			printScore(br.getlegend());
 
-		Sleep(300);
+		Sleep(200);
 		if (br.Collision())
 		{
-			report_result_file(moves_made_this_level, br.get_pac().getPos(), br.getFruit().getPos(), result);
+			if(toSave)report_result_file(moves_made_this_level, br.get_pac().getPos(), br.getFruit().getPos(), result);
 			NewRound();
 			goto PAUSE;
 		}
@@ -483,7 +489,7 @@ void Game::level_progress()
 
 		if (br.Collision())//if one of the ghosts and pacman share the same cell
 		{
-			report_result_file(moves_made_this_level, br.get_pac().getPos(), br.getFruit().getPos(), result);
+			if (toSave)report_result_file(moves_made_this_level, br.get_pac().getPos(), br.getFruit().getPos(), result);
 			NewRound();//update necessary info and reset avatars to default positions
 			goto PAUSE;
 		}
@@ -492,12 +498,22 @@ void Game::level_progress()
 		
 		++moves_made_this_level;
 	} while (!Over());
-	if (win) level_completed();  // prints semi-winner massage
-
-	else
+	if (win)
 	{
-		result += moves_made_this_level;
-		result += 'L';
+		if (toSave) {
+			result += to_string(moves_made_this_level);
+			result += 'W';
+		}
+		
+		level_completed();
+	}
+
+	else if(!quit)
+	{
+		if (toSave) {
+			result += to_string(moves_made_this_level);
+			result += 'L';
+		}
 		Loser();
 	}
 }
@@ -522,23 +538,16 @@ void Game::Engine()
 			br.loadNew_map();
 			if (br.record_game())
 			{
-				loadTo_steps_file();
-
+				saveTo_steps_file();
 				br.clearSteps_record();
 				result.clear();
 			}
 		}
-		if (win)
-		{
-			win = false;
-			Winner();// cout message
-		}
 	}
+	if (win && !quit)Winner();
 }
 
-
-
-void Game::loadTo_steps_file()
+void Game::saveTo_steps_file()
 {
 	string cur_map_name = br.getCur_map_name();
 
@@ -606,7 +615,8 @@ void Game::Loser()
 void Game::pauseGAME()
 {
 	br.getLegend_flag() ? gotoxy(br.getlegend().getX(), br.getlegend().getY() + 1) : gotoxy(0, br.getRows() + 1);
-
+	cout << "                    ";
+	br.getLegend_flag() ? gotoxy(br.getlegend().getX(), br.getlegend().getY() + 1) : gotoxy(0, br.getRows() + 1);
 	cout << "hit key to continue";
 	_getch();
 	pause = false;

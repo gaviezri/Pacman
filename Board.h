@@ -117,5 +117,5 @@ public:
 	void setSave_mode(bool mode) { save_mode = mode; }
 	const string& getSteps_record() { return steps_record; }
 	void clearSteps_record() { steps_record.clear(); }
-	string getCur_map_name() { string tmp = screen_files[active_map - 1]; int len = tmp.substr(tmp.find_last_of('\\') + 1).length() - 6; return tmp.substr((tmp.find_last_of('\\') + 1), len); }  // extracts the current map name from full path
+	const string getCur_map_name() { string tmp = screen_files[active_map - 1]; int len = tmp.substr(tmp.find_last_of('\\') + 1).length() - 6; return tmp.substr((tmp.find_last_of('\\') + 1), len); }  // extracts the current map name from full path
 };
