@@ -58,7 +58,7 @@ public:
 	//-------------Exercise 3 ----------
 	void LOADED_level_progress(short level);
 	void LoadMode();
-	void RegularMode();
+	void RegularMode(); 
 	void getStepsAndResult();
 	void readSteps();
 	void readResult();
@@ -74,7 +74,8 @@ public:
 	}
 	const string& getResult() { return result; }
 	void report_result_file(const int& time, const Point& pac, const Point& fruit, string& res);
-
+	void LOADED_NewRound(short, std::string::iterator&);
+	void ValidityCheckCollision(std::string::iterator& res, short level);
 	//-------------utilities------------
 	void load_specific_Map();
 	string getMapName() {

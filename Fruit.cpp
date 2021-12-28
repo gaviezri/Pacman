@@ -29,3 +29,5 @@ bool Fruit::ExposeMe(const Point& pacpos)
 	if (pacpos == pos) return false;
 	return (rand()%12 == 1);
 }
+
+void Fruit::setPos(const Point& p) { pos = p; }

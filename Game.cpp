@@ -1,6 +1,9 @@
 ﻿#include "Game.h"
 
 
+constexpr int INVALIDARGS = 10;
+
+
 int Game::moves_made_this_level=0;
 
 void Game::PacmanLogo()
@@ -75,7 +78,7 @@ void Game::readResult()
 	for (auto const& entry : filesystem::directory_iterator("."))  // goes through all files in the working directory
 	{
 		tmp_path = entry.path().string();
-		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 6) == "result")    // checkes if path ends with ".result
+		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.find_last_of('.')) == ".result")    // checkes if path ends with ".result
 		{
 			tmp_fptr.open(tmp_path, std::ifstream::in);
 			if (tmp_fptr) {
@@ -95,7 +98,7 @@ void Game::readSteps()
 	for (auto const& entry : filesystem::directory_iterator("."))  // goes through all files in the working directory
 	{
 		tmp_path = entry.path().string();
-		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.length() - 5) == "steps")    // checkes if path ends with ".steps
+		if (tmp_path.length() > 9 && tmp_path.substr(tmp_path.find_last_of('.')) == ".steps")    // checkes if path ends with ".steps
 		{
 			tmp_fptr.open(tmp_path, std::ifstream::in);
 			if (tmp_fptr) {
@@ -116,14 +119,29 @@ void Game::LoadMode()
 	br.loadNew_map();
 	while (level < totmaps && !Over() && Validmap())
 	{
-		br.resetCharacters();
-		moves_made_this_level = 0;
-		LOADED_level_progress(level);
-		level++;
-		br.setActive_map(level);
-	    br.loadNew_map();
-		
+			br.resetCharacters();
+			moves_made_this_level = 0;
+			try { LOADED_level_progress(level); }
+			catch(...)
+			{
+				if(!silent){cout << "TEST FAILED! Level:"<<level<<"- moving to next screen..."; Sleep(3000};
+			}
+			level++;
+			br.setActive_map(level);
+			br.loadNew_map();
 	}
+	//if(win && pacman still got lives)
+}
+                                                                                              
+void QuickExplanation()
+{
+	cout<< "command line arguments are invalid! - please notice:"
+		<< endl << "enter: '-save' to record the current game (only last game will be saved)."
+		<< endl << "enter: '-load' to play a recorded game taken from working directory. game will be shown sped up and a comparison between the steps taken and events in game will take place."
+		<< endl << "enter: '-load [-silent] to play a recorded game and compare it without being shown (comparison will happen at lightspeed)"
+		<< endl << endl << "anyway...  if you want to preform special operations please restart the game with valid (or none) arguments."
+		<< endl << endl << "press any key to Continue";
+	_getch();
 }
 
 void Game::play(int argc, char* argv[])  //  this is where the magic happens (!)
@@ -142,16 +160,22 @@ void Game::play(int argc, char* argv[])  //  this is where the magic happens (!)
 			br.setSave_mode(true);
 			RegularMode();
 		}
-
 		else
-			RegularMode();//? <- 
+		{
+			goto SWdefault;
+		}
 		break;
 	case 3:
 		if (actions[1] == "-load" && actions[2] == "-silent") { silent = true; LoadMode(); }
-		//else?
+		else 
+    {
+     goto SWdefault;
+    }
 		break;
+SWdefault:
 	default:
-		RegularMode();
+		QuickExplanation();
+		exit(INVALIDARGS);
 		break;
 	}
 	delete[] actions;
@@ -217,6 +241,32 @@ void Game::printlegend(Point pt, short hp)
 		}
 		gotoxy(pt.getX(), pt.getY() + 2);
 		cout << "####################";
+	}
+}
+
+void Game::LOADED_NewRound(short level,std::string::iterator& current_results)
+{
+	if(!silent) cout << "\a"; // SOUND FOR COLLISON!
+	br.get_pac().HitByGhost();// -1 hp
+
+	if (br.get_pac().getHP() != 0)
+	{
+		if (!silent) {
+			printlegend(br.getlegend(), br.get_pac().getHP());   // update remaining lives on screen 
+			br.get_pac().clearMe();
+		}
+		br.get_pac().resetMe();
+		if(!silent) br.get_pac().printMe();
+
+		for (auto& G : br.get_ghosts_vec())
+		{
+			if(!silent)G.clearMe(br.getPlay_map()[G.getPos().getY()][G.getPos().getX()]);
+			G.resetMe();
+			if(!silent)G.printMe();
+		}
+		auto Fr = br.getFruit(); 
+		if(!silent)Fr.clearMe();
+		Fr.setPos(extractPointFromStr(current_results));
 	}
 }
 
@@ -305,6 +355,25 @@ void  Game::printInstructions()
 	_getch(); //  "removes" the key used from screen	
 }
 
+inline bool isNumber(char ch) { return ch <= '9' && ch >= '0'; }
+
+int stated_point_of_time(std::string::iterator& res)
+{
+	string tmp;
+	short i = 0;
+	while (isNumber(*res)) { tmp[i++] = *(res++); }
+	return std::stoi(tmp);
+}
+
+void Game::ValidityCheckCollision(std::string::iterator& res, short level)
+{//correctness check during collision
+	if (moves_made_this_level != stated_point_of_time(res) || *(res++) != 'C')
+			throw "incoherency between steps & results";
+	
+	if (br.get_pac().getPos() != extractPointFromStr(res))
+		   throw "incoherency between steps & results";
+}
+
 void Game::level_completed()
 {
 	system("cls");
@@ -328,30 +397,33 @@ void Game::LOADED_level_progress(short level)
 		for (auto g : br.get_ghosts_vec())
 			g.printMe();
 	}
-	string::iterator stepscursor = steps[level].begin();
+
+	std::string::iterator stepscursor = steps[level].begin(), resultscursor = results[level].begin();
 	while (stepscursor != steps[level].end() && !Over())
 	{
 START:
 		LOADED_pacmanMoves_Dispatcher(charToDic(*(stepscursor++)));
 		if (br.Collision())
 		{
-			// comapre to result
-			// LOADED_NewRound() //if collision, reset everyone.
+			ValidityCheckCollision(resultscursor,level);// comapre to result//if results doesnt match terminate program with a message to the user
+			LOADED_NewRound(level, resultscursor);
 			goto START;
 		}
 		if (!silent) Sleep(150);
 		br.moveNPC(stepscursor,silent); // fruit appear and dissappear
 		if (br.Collision())
 		{
-			// conmpare to result
-			// LOADED_NewRound() //if collision, reset everyone.
+			ValidityCheckCollision(resultscursor, level);// comapre to result//if results doesnt match terminate program with a message to the user
+			LOADED_NewRound(level, resultscursor);
 			goto START;
 		}
 		//compare to results when - collision, when winning
 		++moves_made_this_level;
 	}
 	//if there are still steps left. ouch we have a bug.
+	//ValidityCheck(resultscursor,stepscursor);// comapre to result//if results doesnt match terminate program with a message to the user
 }
+
 
 void Game::report_result_file(const int& time, const Point& pac, const Point& fruit, string& res)
 {
