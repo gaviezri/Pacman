@@ -609,6 +609,22 @@ bool Board::Collision()
 	return false;
 }
 
+void Board::resetCharacters()
+{
+	if (ghosts.empty())
+		fruit.setPos(pac.getPos());
+	else fruit.setPos(ghosts[rand() % ghosts.size()].getPos());
+	if (save_mode) {
+		steps_record.push_back('(');
+		steps_record += fruit.getPos().getX();
+		steps_record.push_back(',');
+		steps_record += fruit.getPos().getY();
+		steps_record.push_back(')');
+	}
+	pac.resetMe();
+	for (auto& g : ghosts) g.resetMe();
+}
+
 bool Board::isTopBorder(const unsigned& X, const unsigned& Y)
 {//checking if a give cell is a top border (relatively)
 	unsigned short y;
