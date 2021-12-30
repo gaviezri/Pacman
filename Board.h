@@ -78,14 +78,7 @@ public:
 	bool isOnBorder(Point pos);
 	bool isTopBorder(const unsigned& X, const unsigned& Y);
 	bool isInBorder(Point pos);
-	void resetCharacters()
-	{
-		if (ghosts.empty())
-			fruit.setPos(pac.getPos());
-		else fruit.setPos(ghosts[rand() % ghosts.size()].getPos());
-		pac.resetMe();
-		for (auto& g : ghosts) g.resetMe();
-	}
+	void resetCharacters();
 	short getCrumbs() { return breadcrumbs; }
 	char nextCellCont(Point pos, Direction dic);      // returns map content in a given postion.
 	bool Collision();
@@ -115,7 +108,7 @@ public:
 	//-----------------------------save mode----------------------------------
 	const bool& record_game() { return save_mode; }  // if save mode is TRUE we need to record the game.
 	void setSave_mode(bool mode) { save_mode = mode; }
-	const string& getSteps_record() { return steps_record; }
+	string& getSteps_record() { return steps_record; }
 	void clearSteps_record() { steps_record.clear(); }
 	const string getCur_map_name() { string tmp = screen_files[active_map - 1]; int len = tmp.substr(tmp.find_last_of('\\') + 1).length() - 6; return tmp.substr((tmp.find_last_of('\\') + 1), len); }  // extracts the current map name from full path
 };

@@ -259,6 +259,13 @@ void Game::LOADED_NewRound(short level,std::string::iterator& current_results)
 		auto Fr = br.getFruit();
 		if (!silent)Fr.clearMe();
 		Fr.setPos(extractPointFromStr(current_results));
+		if (true) {
+			br.getSteps_record().push_back('(');
+			br.getSteps_record() += Fr.getPos().getX();
+			br.getSteps_record().push_back(',');
+			br.getSteps_record() += Fr.getPos().getY();
+			br.getSteps_record().push_back(')');
+		}
 	}
 	else win = false;
 }
