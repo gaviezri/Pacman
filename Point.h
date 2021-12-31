@@ -82,4 +82,4 @@ public:
 
 void ShowConsoleCursor(bool showFlag = false);
 void gotoxy(int x=0, int y=0);
-Point extractPointFromStr(std::string::iterator&);
+Point extractPointFromStr(std::string::iterator&, std::string::iterator);

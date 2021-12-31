@@ -42,7 +42,7 @@ public:
 		if (br.getScreen_files().size() == 0)
 		{
 			system("cls");
-			cout << "EROR 9345: Please make sure you have a valid map in your working directory before entring!";
+			cout << "ERROR 9345: Please make sure you have a valid map in your working directory before entring!";
 			Sleep(3000);
 			system("cls");
 			return false;
@@ -63,10 +63,9 @@ public:
 	void getStepsAndResult();
 	void readSteps();
 	void readResult();
-	void LOADED_pacmanMoves_Dispatcher(Direction);
+	void LOADED_pacmanMoves_Dispatcher(std::string::iterator&,const  std::string::iterator&);
 	void result_template(const string& x, const string& y, string& result)   // creates a custom template for writing data to result file
 	{
-		if(result.length()!=0) result.push_back(',');
 		result.push_back('(');
 		result += x;
 		result.push_back(',');
@@ -74,10 +73,10 @@ public:
 		result.push_back(')');
 	}
 	const string& getResult() { return result; }
-	void report_result_file(const int& time, const Point& pac, const Point& fruit, string& res);
-	void LOADED_NewRound(short, std::string::iterator&);
-	void ValidityCheckCollision(std::string::iterator& res, short level);
-	void ValidityCheckEndGame(std::string::iterator& res, short level,char ch);
+	void report_result_file(const int& time, const Point& pac, string& res);
+	bool LOADED_NewRound(short, std::string::iterator&, std::string::iterator);
+	bool ValidityCheckCollision(std::string::iterator& res, short level, std::string::iterator);
+	void ValidityCheckEndGame(std::string::iterator& res, short level, std::string::iterator);
 	//-------------utilities------------
 	void load_specific_Map();
 	string getMapName() {
@@ -86,6 +85,7 @@ public:
 		cin >> name;
 		return name;
 	}
+	void initPrint();
 	void printlegend(Point pt, short hp);
 	bool Over()//indicator to end game loop
 	{

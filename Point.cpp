@@ -79,24 +79,26 @@ Point Point::operator-(const Point& other)const
 	return Point(X,Y);
 }
 
-Point extractPointFromStr(std::string::iterator& pstr)
+Point extractPointFromStr(std::string::iterator& pstr, std::string::iterator end)
 {	
-	int i = 0;
 	string Xval, Yval;
-	if (*pstr != '(') throw Error("Error: Line 87 in Point.cpp - the pointer of result is unsynchronized");
+	if (*pstr != '(')
+		throw Error("Error: Line 87 in Point.cpp - the pointer of result is unsynchronized");
 
 	
 		while (*(++pstr) != ',')
 		{
-			Xval[i++] = *pstr;
+			Xval.push_back(*pstr);
 		}
-		i = 0;
+		
+
 		while (*(++pstr) != ')')
 		{
-			Yval[i++] = *pstr;
+			Yval.push_back(*pstr);
 		}
-		++pstr;
-	return Point(unsigned short(std::stoul(Xval)), unsigned short(std::stoul(Yval)));
+		if(end != pstr) 
+			++pstr;
+	return Point(static_cast<short>(std::stoul(Xval)), static_cast<short>(std::stoul(Yval)));
 }
 
 void ShowConsoleCursor(bool showFlag)// To hide Cursor on console 

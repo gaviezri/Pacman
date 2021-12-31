@@ -91,7 +91,7 @@ public:
 	//-------------------pacman---------------------------
 	Pacman& get_pac() { return pac; }
 	void movePac(Direction dic, unsigned short& score, bool);
-	bool portals(const  Direction&, const Direction&, Point& pos, unsigned short&);
+	bool portals(const  Direction&, const Direction&, Point& pos, unsigned short& );
 	void pacEatsfruit(unsigned short&, unsigned short&);
 	void move_in_border(Direction&, Direction&, Direction&, unsigned short& score);
 	//----------------------ghosts----------------------
@@ -104,11 +104,18 @@ public:
 		if (ghosts.size()) return ghosts[rand() % ghosts.size()].getPos();
 		else return pac.getPos();
 	}
-	void moveNPC(std::string::iterator& stepsptr, bool);
+	void moveNPC(std::string::iterator& stepsptr, bool, std::string::iterator);
 	//-----------------------------save mode----------------------------------
 	const bool& record_game() { return save_mode; }  // if save mode is TRUE we need to record the game.
 	void setSave_mode(bool mode) { save_mode = mode; }
 	string& getSteps_record() { return steps_record; }
 	void clearSteps_record() { steps_record.clear(); }
+	void writePosition(const NPC& g){
+		steps_record.push_back('(');
+		steps_record += to_string(g.getPos().getX());
+		steps_record.push_back(',');
+		steps_record += to_string(g.getPos().getY());
+		steps_record.push_back(')');
+	}
 	const string getCur_map_name() { string tmp = screen_files[active_map - 1]; int len = tmp.substr(tmp.find_last_of('\\') + 1).length() - 6; return tmp.substr((tmp.find_last_of('\\') + 1), len); }  // extracts the current map name from full path
 };

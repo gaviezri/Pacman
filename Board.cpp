@@ -218,6 +218,7 @@ void Board::printMap()
 
 void Board::move_in_border(Direction& next_dic, Direction& cur_dic, Direction& last_dic,unsigned short& score)
 {//pacmans movement dispatcher
+	bool next = false;
 	if (next_dic == Direction::STAY)// pac is now frozen on the current cell until next input is recieved
 	{
 		cur_dic = Direction::STAY;
@@ -252,7 +253,7 @@ void Board::movePac(Direction dic,unsigned short& score,bool silent)
 
 	if (cell_c == '.')
 	{
-		score++;
+		++score;
 		changeFood2Path(pac.getPos());
 	}
 }
@@ -431,7 +432,11 @@ void Board::NPCmoveGenerator(int movesmade,unsigned short& fruitbonus,unsigned s
 			fruit.Appear();
 		NoviceMovement(options, opposite_dic, next_cont,  fruit);
 	}
-	fruit.Toggle(getvalidPos());
+	if (fruit.Toggle(getvalidPos()) && save_mode)
+	{
+		if (*(steps_record.end() - 1) != ')')
+			writePosition(fruit);
+	}
 }
 
 void Board::pacEatsfruit(unsigned short& fruitscore, unsigned short& score)
@@ -439,6 +444,11 @@ void Board::pacEatsfruit(unsigned short& fruitscore, unsigned short& score)
 	if (fruit.getPos() == pac.getPos())
 	{
 		fruitscore += (fruit.Eaten(getvalidPos()) - IntToChar);
+		if (save_mode) {
+
+			if (*(steps_record.end() - 1) != ')')
+				writePosition(fruit);
+		}
 		fruit.Dissappear();
 		if (Play_map[fruit.getPos().getY()][fruit.getPos().getX()] == '.')
 		{
@@ -477,7 +487,7 @@ void Board::NoviceMovement(const vector<Direction>& options, const Direction& op
 
 			steps_record.push_back(g->getAvatar());
 		}
-		steps_record.push_back(dicToChar(G.getcurDic()));                // both fruit and ghost uses this movement function there for it will recorde them all.
+		steps_record.push_back(dicToChar(G.getcurDic()));    // both fruit and ghost uses this movement function there for it will recorde them all.
 	}
 }
 
@@ -614,13 +624,7 @@ void Board::resetCharacters()
 	if (ghosts.empty())
 		fruit.setPos(pac.getPos());
 	else fruit.setPos(ghosts[rand() % ghosts.size()].getPos());
-	if (save_mode) {
-		steps_record.push_back('(');
-		steps_record += fruit.getPos().getX();
-		steps_record.push_back(',');
-		steps_record += fruit.getPos().getY();
-		steps_record.push_back(')');
-	}
+	if (save_mode) writePosition(fruit);
 	pac.resetMe();
 	for (auto& g : ghosts) g.resetMe();
 }
@@ -659,6 +663,7 @@ bool Board::portals(const Direction& dic,const Direction& next_dic,Point& pos,un
 	
 	if (X == 0 && (dic == Direction::LEFT || next_dic == Direction::LEFT) && isBlank(Play_map[Y][cur_rows_len-1] ))// Left -> Right
 	{// print ' ' over pac's last position and update his coord to other side
+		if (save_mode) steps_record.push_back('A');
 		pac.clearMe();
 		pac.setX(cur_rows_len-1);
 		if (Play_map[Y][cur_rows_len - 1] == '.') {changeFood2Path(Point(cur_rows_len - 1, Y)), score++;}
@@ -666,6 +671,7 @@ bool Board::portals(const Direction& dic,const Direction& next_dic,Point& pos,un
 	}
 	else if (X == cur_rows_len-1 && (dic == Direction::RIGHT || next_dic == Direction::RIGHT) && isBlank(Play_map[Y][0])) //Right -> Left
 	{
+		if (save_mode) steps_record.push_back('D');
 		pac.clearMe();
 		pac.setX(0);
 		if (Play_map[Y][0] == '.') { changeFood2Path(Point(0, Y)), score++; }
@@ -673,6 +679,7 @@ bool Board::portals(const Direction& dic,const Direction& next_dic,Point& pos,un
 	}
 	else if (Y==0 && (dic == Direction::UP || next_dic == Direction::UP) && isBlank(Play_map[rows - 1][X]))// TOP -> BOTTOM
 	{
+		if (save_mode) steps_record.push_back('W');
 		pac.clearMe();
 		pac.setY(rows-1);
 		if (Play_map[rows-1][X] == '.') { changeFood2Path(Point(X,rows-1)), score++; }
@@ -680,6 +687,7 @@ bool Board::portals(const Direction& dic,const Direction& next_dic,Point& pos,un
 	}
 	else if (Y == rows-1 && (dic == Direction::DOWN || next_dic == Direction::DOWN) && isBlank(Play_map[0][X])) // BOTTOM -> UP
 	{
+		if (save_mode) steps_record.push_back('X');
 		pac.clearMe();
 		pac.setY(0);
 		if (Play_map[0][X] == '.') { changeFood2Path(Point(X,0)), score++; }
@@ -709,18 +717,24 @@ bool Board::portals(const Direction& dic,const Direction& next_dic,Point& pos,un
 	 return false;
 }
 
- void Board::moveNPC(std::string::iterator& stepsptr,bool silent)
+ void Board::moveNPC(std::string::iterator& stepsptr, bool silent, std::string::iterator end)
  {//for loaded mode
-	 
+	 if (stepsptr == end)return;
 	 for (auto& g : ghosts)
 	 {
 		 g.setCont_under(Play_map[g.getPos().getY()][g.getPos().getX()]);
-		 g.updateMove(charToDic(*(stepsptr++)),silent);
+		 g.updateMove(charToDic(*(stepsptr++)), silent);
 	 }
 	 fruit.setCont_under(Play_map[fruit.getPos().getY()][fruit.getPos().getX()]);
 	 fruit.LOADED_Appear(*(stepsptr++));
 	 fruit.setAvatar(*(stepsptr++));
-	 fruit.updateMove(charToDic(*(stepsptr++)),silent);
-	 //update fruit's new pos when necessary. 
+	 fruit.updateMove(charToDic(*(stepsptr++)), silent);
+	 if (stepsptr == end)return;
+	 if (*(stepsptr) == '(')
+	 {
+		 if (!silent) fruit.clearMe();
+		 fruit.setPos(extractPointFromStr(stepsptr, end));
+	 }
+	 //update fruit's new pos when necessary. clear last appearance if needed
  }
  

@@ -10,7 +10,7 @@ protected:
 
 public:
 	//-------------movements of creatures-------------
-	const Point& getPos() { return pos; }
+	const Point& getPos() const { return pos; }
 	void setPos(const Point& p) { pos = p; }
 	void setX(unsigned int x) { pos.setX(x); }
 	void setY(unsigned int y) { pos.setY(y); }
