@@ -1,5 +1,5 @@
 # Pacman
- by Omri Shahar Revivo - 315873471  & Gal Aviezri - 208782912
+ by OSR and GA
  
  This is Our version of Pacman, besides the basic features we added: ascii art at welcome screen, PC alarm when collision with ghosts, some nice colors, 
 3 modes : 
